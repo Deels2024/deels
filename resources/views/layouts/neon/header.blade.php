@@ -22,6 +22,7 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="{{ext_asset('/dist/css/app.min.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     @yield('page-css')
     <script>
         window.Laravel = {!! json_encode([
