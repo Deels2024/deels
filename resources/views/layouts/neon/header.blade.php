@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-account-structure.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-detail.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-messenger.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-wallet-auth.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
