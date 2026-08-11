@@ -1,0 +1,15 @@
+.main-content__gallery-value {
+  position: absolute;
+  bottom: 26px;
+  z-index: 2;
+  text-align: center;
+  /*right: 33%;*/
+  left: 0;
+  right: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__gallery-value {
+    right: 18%;
+  }
+}

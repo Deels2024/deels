@@ -1,0 +1,369 @@
+/*!
+ * Start Bootstrap - SB Admin 2 Bootstrap Admin Theme (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+.dashboard-wrap{
+    background-color: #f5f8fa;
+    padding: 10px 0;
+}
+#wrapper {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    position: relative;
+}
+#page-wrapper {
+    flex: 1;
+    padding: 0 15px 30px;
+    min-height: 500px;
+}
+#page-wrapper h1.page-header{
+    margin: 15px 0 30px;
+    font-weight: 300;
+}
+#page-wrapper .form-group{
+    background-color: #FFFFFF;
+    padding: 1rem 0;
+}
+#page-wrapper .form-group input[type="checkbox"] {
+    vertical-align: middle;
+}
+@media(min-width:768px) {
+    #page-wrapper {
+        padding: 0 30px  30px;
+        border-left: 1px solid #e7e7e7;
+    }
+}
+.navbar-default.sidebar{
+    position: relative;
+}
+.poweredby-text {
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+}
+.navbar-top-links {
+    margin-right: 0;
+}
+
+.navbar-top-links li {
+    display: inline-block;
+}
+
+.navbar-top-links li:last-child {
+    margin-right: 15px;
+}
+
+.navbar-top-links li a {
+    padding: 15px;
+    min-height: 50px;
+}
+
+.navbar-top-links .dropdown-menu li {
+    display: block;
+}
+
+.navbar-top-links .dropdown-menu li:last-child {
+    margin-right: 0;
+}
+
+.navbar-top-links .dropdown-menu li a {
+    padding: 3px 20px;
+    min-height: 0;
+}
+
+.navbar-top-links .dropdown-menu li a div {
+    white-space: normal;
+}
+
+.navbar-top-links .dropdown-messages,
+.navbar-top-links .dropdown-tasks,
+.navbar-top-links .dropdown-alerts {
+    width: 310px;
+    min-width: 0;
+}
+
+.navbar-top-links .dropdown-messages {
+    margin-left: 5px;
+}
+
+.navbar-top-links .dropdown-tasks {
+    margin-left: -59px;
+}
+
+.navbar-top-links .dropdown-alerts {
+    margin-left: -123px;
+}
+
+.navbar-top-links .dropdown-user {
+    right: 0;
+    left: auto;
+}
+
+.sidebar .sidebar-nav.navbar-collapse {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.sidebar .sidebar-search {
+    padding: 15px;
+}
+
+.sidebar ul li {
+    border-bottom: 1px solid #e7e7e7;
+    width: 100%;
+}
+.sidebar ul li a {
+    color: #333333;
+    display: block;
+    padding: 10px 15px;
+}
+.sidebar ul li a.active {
+    background-color: #eee;
+}
+
+.sidebar .arrow {
+    float: right;
+}
+
+.sidebar .fa.arrow:before {
+    content: "\f104";
+}
+
+.sidebar .active>a>.fa.arrow:before {
+    content: "\f107";
+}
+
+.sidebar .nav-second-level li,
+.sidebar .nav-third-level li {
+    border-bottom: 0!important;
+}
+
+.sidebar .nav-second-level li a {
+    padding-left: 37px;
+}
+
+.sidebar .nav-third-level li a {
+    padding-left: 52px;
+}
+
+@media(min-width:768px) {
+    .sidebar {
+        z-index: 1;
+        float: left;
+        width: 250px;
+    }
+
+    .navbar-top-links .dropdown-messages,
+    .navbar-top-links .dropdown-tasks,
+    .navbar-top-links .dropdown-alerts {
+        margin-left: auto;
+    }
+}
+.huge {
+    font-size: 25px;
+}
+
+/**Customized **/
+.dashboard-stat-box {
+    background: #fff;
+    margin: 5px 0;
+    min-height: 99px;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.select2-container .select2-choice {
+    background-image: none;
+    height: 30px;
+    line-height: 30px;
+}
+#toast-container > div{
+    opacity: 1 !important;
+}
+.file-upload-wrap label{
+    border: 1px solid #dddddd;
+    float: left;
+    text-align: center;
+    height: 150px;
+    width: 150px;
+    padding: 30px 0;
+    cursor: pointer;
+    margin: 5px;
+}
+.file-upload-wrap i{
+    font-size: 50px;
+    cursor: pointer;
+}
+.creating-ads-img-wrap{
+    border: 1px solid #dddddd;
+    float: left;
+    height: 150px;
+    width: 150px;
+    padding: 5px;
+    margin: 5px;
+    position: relative;
+}
+.img-action-wrap {
+    bottom: 0;
+    position: absolute;
+}
+.img-action-wrap a{
+    font-size: 16px;
+    margin: 3px;
+}
+
+.img-action-wrap a.imgDeleteBtn{
+    color: #ff0000;
+}
+.img-action-wrap a.imgFeatureBtn{
+    color: #d58512;
+}
+label{
+    font-weight: 400;
+}
+.account-deletion-wrap h4 {
+    margin: 2rem 0;
+}
+.account-deletion-wrap h5{
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+.no-data-wrap h1{
+    font-weight: 300;
+}
+.no-data-wrap i{
+    font-size: 6rem;
+    margin-bottom: 2rem;
+}
+/**
+Override for GetFUnd Theme
+**/
+.categories-lists td img{
+    max-width: 60px;
+    max-height: 60px;
+}
+.dashboard-page-title {
+    padding-top: 20px;
+    margin-bottom: 20px;
+}
+.dashboard-page-title h2 {
+    margin: 0;
+}
+.img_upload {
+    background: #eeeeee none repeat scroll 0 0;
+    border: 1px solid #cccccc;
+    font-size: 40px;
+    height: 150px;
+    line-height: 150px;
+    text-align: center;
+    width: 150px;
+    margin-right: 20px;
+    display: inline-block;
+    cursor: pointer;
+}
+#feature_image_preview{
+    display: inline-block;
+}
+#feature_image_preview img{
+    max-width: 150px;
+}
+.image-wrap .img-fluid{
+    max-width: 150px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 1rem;
+}
+#modal-filemanager .media-upload-lg-wrap label.upload-icon {
+    font-size: 5rem;
+    cursor: pointer;
+}
+#modal-filemanager .card {
+    height: 147px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+#modal-filemanager .card .card-body label{
+    white-space: nowrap;
+}
+
+ul.campaign-update-nav{
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    display: flex;
+    flex-wrap: nowrap;
+    list-style-type: none;
+    margin: 0 0 20px 0;
+    padding: 0;
+    width: 100%;
+}
+ul.campaign-update-nav li a{
+    border-left: 1px solid #ccc;
+    font-size: 18px;
+    display: block;
+    line-height: 25px;
+    padding: 0.7em 2em;
+    text-align: center;
+}
+.admin-campaign-lists-sub-head{
+    margin-bottom: 20px;
+}
+.dashboard-wrap .page-header{
+    color: #666666;
+    padding: 0;
+}
+.has-error .help-block{
+    color: #ff0000;
+    display: block;
+    padding: 0.5rem 0;
+}
+/**
+File browser modal z-index
+ */
+
+#modal-filemanager{
+    z-index: 99999;
+}
+.table .btn-sm {
+    margin: 5px;
+}
+
+#mobile-menu-toggle {
+    width: 100%;
+    position: absolute;
+    display: none;
+    z-index: 99;
+}
+#mobile-menu-toggle a{
+    display: flex;
+}
+#mobile-menu-toggle a span.sidebar-menu-text{
+    flex: 1;
+}
+.dblock{
+    display: block !important;
+}
+@media only screen and (max-width: 768px) {
+    #mobile-menu-toggle {
+        display: block;
+    }
+    #mobile-menu-toggle a{
+        background-color: #ffffff;
+        line-height: 40px;
+        padding: 0 20px;
+    }
+
+    .navbar-default.sidebar {
+        display: none;
+        position: absolute;
+        background: #fff;
+        z-index: 9;
+        top: 40px;
+    }
+    #page-wrapper{
+        margin-top: 50px;
+    }
+
+}

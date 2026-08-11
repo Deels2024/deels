@@ -1,0 +1,23 @@
+.main-content__donate-comments {
+  width: 608px;
+  padding-left: 19px;
+  margin-top: 45px;
+  grid-area: comments-and-donates;
+  margin-right: 36px;
+}
+
+@media screen and (max-width: 1260px) {
+  .main-content__donate-comments {
+    margin-right: 0;
+    width: 100%;
+    padding-right: 19px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-comments {
+    margin-right: 0;
+    width: 100%;
+    padding: 0;
+  }
+}

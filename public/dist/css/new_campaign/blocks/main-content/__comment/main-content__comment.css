@@ -1,0 +1,13 @@
+.main-content__comment {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  width: 561px;
+  margin-bottom: 40px;
+}
+
+@media screen and (max-width: 940px) {
+  .main-content__comment {
+    width: 100%;
+  }
+}

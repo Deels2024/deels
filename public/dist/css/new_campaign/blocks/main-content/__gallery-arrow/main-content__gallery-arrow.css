@@ -1,0 +1,12 @@
+.main-content__gallery-arrow {
+    position: absolute;
+    top: 5px;
+    right: 13px;
+    width: 39px;
+    height: 39px;
+    border: none;
+    background: none;
+    background-image: url("/images/icon/arrow.svg");
+    cursor: pointer;
+    z-index: 2;
+}

@@ -1,0 +1,10 @@
+.main-content__comments-button {
+    padding: 15px 48px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #B224EF 0%, #7579FF 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}

@@ -1,0 +1,17 @@
+.story__content {
+  position: relative;
+  /*z-index: -1;*/
+  width: 204px;
+  height: 350px;
+  border: 1px solid #00f0ff;
+  border-radius: 10px;
+}
+
+@media screen and (max-width: 600px) {
+  .story__content {
+    width: 171px;
+    height: 296px;
+    border: 1px solid #00f0ff;
+    border-radius: 10px;
+  }
+}

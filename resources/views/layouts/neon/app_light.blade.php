@@ -1,0 +1,5 @@
+@include('layouts/neon/header_light')
+@include('inc.alerts')
+@yield('content')
+@include('auth.contest_result_modal')
+@include('layouts/neon/footer',['hide_footer' => true])

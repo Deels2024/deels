@@ -1,0 +1,8 @@
+@include('layouts/neon/header')
+@include('inc.alerts')
+@yield('content')
+@include('auth.select_email_modal')
+@include('auth.select_phone_modal')
+@include('auth.suspicious_activity_modal')
+@include('auth.contest_result_modal')
+@include('layouts/neon/footer')

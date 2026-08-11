@@ -1,0 +1,11 @@
+.main-content__social-link_dzen {
+    width: 27px;
+    height: 27px;
+    background-image: url(/images/icon/dzen.svg);
+}
+
+.main-content__social-link_telegram {
+    width: 27px;
+    height: 27px;
+    background-image: url(/images/icon/tg.svg);
+}

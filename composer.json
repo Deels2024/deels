@@ -1,0 +1,122 @@
+{
+    "name": "laravel/laravel",
+    "description": "The Laravel Framework.",
+    "keywords": ["framework", "laravel"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "barryvdh/laravel-debugbar": "^3.7",
+        "bavix/laravel-wallet": "9.x",
+        "cboden/ratchet": "^0.4.4",
+        "chillerlan/php-qrcode": "^5.0",
+        "cmgmyr/messenger": "^2.29",
+        "erag/laravel-disposable-email": "^3.3",
+        "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^3.0",
+        "glushkovds/phpclickhouse-laravel": "^1.19",
+        "google/recaptcha": "^1.2",
+        "guzzlehttp/guzzle": "^7.2",
+        "imdhemy/laravel-purchases": "^1.10",
+        "intervention/image": "^2.7",
+        "irazasyed/telegram-bot-sdk": "^3.13",
+        "kreait/laravel-firebase": "^5.9",
+        "laravel-notification-channels/fcm": "^3.2",
+        "laravel/framework": "^9.2",
+        "laravel/pint": "1.20.0",
+        "laravel/sanctum": "^3.3",
+        "laravel/socialite": "^5.5",
+        "laravel/tinker": "^2.7",
+        "laravel/ui": "^3.4",
+        "nextapps/laravel-verification-code": "^2.0",
+        "overtrue/laravel-follow": "^5.1",
+        "pawlox/video-thumbnail": "^4",
+        "php-ffmpeg/php-ffmpeg": "^1.1",
+        "predis/predis": "^1.1",
+        "propaganistas/laravel-phone": "^4.4",
+        "ratchet/pawl": "^0.4.1",
+        "samueletur/laravel-error-tracking-to-telegram": "^1.0",
+        "socialiteproviders/mailru": "^4.1",
+        "socialiteproviders/odnoklassniki": "^4.1",
+        "socialiteproviders/vkontakte": "^5.0",
+        "socialiteproviders/yandex": "^4.1",
+        "socialiteproviders/zoho": "^4.1",
+        "spatie/laravel-sitemap": "^6.0",
+        "stripe/stripe-php": "^9.1",
+        "togos/gitignore": "^1.1",
+        "ultrono/laravel-sitemap": "^9.4",
+        "webklex/laravel-imap": "^5.3"
+    },
+    "require-dev": {
+        "doctrine/dbal": "^3.4",
+        "fakerphp/faker": "^1.9.1",
+        "laravel/sail": "^1.0.1",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^6.1",
+        "phpstan/phpstan": "^1.6",
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/laravel-ignition": "^1.0",
+        "stechstudio/laravel-php-cs-fixer": "^3.1",
+        "theanik/laravel-more-command": "^1.3"
+    },
+    "autoload": {
+        "classmap": [
+            "database/seeds",
+            "database/factories"
+        ],
+        "psr-4": {
+            "App\\": "app/",
+            "RB\\": "packages/rubicon/filestreaming/src/classes/"
+        },
+        "files": [
+            "app/Support/DeelsValidationRule.php",
+            "app/helpers.php",
+            "packages/rubicon/filestreaming/src/include/common.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+            ]
+        }
+    },
+    "scripts": {
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover"
+        ],
+        "post-install-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "php artisan optimize"
+        ],
+        "post-update-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan optimize"
+        ],
+        "phpstan": [
+            "vendor/bin/phpstan analyse -c phpstan.neon"
+        ],
+        "fix": [
+            "vendor/bin/php-cs-fixer fix --config=php-cs-fixer.php"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "platform-check": false
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

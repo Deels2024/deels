@@ -1,0 +1,22 @@
+.main-content__stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: repeat(3, 30px);
+  padding-left: 15px;
+  border-left: 2px solid #00f0ff;
+  margin: 0;
+  grid-area: stat;
+  justify-items: stretch;
+  width: 40%;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__stat {
+    padding: 5px 0;
+    width: 100%;
+    align-items: center;
+    font-size: 18px;
+    padding-left: 24px;
+    margin-bottom: 38px;
+  }
+}

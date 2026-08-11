@@ -1,0 +1,9 @@
+.main-content__comment-profile {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    align-items: center;
+    gap: 10px;
+}

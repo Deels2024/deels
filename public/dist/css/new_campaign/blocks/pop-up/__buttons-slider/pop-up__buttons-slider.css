@@ -1,0 +1,13 @@
+.pop-up__buttons-slider {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 20px;
+    position: absolute;
+    z-index: 4;
+    left: 38%;
+}

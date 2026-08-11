@@ -1,0 +1,8 @@
+.main-content__user-avatar {
+    display: block;
+    width: 45px;
+    height: 45px;
+    background-position: center;
+    border-radius: 50%;
+    background-size: contain;
+}

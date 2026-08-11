@@ -1,0 +1,17 @@
+.story__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: 36px;
+  grid-area: target;
+}
+
+@media screen and (max-width: 1260px) {
+  .story__buttons {
+    margin: 0;
+    padding: 0;
+    border: none;
+    margin-bottom: 60px;
+  }
+}

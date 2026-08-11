@@ -1,0 +1,98 @@
+<html xmlns="http://www.w3.org/1999/xhtml" style="width:100%;min-width:650px;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
+<head>
+    <title>{{$mailing->subject}}</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="telephone=no" name="format-detection">
+</head>
+<body style="min-width:650px;">
+{!! $body !!}
+<div class="footer" style="min-width:650px; padding:25px; background: #0d102c;position: relative;z-index: 10;width: 100%!important;">
+    <div class="container footer__menu" style="position:relative; width: calc(100% - 40px);max-width: 1180px;margin: 0;position: relative;z-index: 10;display: flex;align-items: center;">
+        <table style="width: 100%;min-width:500px;">
+            <tr>
+                <td style="vertical-align: top; text-align: left">
+                    <a href="https://{{$hostname ?? 'deels.ru'}}" class="footer__logo" style="">
+                        <img src="{{url('/dist/images/icons/deels.png')}}" alt="DEELS" style="width: 140px; height:  40px;">
+                    </a>
+                </td>
+                <td style="vertical-align: top; text-align: right">
+                    <div class="footer__icons" style="
+                    display: block;
+                    text-align: right;
+                ">
+                        <div style="
+                    font-weight: 800;
+                    font-size: 12px;
+                    font-family: Gilroy, sans-serif;
+                    color: #fff;
+                    text-decoration: none;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 10px;
+                ">Следите за новостями</div>
+                        <div class="icons" style="position: relative; text-align: right">
+                            <a style="padding-right: 5px; text-decoration: none" href="https://t.me/deels_ru">
+                                <img width="25" src="https://deels.ru/images/action-top-banner/tg.png" alt="">
+                            </a>
+                            <a style="text-decoration: none" href="https://vk.com/deels">
+                                <img width="25" src="https://deels.ru/images/action-top-banner/vk.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table style="min-width:300px; margin-top:10px; border: 0; text-align: left" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <a href="https://{{$hostname ?? 'deels.ru'}}/dashboard/my_campaigns/start_campaign" style="position: relative; margin-right: 20px; min-width:150px; width: 150px; display: block; color: #fff; cursor: pointer; border-radius: 10px; font-size: 16px; font-weight: 600; font-family: Gilroy,sans-serif; text-align: center; padding: 15px; text-decoration: none;background: linear-gradient(90deg, #b224ef 0%, #7579ff 100%);">
+                    Начать копить
+                </a>
+            </td>
+            <td>
+                <a href="https://play.google.com/store/apps/details?id=com.kts.kopiberi_application">
+                    <img src="{{url('/images/promo/android.png')}}" style="width: 160px; height: auto">
+                </a>
+            </td>
+        </tr>
+    </table>
+
+
+    <div class="container footer__items" style="width: calc(100% - 40px);max-width: 1180px;position: relative;z-index: 10;margin: 25px 0 0;gap: 30px;display: flex;align-items: center;justify-content: flex-start;">
+        <table style="min-width:500px; width:100%; border: 0; text-align: left" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="vertical-align: middle; text-align: left">
+                    <table style="width: auto">
+                        <tr>
+                            <td style="vertical-align: middle"><img src="https://deels.ru/dist/images/email_icons/png4.png"></td>
+                            <td style="vertical-align: middle"> <a href="tel:+78125079808" style="font-family: Gilroy, sans-serif;color: #fff;text-decoration: none;transition: all 0.3s;">+7
+                                    (812) 5079808</a></td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="vertical-align: middle; text-align: left">
+                    <table style="width: auto">
+                        <tr>
+                            <td style="vertical-align: middle"><img src="https://deels.ru/dist/images/email_icons/png3.png"></td>
+                            <td style="vertical-align: middle"><a href="mailto:info@deels.ru" style="font-family: Gilroy, sans-serif;color: #fff;text-decoration: none;transition: all 0.3s;">info@deels.ru</a></td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="vertical-align: middle; text-align: right;">
+                    <a href="https://{{$hostname ?? 'deels.ru'}}/removeFromMailList?token={{$usermail->token ?? ''}}" style="font-family: Gilroy, sans-serif;color: #fff;text-decoration: none;font-size:12px;">Отписаться от рассылки</a>
+                </td>
+            </tr>
+
+
+        </table>
+
+
+
+    </div>
+
+    <img src="{{url('/mail_track?mail_id')}}={{$mailing->id}}" alt="">
+</div>
+</body>

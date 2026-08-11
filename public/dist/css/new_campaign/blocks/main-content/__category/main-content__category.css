@@ -1,0 +1,29 @@
+.main-content__category {
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 500;
+  grid-area: category;
+  margin-left: 30px;
+  margin-bottom: 20px;
+}
+
+.main-content__category a {
+  color: #fff;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 1260px) {
+  .main-content__category {
+    margin: 0;
+    margin-top: 22px;
+    margin-bottom: 11px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .main-content__category {
+    margin: 0;
+    margin-top: 22px;
+    margin-bottom: 11px;
+  }
+}

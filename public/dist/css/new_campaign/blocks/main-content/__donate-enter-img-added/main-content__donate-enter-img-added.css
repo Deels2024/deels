@@ -1,0 +1,12 @@
+.main-content__donate-enter-img-added {
+  position: relative;
+  border-radius: 10px;
+  margin-top: 28px;
+  margin-bottom: 30px;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-enter-img-added {
+    margin-bottom: 52px;
+  }
+}

@@ -1,0 +1,13 @@
+.page {
+    background-image: url(../../images/background/background.png);
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: Gilroy;
+    font-size: 14px;
+    color: #fff;
+}

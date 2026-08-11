@@ -1,0 +1,9 @@
+.footer__link-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 18px;
+}

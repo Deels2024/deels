@@ -1,0 +1,13 @@
+.story__button_like {
+  min-width: 120px;
+  height: 50px;
+  background-image: url(/images/icon/like.svg)!important;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 1260px) {
+  .story__button_like {
+    width: 50%;
+  }
+}

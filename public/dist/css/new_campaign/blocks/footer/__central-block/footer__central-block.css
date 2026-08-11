@@ -1,0 +1,4 @@
+.footer__central-block {
+    display: flex;
+    flex-direction: column;
+}

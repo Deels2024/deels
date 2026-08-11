@@ -1,0 +1,20 @@
+.main-content__info-target {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__info-target {
+    display: flex;
+    gap: 35px;
+    text-align: center;
+    justify-content: center;
+    font-size: 46px;
+    align-items: flex-end;
+    font-weight: 600;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 21px;
+    margin-bottom: 16px;
+  }
+}

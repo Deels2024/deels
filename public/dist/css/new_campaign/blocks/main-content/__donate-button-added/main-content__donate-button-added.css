@@ -1,0 +1,23 @@
+.main-content__donate-button-added {
+  border: none;
+  padding: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(/images/icon/add-donate.svg);
+  position: absolute;
+  bottom: -25px;
+  right: -25px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-button-added {
+    display: grid;
+    column-gap: 15px;
+    right: 41%;
+  }
+}

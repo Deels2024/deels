@@ -1,0 +1,53 @@
+.main-content__user-profile-main {
+  display: grid;
+  grid-auto-rows: auto;
+  margin-top: 151px;
+  grid-template-areas:
+    "gallery user-profile target"
+    "gallery category target"
+    "gallery title target"
+    "gallery info target"
+    "gallery switch target"
+    "special comments-and-donates story";
+}
+
+@media screen and (max-width: 1260px) {
+  .main-content__user-profile-main {
+    display: grid;
+    grid-auto-rows: auto;
+    column-gap: 20px;
+    grid-template-columns: 240px minmax(170px, 1fr);
+    grid-template-areas:
+      "gallery user-profile"
+      "gallery category"
+      "gallery title"
+      "gallery info"
+      "story target"
+      "story switch"
+      "story comments-and-donates ";
+  }
+}
+
+@media screen and (max-width: 940px) {
+  .main-content__user-profile-main {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    grid-template-areas:
+      "user-profile user-profile"
+      "category category"
+      "title title"
+      "gallery story"
+      "info info"
+      "target target"
+      "switch switch"
+      "comments-and-donates comments-and-donates";
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__user-profile-main {
+    display: grid;
+    column-gap: 15px;
+  }
+}

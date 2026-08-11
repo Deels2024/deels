@@ -1,0 +1,11 @@
+.story__price-value {
+  font-weight: 500;
+  font-size: 22px;
+  color: #00f0ff;
+}
+
+@media screen and (max-width: 1260px) {
+  .story__price-value {
+    font-size: 25px;
+  }
+}

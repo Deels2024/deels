@@ -1,0 +1,12 @@
+.main-content__donate-price {
+  font-weight: 600;
+  font-size: 18px;
+  margin-left: 20px;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-price {
+    grid-area: price;
+    margin: 0;
+  }
+}

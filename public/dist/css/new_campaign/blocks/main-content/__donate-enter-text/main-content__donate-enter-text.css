@@ -1,0 +1,12 @@
+.main-content__donate-enter-text {
+  display: flex;
+  flex-direction: column;
+  margin-left: 68px;
+  margin-top: 28px;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-enter-text {
+    margin: 0;
+  }
+}

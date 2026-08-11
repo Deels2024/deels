@@ -1,0 +1,16 @@
+.main-content {
+  display: flex;
+  flex-direction: row;
+  row-gap: 46px;
+  column-gap: 30px;
+  flex-wrap: wrap;
+}
+
+@media screen and (max-width: 400px) {
+  .main-content {
+    display: grid;
+    grid-template-areas:
+      "header-profile"
+      "gallery";
+  }
+}

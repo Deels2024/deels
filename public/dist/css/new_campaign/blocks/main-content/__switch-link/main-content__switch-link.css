@@ -1,0 +1,11 @@
+.main-content__switch-link {
+  text-align: center;
+  padding: 12px 0;
+  width: 50%;
+}
+
+.main-content__switch-link a {
+  text-align: center;
+  padding: 0;
+  width: 100%;
+}

@@ -1,0 +1,6 @@
+.footer__form {
+    display: flex;
+    gap: 40px;
+    list-style-type: none;
+    padding-top: 7px;
+}

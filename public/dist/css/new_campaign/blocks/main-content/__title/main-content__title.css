@@ -1,0 +1,32 @@
+.main-content__title {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 36.75px;
+  max-width: 455px;
+  text-shadow: 0px 0px 4px #fff;
+  margin: 0 0 14px;
+  grid-area: title;
+  margin-left: 30px;
+  word-break: break-word;
+}
+
+@media screen and (max-width: 1260px) {
+  .main-content__title {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 940px) {
+  .main-content__title {
+    margin-bottom: 22px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .main-content__title {
+    margin: 0;
+    margin-bottom: 22px;
+    width: 100%;
+  }
+}

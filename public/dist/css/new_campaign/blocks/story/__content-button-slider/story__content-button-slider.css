@@ -1,0 +1,9 @@
+.story__content-button-slider {
+    width: 10px;
+    height: 10px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+}

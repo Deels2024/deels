@@ -1,0 +1,24 @@
+.main-content__donate-profile {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.main-content__donate-profile li {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-profile {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

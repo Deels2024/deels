@@ -1,0 +1,13 @@
+.main-content__donate-label-button {
+  font-weight: 600;
+  font-size: 16px;
+  background: linear-gradient(90deg, #b224ef 0%, #7579ff 100%), #ffffff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-label-button {
+    grid-area: text;
+  }
+}

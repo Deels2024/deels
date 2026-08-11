@@ -1,0 +1,6 @@
+.main-content__comment-head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}

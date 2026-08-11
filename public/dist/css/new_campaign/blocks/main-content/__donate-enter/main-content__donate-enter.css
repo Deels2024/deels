@@ -1,0 +1,28 @@
+.main-content__donate-enter {
+  width: 100%;
+  display: inline;
+  min-height: 240px;
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 23px;
+  letter-spacing: 0.02px;
+  color: #ffffff;
+  margin-bottom: 30px;
+  resize: none;
+}
+
+.main-content__donate-enter::-webkit-scrollbar {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-enter {
+    padding: 15px;
+    min-height: 289px;
+    color: rgba(255, 255, 255, 0.3);
+  }
+}

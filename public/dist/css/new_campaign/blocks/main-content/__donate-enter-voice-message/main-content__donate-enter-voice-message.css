@@ -1,0 +1,7 @@
+.main-content__donate-enter-voice-message {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    width: 220px;
+    margin-bottom: 26px;
+}

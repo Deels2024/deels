@@ -1,0 +1,10 @@
+.story__head {
+    position: relative;
+
+}
+
+@media screen and (max-width: 400px) {
+    .story__head {
+        display: none;
+    }
+}

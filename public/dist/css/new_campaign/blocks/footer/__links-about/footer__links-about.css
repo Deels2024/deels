@@ -1,0 +1,14 @@
+.footer__links-about{
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    gap: 75px;
+    margin-top: 55px;
+}
+
+.footer__links-about li {
+    display: flex;
+    flex-direction: row;
+}

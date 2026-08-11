@@ -1,0 +1,9 @@
+.pop-up__button-slider {
+    width: 15px;
+    height: 15px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+}

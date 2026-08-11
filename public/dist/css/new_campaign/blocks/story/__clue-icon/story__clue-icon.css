@@ -1,0 +1,29 @@
+.story__clue-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  background-image: url(/images/icon/clue.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  right: -12px;
+  top: -14px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 960px) {
+  .story__clue-icon {
+    right: -90px;
+    top: 8px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .story__clue-icon {
+    width: 12px;
+    height: 12px;
+    right: -75px;
+    top: 8px;
+  }
+}

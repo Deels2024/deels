@@ -1,0 +1,21 @@
+.story__button_copy-link {
+  min-width: 120px;
+  height: 50px;
+  background-image: url(/images/icon/copy.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.story__button_share-link {
+  min-width: 60px!important;
+  width: auto!important;
+  height: 50px;
+  background-image: url(/images/icon/share.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 1260px) {
+  .story__button_copy-link {
+    width: 50%;
+  }
+}

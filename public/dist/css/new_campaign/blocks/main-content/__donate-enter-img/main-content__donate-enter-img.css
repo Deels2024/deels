@@ -1,0 +1,6 @@
+.main-content__donate-enter-img {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 41px;
+}

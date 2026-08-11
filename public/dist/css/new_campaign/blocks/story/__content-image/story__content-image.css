@@ -1,0 +1,16 @@
+.story__content-image {
+  width: 204px;
+  height: 350px;
+  border-radius: 10px;
+  background: #fff;
+  display: block;
+  position: relative;
+  z-index: -1;
+}
+
+@media screen and (max-width: 600px) {
+  .story__content-image {
+    width: 171px;
+    height: 296px;
+  }
+}

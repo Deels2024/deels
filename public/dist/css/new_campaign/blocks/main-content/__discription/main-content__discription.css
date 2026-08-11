@@ -1,0 +1,16 @@
+.main-content__discription {
+  width: 60%;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18.9px;
+  padding-right: 36px;
+  margin: 0;
+  grid-area: discription;
+  word-break: break-word;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__discription {
+    width: 100%;
+  }
+}

@@ -1,0 +1,12 @@
+.main-content__donate-pop-up-button {
+    padding: 0;
+    margin: 0;
+    width: 19px;
+    height: 19px;
+    background: none;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: none;
+    cursor: pointer;
+}

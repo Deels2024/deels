@@ -1,0 +1,9 @@
+.main-content__social-link-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin: 0 0 0 33px;
+    gap: 20px;
+    align-items: center;
+}

@@ -1,0 +1,21 @@
+.main-content__special-block {
+  width: 229px;
+  display: flex;
+  flex-direction: column;
+  grid-area: special;
+  margin-top: 43px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding-right: 39px;
+}
+
+@media screen and (max-width: 1260px) {
+  .main-content__special-block {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .main-content__special-block {
+    display: none;
+  }
+}

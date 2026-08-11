@@ -1,0 +1,13 @@
+.main-content__comments-buttons {
+  display: flex;
+  gap: 51px;
+  align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__comments-buttons {
+    flex-direction: column;
+    gap: 20px;
+    align-items: normal;
+  }
+}

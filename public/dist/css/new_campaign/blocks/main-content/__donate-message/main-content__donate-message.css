@@ -1,0 +1,11 @@
+.main-content__donate-message {
+  margin-top: 32px;
+  display: flex;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-message {
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    margin: 0;
+  }
+}

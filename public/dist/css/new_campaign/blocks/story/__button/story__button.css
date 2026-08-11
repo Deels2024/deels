@@ -1,0 +1,20 @@
+.story__button {
+  padding: 16px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  background-color: #0d102c;
+  border-radius: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.story__record:before {
+  content: '';
+  display: inline-flex;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff0000;
+}

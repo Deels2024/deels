@@ -1,0 +1,16 @@
+.story__title {
+  padding: 0;
+  margin: 0;
+  font-weight: 600;
+  font-size: 20px;
+  text-align: center;
+  text-shadow: 0px 0px 4px #fff;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 940px) {
+  .story__title {
+    display: none;
+  }
+}

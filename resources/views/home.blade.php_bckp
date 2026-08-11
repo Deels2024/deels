@@ -1,0 +1,852 @@
+@extends('layouts.neon.app')
+@section('title')
+    @if(!empty($title))
+        {{ $title }} |
+    @endif
+    @parent
+@endsection
+
+@section('content')
+    <div class="background_mobile"></div>
+
+    <div class="wrapper">
+        <link rel="stylesheet" href="/dist/css/kpromo_slider.css"/>
+        <link rel="stylesheet" href="/js/libs/fancybox/jquery.fancybox.min.css"/>
+        <link rel="stylesheet" href="/dist/css/admin-top.css?v=1"/>
+
+        <div class="kpromo">
+            <div class="container">
+                <div class="kpromo-row">
+                    <div class="kpromo-content">
+                        <h1 class="kpromo__title">Накоплено на 100%!</h1>
+                        <div class="kpromo-slider owl-carousel owl-theme">
+                            @foreach($doneCampaigns as $campaign)
+                                @include('campaigns.short_card')
+                            @endforeach
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide1.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Развлечения</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide2.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Для дома и дачи</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide3.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Еда и напитки</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide4.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Путешествия и приключения </h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 21.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Вноси донат<br>--}}
+                            {{--                                        2 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях<br>--}}
+                            {{--                                        3 выиграй спонсирование--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide5.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Инновации</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+
+{{--                            <div class="kpromo-item open-fancybox" href="#modal" data-amount="5000" data-min-pay="50" data-category="7">--}}
+{{--                                <img src="/dist/images/kpromo_images/prslide7.webp" alt="" class="kpromo-item__img">--}}
+{{--                                <div class="kpromo-item__content">--}}
+{{--                                    <h3 class="kpromo-item__title">Мода и стиль</h3>--}}
+{{--                                    <div class="kpromo-item__info">Приз: 5000 ₽</div>--}}
+{{--                                    <div class="kpromo-item__info">Дата: 26.06-17.07</div>--}}
+{{--                                    <p class="kpromo-item__text">--}}
+{{--                                        <span>Описание условий:</span><br>--}}
+{{--                                        1 Выбирай копилку<br>--}}
+{{--                                        2 Вноси донат<br>--}}
+{{--                                        3 Следи за розыгрышем <br>--}}
+{{--                                        в соц.сетях--}}
+{{--                                    </p>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+
+{{--                            <div class="kpromo-item open-fancybox" href="#modal" data-amount="10000" data-min-pay="100" data-category="6">--}}
+{{--                                <img src="/dist/images/kpromo_images/prslide6.webp" alt="" class="kpromo-item__img">--}}
+{{--                                <div class="kpromo-item__content">--}}
+{{--                                    <h3 class="kpromo-item__title">Здоровье и фитнес</h3>--}}
+{{--                                    <div class="kpromo-item__info">Приз: 10000 ₽</div>--}}
+{{--                                    <div class="kpromo-item__info">Дата: 26.06-17.07</div>--}}
+{{--                                    <p class="kpromo-item__text">--}}
+{{--                                        <span>Описание условий:</span><br>--}}
+{{--                                        1 Выбирай копилку<br>--}}
+{{--                                        2 Вноси донат<br>--}}
+{{--                                        3 Следи за розыгрышем <br>--}}
+{{--                                        в соц.сетях--}}
+{{--                                    </p>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide8.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Мобильная техника</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 21.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Вноси донат<br>--}}
+                            {{--                                        2 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях<br>--}}
+                            {{--                                        3 выиграй спонсирование--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+{{--                            <div class="kpromo-item open-fancybox" href="#modal" data-amount="15000" data-min-pay="200" data-category="11">--}}
+{{--                                <img src="/dist/images/kpromo_images/prslide9.webp" alt="" class="kpromo-item__img">--}}
+{{--                                <div class="kpromo-item__content">--}}
+{{--                                    <h3 class="kpromo-item__title">Домашняя электроника</h3>--}}
+{{--                                    <div class="kpromo-item__info">Приз: 15000 ₽</div>--}}
+{{--                                    <div class="kpromo-item__info">Дата: 26.06-17.07</div>--}}
+{{--                                    <p class="kpromo-item__text">--}}
+{{--                                        <span>Описание условий:</span><br>--}}
+{{--                                        1 Выбирай копилку<br>--}}
+{{--                                        2 Вноси донат<br>--}}
+{{--                                        3 Следи за розыгрышем <br>--}}
+{{--                                        в соц.сетях--}}
+{{--                                    </p>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide10.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Образование</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 21.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Вноси донат<br>--}}
+                            {{--                                        2 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях<br>--}}
+                            {{--                                        3 выиграй спонсирование--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide11.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Другое</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                            {{--                            <div class="kpromo-item">--}}
+                            {{--                                <img src="/dist/images/kpromo_images/prslide12.jpg" alt="" class="kpromo-item__img">--}}
+                            {{--                                <div class="kpromo-item__content">--}}
+                            {{--                                    <h3 class="kpromo-item__title">Бытовая техника</h3>--}}
+                            {{--                                    <div class="kpromo-item__info">Приз: 17.10 ₽</div>--}}
+                            {{--                                    <div class="kpromo-item__info">Дата: 22.03.2023</div>--}}
+                            {{--                                    <p class="kpromo-item__text">--}}
+                            {{--                                        <span>Описание условий:</span><br>--}}
+                            {{--                                        1 Выбирай копилку<br>--}}
+                            {{--                                        2 Вноси донат<br>--}}
+                            {{--                                        3 Следи за розыгрышем <br>--}}
+                            {{--                                        в соц.сетях--}}
+                            {{--                                    </p>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+
+                        </div>
+                    </div>
+                    <div class="kpromo-img">
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="/dist/images/kpromo_images/kpromo-img-xs.webp">
+                            <source media="(min-width: 769px)" srcset="/dist/images/kpromo_images/kpromo-img-xl.webp">
+                            <img src="/dist/images/kpromo_images/kpromo-img-xl.webp" alt="">
+                        </picture>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <link rel="stylesheet" href="/dist/css/admin-top.css?v=1">
+        <div class="showcase">
+            <div class="wrapper-container">
+                <div class="showcase__start">
+                    <div class="showcase__start-info">
+                        <div class="showcase__start-title">Начни копить уже сегодня</div>
+                        <div class="showcase__start-mob">
+                            <img src="/images/action-top-banner/startmob.webp" alt=""/>
+                        </div>
+                        <a class="showcase__start-btn" onclick="window.location='{{route('start_campaign')}}'">Начать копить</a>
+                        <div class="showcase__start-follow">
+                            <div class="showcase__start-icon">
+                                <a href="https://www.youtube.com/@kopiberi2242/shorts" target="_blank"><img src="/images/action-top-banner/youtube.svg" alt=""/></a>
+                                <a href="https://vk.com/kopiberi1" target="_blank"><img src="/images/action-top-banner/vk.svg" alt=""/></a>
+                            </div>
+                            <div class="showcase__start-message">Подпишись, чтобы выиграть финансирование своей мечты!</div>
+                        </div>
+                    </div>
+                    <div class="showcase__start-img">
+                        <img src="/images/action-top-banner/start.webp" alt=""/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fancy-modal" id="modal">
+            <div class="modal__blocks">
+                <div class="modal__message">
+                    Выбери любую копилку для внесения доната
+                    <span><img src="/images/action-top-banner/x.png" alt=""/></span>
+                </div>
+
+            </div>
+            {{--            <a href="#" class="modal__refresh"><img src="/images/action-top-banner/refresh.png" alt=""/></a>--}}
+        </div>
+
+        <div class="fancy-modal" id="modal-second">
+        </div>
+
+        <div class="fancy-modal modal-third" id="modal-third">
+            <div class="modal-third-block">
+                <a href="#modal-second" class="open-fancybox modal-third-back"
+                ><img src="/images/action-top-banner/arrow-left.png" alt=""
+                    /></a>
+                <div class="modal-third__header">
+                    <div class="modal-third__title">Введите сумму доната</div>
+                    <div class="modal__message">
+                        После совершения платежа, ты автоматически становишься участником розыгрыша <span class="action_amount">5000</span>₽
+                        <span><img src="/images/action-top-banner/x.png" alt=""/></span>
+                    </div>
+                </div>
+                <input type="number" class="modal-third__input" min="50"/>
+                <a href="#modal-foure" class="open-fancybox modal-third-next">Подтвердить</a>
+            </div>
+        </div>
+
+        <div class="fancy-modal modal-third" id="modal-foure">
+            <div class="modal-third-block">
+                <a href="#modal-third" class="open-fancybox modal-third-back"
+                ><img src="/images/action-top-banner/arrow-left.png" alt=""
+                    /></a>
+                <div class="modal-foure__header">
+                    <div class="modal-foure__title">Вклад в копилку</div>
+                    <div class="modal__message">
+                        Заполни форму оплаты. Для участия в конкурсе размер доната должен быть минимум <span class="action_min_pay"></span>₽.
+                        <span><img src="/images/action-top-banner/x.png" alt=""/></span>
+                    </div>
+                </div>
+                <div class="modal-foure__content">
+                    <div class="modal-foure__item">
+                        @include('checkout_part')
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-five" class="fancy-modal modal-five">
+            <div class="modal-five__plus">+1 <img src="/images/action-top-banner/health-big.svg" alt=""/></div>
+            <div class="modal-five__title">Поздравляем с участием!</div>
+            <div class="modal-five__subtitle">
+                Чем больше <img src="/images/action-top-banner/health-big.svg" alt=""/>
+                , тем больше шанс выиграть
+            </div>
+            <div class="modal-five__end">Ваши донаты и участие в конкурсах Вы можете отслеживать в личном кабинете</div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="finish">
+            <div class="container">
+                <h2 class="finish__title">
+                    Поздравляем с <br> осуществлением мечты!
+                    <span>Поздравляем с <br> осуществлением мечты!</span>
+                </h2>
+                <div class="finish-slider">
+                    <button class="finish-btn finish-slider__prev">
+                        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 1L2 7.5L8 14" stroke="white" stroke-width="2"/>
+                        </svg>
+
+                    </button>
+                    <button class="finish-btn finish-slider__next">
+                        <svg width="9" height="15" viewBox="0 0 9 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L7 7.5L1 14" stroke="white" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    <div class="finish-slider__track">
+
+                        <!-- 1 карточка -->
+                        @foreach($completedCampaigns as $campaign)
+                            <div class="finish-slide">
+                                <div class="bank__item catalog__content-item">
+                                    <div class="finish-slide__img">
+                                        <img class="lozad" onclick="window.location='{{route('campaign_single', $campaign->slug)}}'"
+                                             src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}"
+                                             alt="">
+                                        @include('inc.fully_banner')
+                                    </div>
+
+                                    <div class="bank__content">
+                                        <div class="bank__title">
+                                            <div class="bank__title-text">
+                                                {{$campaign->title}}
+                                            </div>
+                                            <span class="bank__title-blur">  {{$campaign->title}}</span>
+                                        </div>
+                                        <div class="bank__purpose">
+                                            Цель: {!! get_amount($campaign->goal) !!}
+                                            <span class="bank__purpose-blur">Цель: {!! get_amount($campaign->goal) !!}</span>
+                                        </div>
+                                        <div class="bank__text">Прогресс: 100%</div>
+                                        <div class="bank__text">Осталось дней: - ∞</div>
+                                        <div class="bank__text">Финансировано: {!! get_amount($campaign->goal) !!}</div>
+                                        <div class="bank__user">
+                                            <img class="finish-ava magnific_image circle-img" class="lozad"
+                                                 src="{{$campaign->user?->avatar()}}" data-image="{{$campaign->user?->avatar()}}">
+                                            <div class="bank__user-text">{{$campaign->user?->name}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="info">
+        <div class="info__top"></div>
+        <div class="container">
+            <style>
+                .small_margin {
+                    margin-top: 70px;
+                    margin-bottom: 80px;
+                }
+                @media screen and (max-width: 800px) {
+                    .small_margin {
+                        margin-top: 0;
+                        margin-bottom: 0;
+                    }
+                }
+            </style>
+            <div class="info__content flex small_margin">
+                <div class="info__img">
+                    <img class="lozad" src="/dist/images/index/info.svg"/>
+                </div>
+                <div class="info__items">
+                    <div class="info__item">
+                        <div class="info__num">{{$campaignsCount+1500}}</div>
+                        <div class="info__text">всего копилок</div>
+                    </div>
+                    <div class="info__item">
+                        <div class="info__num">{{$usersCount}}</div>
+                        <div class="info__text">всего спонсоров</div>
+                    </div>
+                    <div class="info__item">
+                        <div class="info__num">{!! round($fundRaised+569600) !!}<span class="ruble-sign">₽</span></div>
+{{--                        <div class="info__num">569600<span class="ruble-sign">₽</span></div>--}}
+                        <div class="info__text">привлеченные средства</div>
+                    </div>
+                    <div class="info__item">
+                        <div class="info__num ">{{$fundedCampaignsCount+156}}</div>
+                        <div class="info__text">финансируемые копилки</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info__bottom"></div>
+    </div>
+
+    <div class="container">
+        <div class="bank bank_index">
+            <h2>
+                Финансируемые <br/>копилки <span>Финансируемые <br/>копилки</span>
+            </h2>
+            <div class="owl-carousel owl-theme bank__carousel">
+
+                @foreach($fundedCampaigns as $campaign)
+                    <a href="{{route('campaign_single', $campaign->slug)}}" class="bank__item">
+                        <img class="lozad" src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt=""/>
+                        <div class="bank__content">
+                            <div class="bank__title">
+                                <div class="bank__title-text">
+                                    {{$campaign->title}}
+                                </div>
+                                <span class="bank__title-blur"
+                                >{{$campaign->title}}</span
+                                >
+                            </div>
+                            <div class="bank__purpose">
+                                Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}
+                                <span class="bank__purpose-blur">Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}</span>
+                            </div>
+                            <div class="bank__text">Прогресс: {!!  $campaign->percent_raised() !!}%</div>
+                            <div class="bank__text">Осталось дней: - ∞</div>
+                            <div class="bank__text">
+                                Финансировано: {!! get_amount($campaign->success_payments_sum_amount) !!}</div>
+                            <div class="bank__user">
+                                <img class="bank__img lozad magnific_image circle-img"
+                                     src="{{$campaign->user?->avatar()}}"/>
+                                <div class="bank__user-text">{{$campaign->user?->name}}</div>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="bank bank_index">
+            <h2>
+                Недавно пополненные <br/>копилки <span>Недавно пополненные <br/>копилки</span>
+            </h2>
+            <div class="owl-carousel owl-theme bank__carousel">
+                @foreach($latestFundedCampaigns as $campaign)
+                    <a href="{{route('campaign_single', $campaign->slug)}}" class="bank__item">
+                        <img class="lozad" src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt=""/>
+                        <div class="bank__content">
+                            <div class="bank__title">
+                                <div class="bank__title-text">
+                                    {{$campaign->title}}
+                                </div>
+                                <span class="bank__title-blur"
+                                >{{$campaign->title}}</span
+                                >
+                            </div>
+                            <div class="bank__purpose">
+                                Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}
+                                <span class="bank__purpose-blur">Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}</span>
+                            </div>
+                            <div class="bank__text">Прогресс: {!!  $campaign->percent_raised() !!}%</div>
+                            <div class="bank__text">Осталось дней: - ∞</div>
+                            <div class="bank__text">
+                                Финансировано:
+
+                                {!! get_amount($campaign->success_payments_sum_amount) !!}
+
+                            </div>
+                            <div class="bank__user">
+                                @if ($campaign->user)
+                                    <img class="bank__img lozad magnific_image circle-img"
+                                         src="{{$campaign->user?->avatar()}}"/>
+                                    <div class="bank__user-text">{{$campaign->user->name}}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="bank bank_index">
+            <h2>
+                Новые <br/>копилки <span>Новые <br/>копилки</span>
+            </h2>
+            <div class="owl-carousel owl-theme bank__carousel">
+                @foreach($newCampaigns as $campaign)
+                    @php
+                        $percent_raised = $campaign->percent_raised();
+                    @endphp
+                    <a href="{{route('campaign_single', $campaign->slug)}}" class="bank__item">
+                        <img class="lozad" src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt=""/>
+                        <div class="bank__content">
+                            <div class="bank__title">
+                                <div class="bank__title-text">
+                                    {{$campaign->title}}
+                                </div>
+                                <span class="bank__title-blur"
+                                >{{$campaign->title}}</span
+                                >
+                            </div>
+                            <div class="bank__purpose">
+                                Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}
+                                <span class="bank__purpose-blur">Цель: {!! get_amount($campaign->goal) !!} {!! __('app.goal') !!}</span>
+                            </div>
+                            <div class="bank__text">Прогресс: {!! $percent_raised !!}%</div>
+                            <div class="bank__text">Осталось дней: - ∞</div>
+                            <div class="bank__text">
+                                Финансировано: {!! get_amount($campaign->success_payments_sum_amount) !!}</div>
+                            <div class="bank__user">
+                                <img class="bank__img lozad magnific_image circle-img"
+                                     src="{{$campaign->user?->avatar()}}"/>
+                                <div class="bank__user-text">{{$campaign->user?->name}}</div>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    <style>
+        .donators .owl-next,.donators .owl-prev {
+            display: none!important;
+        }
+    </style>
+    <!-- donators-slider -->
+    <div class="donators">
+        <div class="donators__container">
+            <div class="donators-slider owl-carousel owl-theme">
+
+                <div class="donators-slider__item">
+                    <h2 class="donators-slider__title">Топ донатеров за месяц</h2>
+                    <table>
+                        <tbody>
+                        @foreach($topDonaters as $k=>$donater)
+                            @if ($donater->user)
+                                <tr>
+                                    <td>{{$loop->iteration}}</td>
+                                    <td> {{$donater->user?->name}}</td>
+                                    @php
+                                        $email='';
+                                        if ($donater->user) {
+                                            $emailSplit = explode('@', $donater->user?->email);
+                                            $encryptedPart = substr($emailSplit[0],0,2).str_repeat('*', strlen($emailSplit[0])-2);
+
+                                            if (strlen($encryptedPart)>2) {
+                                            $email = $encryptedPart.'@'.$emailSplit[1];
+                                            } else {
+                                                $email = '***@'.$emailSplit[1];
+                                            }
+                                        }
+                                    @endphp
+                                    <td> {{$email}}</td>
+                                    <td>{{(int)$donater->amountFull}} ₽</td>
+
+                                </tr>
+                            @endif
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <?php /*
+                <div class="donators-slider__item">
+                    <h2 class="donators-slider__title">Топ по приглашениям</h2>
+                    <table>
+                        <tbody>
+                        @foreach($topReferrals as $k=>$donater)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td> {{$donater?->name}}</td>
+                                @php
+                                    $emailSplit = explode('@', $donater?->email);
+                                    $encryptedPart = substr($emailSplit[0],0,2).str_repeat('*', strlen($emailSplit[0])-2);
+
+                                    if (strlen($encryptedPart)>2) {
+                                    $email = $encryptedPart.'@'.$emailSplit[1];
+                                    } else {
+                                        $email = '***@'.$emailSplit[1];
+                                    }
+                                @endphp
+                                <td> {{$email}}</td>
+                                <td>{{(int)$donater->referrals_count}}</td>
+
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="donators-slider__item">
+                    <h2 class="donators-slider__title">Топ победителей в розыгрышах</h2>
+                    <table>
+                        <tbody>
+                        @foreach($topWinners as $k=>$donater)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td> {{$donater?->name}}</td>
+                                @php
+                                    $emailSplit = explode('@', $donater->email);
+                                    $encryptedPart = substr($emailSplit[0],0,2).str_repeat('*', strlen($emailSplit[0])-2);
+
+                                    if (strlen($encryptedPart)>2) {
+                                    $email = $encryptedPart.'@'.$emailSplit[1];
+                                    } else {
+                                        $email = '***@'.$emailSplit[1];
+                                    }
+                                @endphp
+                                <td> {{$email}}</td>
+                                <td>{{(int)$donater->rewards_count}}</td>
+
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                 */?>
+            </div>
+        </div>
+    </div>
+    <!-- END donators-slider -->
+
+    <div class="container">
+        <div class="dream">
+            <h2>
+                Реализуй мечту, <br/>
+                поведав о них миру
+                <span
+                >Реализуй мечту, <br/>
+                поведав о них миру</span
+                >
+            </h2>
+            <div class="dream__items flex align_start">
+                <div class="dream__item dream__item-show" data-btn="1">
+                    <div class="dream__coin">
+                        <img class="lozad" src="/dist/images/icons/coin.svg"/>
+                    </div>
+                    <h3>Мечты легко становятся реальностью.</h3>
+                    <div class="dream__content">
+                        Для этого достаточно воспользоваться нашим сервисом и начать
+                        сбор средств на то, чтобы воплотить их в жизнь. Новая
+                        краудфандинговая платформа предоставляет возможность
+                        рассказать о своих заветных желаниях тем, кто готов внести
+                        свой вклад в реализацию вашей мечты. Приятный интерфейс и
+                        грамотная организация комфортного взаимодействия между
+                        участниками процесса обеспечат быстрое получение не достающей
+                        вам суммы.
+                    </div>
+                </div>
+                <div class="dream__item" data-btn="2">
+                    <div class="dream__coin">
+                        <img class="lozad" src="/dist/images/icons/coin.svg"/>
+                    </div>
+                    <h3>Начать копить</h3>
+                    <div class="dream__content">
+                        В повседневной жизни кажется вам недостижимым. В мире так
+                        много хороших людей. Многие из них хотят стать для кого-то
+                        добрым волшебником. Откройте сбор средств для того, чтобы
+                        получить желаемое. Все остальное сделают спонсоры и наша
+                        площадка, куда интегрированы удобные финансовые инструменты, а
+                        безопасность данных обеспечивается высококлассными
+                        специалистами.
+                    </div>
+                </div>
+            </div>
+            <div class="dream__btns">
+                <div class="dream__items-btn active" data-btn="1"></div>
+                <div class="dream__items-btn" data-btn="2"></div>
+            </div>
+            {{--            <h4 class="dream__btn btn btn_fill text">Подробнее</h4>--}}
+        </div>
+    </div>
+    <div class="container">
+        <div class="reason">
+            <h2>
+                Почему выбирают <br/>
+                именно DEELS
+                <span
+                >Почему выбирают <br/>
+                именно DEELS</span
+                >
+            </h2>
+            <div class="reason__content">
+                <div class="reason__items">
+                    <div class="reason__item">
+                        <div class="reason__num">
+                            01
+                            <span>01</span>
+                        </div>
+                        <h3 class="reason__title">Безопасность</h3>
+                        <div class="reason__text">
+                            Ваша транзакция и данные в безопасности, и вам нечего
+                            беспокоиться о нас. Мы даем безопасность мирового класса
+                        </div>
+                    </div>
+                    <div class="reason__item">
+                        <div class="reason__num">
+                            02
+                            <span>02</span>
+                        </div>
+                        <h3 class="reason__title">Гибкость</h3>
+                        <div class="reason__text">
+                            Вы можете задонатить любую сумму, какую захотите, в
+                            копилках нет фиксированной суммы
+                        </div>
+                    </div>
+                    <div class="reason__item">
+                        <div class="reason__num">
+                            03
+                            <span>03</span>
+                        </div>
+                        <h3 class="reason__title">Легко</h3>
+                        <div class="reason__text">
+                            Создайте кампанию или пожертвуйте менее 5 минут, просто
+                            создайте копилки, соберите средства и воплотите свою мечту
+                        </div>
+                    </div>
+                    <div class="reason__item">
+                        <div class="reason__num">
+                            04
+                            <span>04</span>
+                        </div>
+                        <h3 class="reason__title">Поддерживает награду</h3>
+                        <div class="reason__text">
+                            Владелец копилки может предложить вознаграждение, поэтому
+                            спонсор получит вознаграждение за конкретный донат
+                        </div>
+                    </div>
+                </div>
+                <div class="reason__img">
+                    <img class="lozad" src="/dist/images/index/reason.webp"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="start">
+        <div class="container">
+            <h2>Начни уже <br/>сегодня</h2>
+            <div class="start__text">
+                Откройте сбор средств на то, о чем давно мечтаете! Наша площадка
+                предоставит удобные финансовые инструменты и обеспечит безопасное
+                взаимодействие между участниками процесса
+            </div>
+            <div class="start__btn btn btn_fill" onclick="window.location='{{route('start_campaign')}}'">Начать копить
+            </div>
+            <a href="{{route('browse_campaigns')}}" class="start__btn btn start__btn-big"
+            >Копилки</a
+            >
+            <div class="start__img">
+                <img class="lozad" src="/dist/images/index/start.webp"/>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('page-js')
+    <script>
+		//donators-slider
+		$('.donators-slider').owlCarousel({
+			loop: true,
+			nav: true,
+			dots: false,
+			center: true,
+			margin: 20,
+			stagePadding: 10,
+			navText: [
+				'<svg viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg"><circle r="21.5" transform="matrix(-1 0 0 1 21.5 21.5)"/><path d="M24 15L18 21.5L24 28" stroke-width="2"/></svg>',
+				'<svg viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="21.5" cy="21.5" r="21.5" /><path d="M19 15L25 21.5L19 28" stroke-width="2"/></svg>'],
+			items: 1,
+			responsive: {
+				0: {
+					margin: 4,
+				},
+				480: {
+					margin: 20,
+				},
+			}
+		});
+
+		if ($(window).width() >= 900) {
+			$('.topslider').slick({
+				arrows: false,
+				slidesToShow: 1,
+				infinite: true,
+				autoplay: true,
+				autoplaySpeed: 5000,
+			})
+		}
+
+		$('.finish-slider__track').slick({
+			arrows: false,
+			slidesToShow: 3,
+			infinite: false,
+
+			prevArrow: $('.finish-slider__prev'),
+			nextArrow: $('.finish-slider__next'),
+
+			responsive: [
+				{
+					breakpoint: 980,
+					settings: {
+						slidesToShow: 2,
+					}
+				},
+				{
+					breakpoint: 650,
+					settings: {
+						slidesToShow: 1,
+					}
+				},
+			]
+		});
+
+		$('.finish-slider__prev').click(() => {
+			$('.finish-slider__track').slick('slickPrev')
+		});
+		$('.finish-slider__next').click(() => {
+			$('.finish-slider__track').slick('slickNext')
+		});
+    </script>
+    <script src="/dist/js/swiper.min.js"></script>
+    <script src="/js/libs/fancybox/jquery.fancybox.min.js"></script>
+    <script src="/dist/js/actions-top.js"></script>
+@endsection

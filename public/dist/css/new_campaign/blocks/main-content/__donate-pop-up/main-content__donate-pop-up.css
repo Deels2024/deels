@@ -1,0 +1,35 @@
+.main-content__donate-pop-up {
+    display: none;
+    background-color: #0D102C;
+    padding: 14px 26px;
+    border-radius: 8px;
+    border: 1px solid #00F0FF;
+    gap: 24px;
+    align-items: center;
+    position: absolute;
+    top: -60px;
+    left: -10px;
+}
+
+.main-content__donate-pop-up::before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    right: 101px;
+    width: 10px;
+    height: 10px;
+    rotate: 45deg;
+    border: 1px solid #00F0FF;
+    background-color: #0D102C;
+    /*border-radius: 50%;*/
+}
+
+.main-content__donate-pop-up::after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    right: 98px;
+    width: 18px;
+    height: 10px;
+    background-color: #0D102C;
+}

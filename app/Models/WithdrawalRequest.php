@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+class WithdrawalRequest extends Model
+{
+    protected $guarded = [];
+
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function getStatus() {
+        $status = '';
+        if($this->status == 'pending') {
+            $status = 'Ожидание';
+        }
+        if($this->status == 'approved') {
+            $status = 'Подтвержден';
+        }
+        if($this->status == 'declined') {
+            $status = 'Отклонен';
+        }
+
+        return $status;
+
+    }
+
+    public function getStatusColor() {
+
+        $statuses = [
+            'pending' => 'light',
+            'approved' => 'success',
+            'declined' => 'danger',
+        ];
+        return $statuses[$this->status];
+    }
+
+    public function getStatusIco() {
+        $status = '';
+        if($this->status == 'pending') {
+            $status = 'Ожидание';
+        }
+        if($this->status == 'approved') {
+            $status = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 20 20"><path fill="#04AA6D" d="M9.5 20c-2.538 0-4.923-0.988-6.718-2.782s-2.782-4.18-2.782-6.717c0-2.538 0.988-4.923 2.782-6.718s4.18-2.783 6.718-2.783c2.538 0 4.923 0.988 6.718 2.783s2.782 4.18 2.782 6.718-0.988 4.923-2.782 6.717c-1.794 1.794-4.18 2.782-6.718 2.782zM9.5 2c-4.687 0-8.5 3.813-8.5 8.5s3.813 8.5 8.5 8.5 8.5-3.813 8.5-8.5-3.813-8.5-8.5-8.5z"></path><path fill="#04AA6D" d="M7.5 14.5c-0.128 0-0.256-0.049-0.354-0.146l-3-3c-0.195-0.195-0.195-0.512 0-0.707s0.512-0.195 0.707 0l2.646 2.646 6.646-6.646c0.195-0.195 0.512-0.195 0.707 0s0.195 0.512 0 0.707l-7 7c-0.098 0.098-0.226 0.146-0.354 0.146z"></path></svg>';
+        }
+        if($this->status == 'declined') {
+            $status = 'Отклонен';
+        }
+
+        return $status;
+
+    }
+}

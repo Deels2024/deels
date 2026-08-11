@@ -1,0 +1,4014 @@
+openapi: 3.0.0
+info:
+  title: DEELS API
+  version: 0.3.0
+  description: 'Подозрительные аккаунты получают HTTP 403 на ограниченные действия. Формат ответа описан схемой SuspiciousRestrictionResponse.'
+servers:
+  - url: localhost
+  - url: https://deels.ru
+paths:
+  /api/user/sendEmailCode:
+    post:
+      tags:
+        - Auth
+      summary: 'Отправить код подтверждения email при регистрации'
+      description: 'Проверяет формат, российский домен, уникальность и отсутствие email в списке одноразовых адресов. При успешной проверке отправляет шестизначный код.'
+      operationId: sendRegistrationEmailCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@yandex.ru
+      responses:
+        200:
+          description: 'Код отправлен'
+          content:
+            application/json:
+              example:
+                success: true
+        422:
+          description: 'Email не прошел валидацию или находится в черном списке'
+          content:
+            application/json:
+              example:
+                success: false
+                error: Данный e-mail заблокирован. Используйте другой адрес для регистрации
+        429:
+          description: 'Повторная отправка временно недоступна'
+          content:
+            application/json:
+              example:
+                success: false
+                error: Повторная отправка будет доступна через 87 сек.
+                retry_after: 87
+  /api/register:
+    post:
+      tags:
+        - Auth
+      summary: 'Регистрация'
+      description: ''
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - password_confirmation
+              properties:
+                email:
+                  description: 'Email с российским доменом. Одноразовые и временные почтовые адреса не принимаются.'
+                  type: string
+                  format: email
+                  example: user@yandex.ru
+                username:
+                  description: ''
+                  type: string
+                  example: string
+                password:
+                  description: Пароль
+                  type: string
+                  example: string
+                password_confirmation:
+                  description: Подтверждение пароля
+                  type: string
+                  example: string
+                phone:
+                  description: Необязательный номер телефона в российском формате
+                  type: string
+                  nullable: true
+                  example: '+79999999999'
+      responses:
+        200:
+          description: 'Успешная регистрация либо ошибка валидации. Для заблокированного email в errors.email возвращается сообщение «Данный e-mail заблокирован. Используйте другой адрес для регистрации».'
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    success: true
+                    user_id: 123
+                    access_token: 266|uDzT9mEeJKNDp45k7krKP3l37JRfCzHztb7vhxXLec706d47
+                    token_type: Bearer
+                disposableEmail:
+                  value:
+                    success: false
+                    errors:
+                      email:
+                        - Данный e-mail заблокирован. Используйте другой адрес для регистрации
+  /api/auth_token:
+    post:
+      tags:
+        - Auth
+      summary: 'Авторизация'
+      description: ''
+      operationId: authtoken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  description: ''
+                  type: string
+                  example: string
+                password:
+                  description: ''
+                  type: string
+                  example: string
+                device_name:
+                  description: Устройство
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                access_token: 4|JEh7jfpwMvWS3vms79JIzKXOg6Ru0p2NNG23hi7u9c814cd9
+                token_type: Bearer
+  /api/firebase_token:
+    post:
+      tags:
+        - Auth
+      summary: 'Firebase токен'
+      description: ''
+      operationId: firebasetoken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                access_token: 4|JEh7jfpwMvWS3vms79JIzKXOg6Ru0p2NNG23hi7u9c814cd9
+                token_type: Bearer
+  /api/vk_auth/link:
+    get:
+      tags:
+        - Auth
+      summary: 'Получить ссылку авторизации VK ID'
+      description: 'Генерирует VK ID authorize URL без хранения client_id в клиентском приложении. code_verifier нужно сохранить на клиенте и передать в /api/vk_auth вместе с code и device_id.'
+      operationId: vk_auth_link
+      parameters:
+        - in: query
+          name: redirect_uri
+          required: false
+          schema:
+            type: string
+            example: https://oauth.vk.com/blank.html
+        - in: query
+          name: scope
+          required: false
+          schema:
+            type: string
+            example: vkid.personal_info email phone friends
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                auth_url: https://id.vk.com/authorize?client_id=54653069&redirect_uri=https%3A%2F%2Foauth.vk.com%2Fblank.html&response_type=code&scope=vkid.personal_info%20email%20phone%20friends&state=random&code_challenge=challenge&code_challenge_method=S256
+                state: random
+                code_verifier: verifier
+                redirect_uri: https://oauth.vk.com/blank.html
+                scope: vkid.personal_info email phone friends
+  /api/vk_auth:
+    post:
+      tags:
+        - Auth
+      summary: 'Авторизация через VK'
+      description: 'Принимает access_token VK ID в vk_token или параметры VK ID authorization code flow: code, device_id, code_verifier. Для обратной совместимости также поддерживается старый VK access token. Если VK token содержит право friends, backend сам вызовет VK API friends.get, сохранит друзей и вернет найденных пользователей Deels в found_users.'
+      operationId: vk_token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vk_token:
+                  description: 'Access token, полученный после авторизации VK ID'
+                  type: string
+                  example: vk1.a.0vomm8wqT3kFxiiXo...
+                code:
+                  description: 'Authorization code из callback VK ID'
+                  type: string
+                  example: vk2.a.abcd...
+                device_id:
+                  description: 'device_id из callback VK ID'
+                  type: string
+                  example: abcdef12-3456-7890-abcd-ef1234567890
+                code_verifier:
+                  description: 'PKCE code_verifier, использованный при формировании code_challenge'
+                  type: string
+                  example: 2cf24dba5fb0a30e26e83b2ac5b9e29e...
+                redirect_uri:
+                  description: 'Redirect URI, использованный при авторизации. Если не передан, используется VKONTAKTE_REDIRECT_URI.'
+                  type: string
+                  example: https://deels.ru/login/vk-callback
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                access_token: 4|JEh7jfpwMvWS3vms79JIzKXOg6Ru0p2NNG23hi7u9c814cd9
+                token_type: Bearer
+                found_users:
+                  - id: 76795
+                    username: vk_1070650695
+                    avatar: https://deels.ru/default_avatars/avatar_1.png
+                    source: vk
+                show_friends_popup: true
+                email_required: true
+                email_verification_required: false
+                show_email_prompt: true
+                next_email_prompt_at: '2026-07-17T13:35:32+03:00'
+  /api/user/email:
+    post:
+      tags:
+        - Users
+      summary: 'Сохранить email и получить код подтверждения'
+      description: 'Требуется Bearer token. Сохраняет email авторизованного пользователя как неподтвержденный и отправляет шестизначный код тем же механизмом, который используется при регистрации. Этот же endpoint используется для повторной отправки. Повторный запрос доступен через 120 секунд.'
+      operationId: saveEmailAndSendCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@yandex.ru
+      responses:
+        200:
+          description: 'Email сохранен, код отправлен'
+          content:
+            application/json:
+              example:
+                success: true
+                email: user@yandex.ru
+                email_required: false
+                email_verification_required: true
+                retry_after: 120
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+        422:
+          description: 'Некорректный, иностранный, одноразовый или уже занятый email'
+          content:
+            application/json:
+              examples:
+                invalidEmail:
+                  value:
+                    success: false
+                    error: Поле email имеет неверный формат.
+                disposableEmail:
+                  value:
+                    success: false
+                    error: Данный e-mail заблокирован. Используйте другой адрес для регистрации
+        429:
+          description: 'Повторная отправка временно недоступна'
+          content:
+            application/json:
+              example:
+                success: false
+                error: Повторная отправка будет доступна через 87 сек.
+                retry_after: 87
+  /api/user/email/verify:
+    post:
+      tags:
+        - Users
+      summary: 'Подтвердить email кодом'
+      description: 'Требуется Bearer token. Проверяет шестизначный код для сохраненного email. После успеха email помечается подтвержденным в users_activation.'
+      operationId: verifyEmailCode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  pattern: '^\d{6}$'
+                  example: '123456'
+      responses:
+        200:
+          description: 'Email подтвержден'
+          content:
+            application/json:
+              example:
+                success: true
+                email: user@yandex.ru
+                email_required: false
+                email_verification_required: false
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+        422:
+          description: 'Код некорректен или просрочен'
+          content:
+            application/json:
+              example:
+                success: false
+                error: Неверный или просроченный код.
+  /api/user/email-prompt/postpone:
+    post:
+      tags:
+        - Users
+      summary: 'Отложить напоминание об email'
+      description: 'Требуется Bearer token. Вызывается при выборе «Позже». Следующие показы назначаются на третий день после регистрации, через неделю после регистрации, затем раз в месяц.'
+      operationId: postponeEmailPrompt
+      responses:
+        200:
+          description: 'Напоминание отложено'
+          content:
+            application/json:
+              example:
+                success: true
+                next_email_prompt_at: '2026-07-19T13:35:32+03:00'
+                show_email_prompt: false
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+  /api/apple_auth:
+    post:
+      tags:
+        - Auth
+      summary: 'Авторизация через Apple ID'
+      description: ''
+      operationId: apple_token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apple_token:
+                  description: ''
+                  type: string
+                  example: eyJraWQiOiJyczBNM2tPV...
+  /api/yandex_auth:
+    post:
+      tags:
+        - Auth
+      summary: 'Авторизация через Yandex'
+      description: ''
+      operationId: yandex_auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                yandex_token:
+                  description: ''
+                  type: string
+                  example: y0__xCP57Y...
+  /api/user/{id}:
+    get:
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 12
+      summary: Профиль пользователя
+      description: 'Без указания id отображается информация авторизованного пользователя<br><br>
+      <b>wallet_balance:</b> баланс в дилсах, доступный пользователю для использования внутри проекта<br>
+      <b>profit_balance:</b> баланс средств в рублях, полученных пользователем внутри проекта. доступны только для вывода.<br>
+      <b>withdraw_balance:</b> баланс средств в рублях, которые пользователь может вывести с проекта (сумма дилсов и средств)<br><br>
+      <b>trust_rating:</b> рейтинг доверия пользователя, может быть положительным или отрицательным, по умолчанию 0<br><br>
+      <b>contests:</b> видимые авторизованному пользователю челленджи и батлы, в которых владелец профиля является автором или участником.
+      Поле <b>profile_contest_type</b> содержит тип элемента: challenge или battle.<br>
+      <b>hidden_contests_count:</b> количество челленджей и батлов владельца профиля, скрытых от авторизованного пользователя настройками видимости.<br><br>
+      кошельки пользователя:<br>
+      <b>default:</b> для всех входящих операций. то, что пользователь получает внутри проекта (он же profit_balance)<br>
+      <b>payments:</b> кошелек, который пополняет пользователь и использует для оплат\донатов (он же wallet_balance)<br>
+      '
+      operationId: user_info
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  id: 12
+                  name: Name
+                  username: Username
+                  email: email@mail.ru
+                  status: text
+                  trust_rating: 0
+                  limits: json or null
+                  country: Российская Федерация
+                  gender: Мужской
+                  address: null
+                  website: null
+                  phone: null
+                  avatar: https://project.loc/uploads/images/avatars/12/file.jpg
+                  avatar_url: https://project.loc/uploads/images/avatars/12/file.jpg
+                  donated: '100500.00'
+                  campaigns_total: 14
+                  last_campaigns: []
+                  challenges: []
+                  challenges_participant: []
+                  contests:
+                    - id: 123
+                      title: Мой челлендж
+                      profile_contest_type: challenge
+                    - id: 456
+                      title: Мой батл
+                      profile_contest_type: battle
+                  hidden_contests_count: 2
+                  wallet_balance: 100500
+                  profit_balance: 100500
+                  withdraw_balance: 100500
+                  wallets: []
+                  is_activated: 1
+                  blocked_by_user: 1
+                  need_actions: {}
+                  suspicious_blocked_until: '2026-07-17T13:00:00+03:00'
+                  suspicious_retry_after: 3600
+                  stories: []
+                  likes_count: 0
+  /api/profile/likes:
+    get:
+      tags:
+        - Users
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            example: 'stories'
+          description: 'stories - сторис, campaigns - копилки, comments - комментарии'
+      summary: Просмотр лайков
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                comments: []
+                campaigns: []
+                stories: []
+  /api/user/abuse:
+    get:
+      tags:
+        - Users
+      summary: 'Получить жалобу на пользователя'
+      description: ''
+      operationId: get_abuse
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 12
+          description: ID пользователя, на которого подана жалоба
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                user_id: 12
+                abused_by: 34
+                blocked: 1
+                abuse: spam
+    post:
+      tags:
+        - Users
+      summary: 'Жалоба на пользователя'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                blocked:
+                  description: 'Скрыть контент сторис'
+                  type: integer
+                  example: 1
+                abuse:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Ваша жалоба получена!
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы уже пожаловались на этого пользователя
+  /api/user/follow:
+    post:
+      tags:
+        - Users
+      summary: 'Подписка пользователя'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: 'Кто подписывается'
+                  type: integer
+                  example: integer
+                follow_id:
+                  description: 'На кого подписывается'
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Вы подписались!
+                count: 1
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы не можете подписаться на себя
+  /api/user_friends:
+    get:
+      tags:
+        - Users
+      summary: 'Список друзей'
+      description: 'Список пользователей, на которых подписан текущий пользователь и которые подписаны на него'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                followers:
+                  - id: 67124
+                    username: username1
+                    avatar: https://deels.ru/uploads/images/avatars/67124/833c761f-29ce-4c16-ae11-ab66b4d11625.jpg
+                  - id: 6
+                    username: username2
+                    avatar: https://deels.ru/uploads/images/profile-photo-female.png
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы не авторизованы
+  /api/user_followers:
+    get:
+      tags:
+        - Users
+      summary: 'Список подписок'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                followers:
+                  - id: 67124
+                    username: username1
+                    avatar: https://deels.ru/uploads/images/avatars/67124/833c761f-29ce-4c16-ae11-ab66b4d11625.jpg
+                  - id: 6
+                    username: username2
+                    avatar: https://deels.ru/uploads/images/profile-photo-female.png
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы не авторизованы
+  /api/user_followings:
+    get:
+      tags:
+        - Users
+      summary: 'Список подписчиков'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                followers:
+                  - id: 67124
+                    username: username1
+                    avatar: https://deels.ru/uploads/images/avatars/67124/833c761f-29ce-4c16-ae11-ab66b4d11625.jpg
+                  - id: 6
+                    username: username2
+                    avatar: https://deels.ru/uploads/images/profile-photo-female.png
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы не авторизованы
+  /api/user/activation_resend:
+    post:
+      tags:
+        - Users
+      summary: 'Отправка повторного запроса на получение звонка'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                type:
+                  description: 'sms | phone'
+                  type: string
+                  example: 'phone'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                action: phone
+                time: 2024/04/12 00:09:15
+                message: На номер 7999***9999 совершен звонок в 12.04.24 00:07:15. Пожалуйста, введите последние 4 цифры номера телефона входящего звонка в соответствующее поле
+                phone: '89999999999'
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Пользователь не найден
+        401:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                verified: 0
+                message: Повторный запрос активацию телефона можно отправить через 1 мин 48 сек!
+  /api/user/activation_verify:
+    post:
+      tags:
+        - Users
+      summary: 'Верификация кода'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                phone_code:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Пользователь не найден
+        401:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Подтверждение не выполнено!
+  /api/user/phone_update:
+    post:
+      tags:
+        - Users
+      summary: 'Обновление номера телефона'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                phone:
+                  description: ''
+                  type: integer
+                  example: '89999999999'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                action: phone
+                time: 2024/04/12 00:09:15
+                message: На номер 7999***9999 совершен звонок в 12.04.24 00:07:15. Пожалуйста, введите последние 4 цифры номера телефона входящего звонка в соответствующее поле
+                phone: '89999999999'
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Произошла ошибка
+  /api/profile/update:
+    post:
+      tags:
+        - Users
+      summary: 'Редактирование пользователя'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  description: ''
+                  type: string
+                  example: string@string.ru
+                name:
+                  description: ''
+                  type: string
+                  example: string
+                username:
+                  description: ''
+                  type: string
+                  example: string
+                gender:
+                  description: ''
+                  type: string
+                  example: male
+                  enum:
+                    - male
+                    - female
+                phone:
+                  description: ''
+                  type: string
+                  example: string
+                address:
+                  description: ''
+                  type: string
+                  example: string
+                avatar:
+                  description: ''
+                  type: string
+                  example: string
+                  format: binary
+                status:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  id: 12
+                  name: name
+                  last_name: 'last_name'
+                  email: ssn.work@mail.ru
+                  username: username
+                  country_id: 185
+                  gender: male
+                  address: null
+                  website: null
+                  phone: null
+                  avatar: null
+                  user_type: admin
+                  active_status: 1
+                  trust_rating: 0
+                  request_deletion: null
+                  request_deletion_time: null
+                  cancel_deletion_time: null
+                  created_at: '2020-07-23T06:53:33.000000Z'
+                  updated_at: '2024-03-11T09:58:24.000000Z'
+                  last_active: '2024-03-11 01:06:28'
+                  referral_code: d0aca549-2bc4-43c4-8081-ba013375eca5
+                  invite_referral_code: null
+                  unsubscribe: null
+                  status: null
+                  device_key: e-lwuHvsMKfj1TQS344RXu:APA91bHn9Cv9-jWUpLnxo17Y6Dwvki_QiHro5wvhxDLxicq9i6D87a_QL3wbyzuAkeuqAT_eWVuYjSPCg4bpsyKxFlStoYoGQhFBIEMr_ycA7eATnc3Vy16XaPmRFvO8k3hWlNqIIaZF
+                  delete_token: dae9abaf-df7e-4412-aa1a-9550dbddd122
+                  limits:
+                    chatgpt:
+                      tries: 999993
+                      last_usage: '2024-01-30T21:46:50.891067Z'
+                      next_usage: '2024-02-02T21:46:50.891088Z'
+                  telegram_id: null
+                  connect_token: 54ea8d9b7212a5c238b653b1a74da53b
+                  meta_data:
+                    online:
+                      minutes: 3
+                      connected: '2024-02-19T10:53:46.311196Z'
+                      disconnected: '2024-02-19T10:53:46.311196Z'
+                  deleted_at: null
+                  avatar_url: https://deels.ru/default_avatars/avatar_1.webp
+                  fullname: user_full_name
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors:
+                  email:
+                    - Поле E-Mail адрес должно содержать валидный email адрес
+                  name:
+                    - Количество символов в поле Имя должно быть не менее 2.
+                  gender:
+                    - Введенное значение gender не подходит
+                  username:
+                    - Ник уже используется
+  /api/profile/delete:
+    post:
+      tags:
+        - Users
+      summary: 'Удаление аккаунта'
+      description: ''
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Инструкция по удалению аккаунта отправлена на ваш e-mail
+
+  /api/wallet/deposit:
+    post:
+      summary: Пополнение
+      tags:
+        - Wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  description: ''
+                  type: integer
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                payment_url: https://securepayments.tinkoff.ru/aeZYN4QU
+  /api/wallet/transactions:
+    get:
+      tags:
+        - Wallet
+      summary: Список транзакций
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - payments
+            example: 'payments'
+          description: 'payments - Мои монеты'
+      responses:
+        200:
+          description: 'donate: campaign - донат в кокилку, donate: story - донат в сторис, donate: stream - донат за стрим, get: campaign - начисление за донат копилки, get: story - начисление за донат сторис, get: coins - начисление за онлайн'
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 322
+                    payable_type: App\Models\User
+                    payable_id: 12
+                    wallet_id: 1
+                    type: "deposit"
+                    amount: "50"
+                    confirmed: true
+                    meta: {"get": "coins"}
+                    uuid: "e494825f-97fa-4817-838c-ef137bd1b7bb"
+                    created_at: "2024-02-19T07:53:46.000000Z"
+                    updated_at: "2024-02-19T07:53:46.000000Z"
+                    description: "Пополнение администрацией"
+                current_page: 1
+                total_pages: 2
+                requested_withdrawal:
+                  id: 7
+                  user_id: 12
+                  campaign_id: null
+                  total_amount: 50
+                  withdrawal_amount: 50
+                  platform_owner_commission: 0
+                  withdrawal_account: '12'
+                  paypal_email: null
+                  bank_account_holders_name: null
+                  bank_account_number: null
+                  swift_code: null
+                  bank_name_full: null
+                  bank_branch_name: null
+                  bank_branch_city: null
+                  bank_branch_address: null
+                  country_id: null
+                  status: pending
+                  created_at: '2023-12-11T17:24:48.000000Z'
+                  updated_at: '2023-12-11T17:24:48.000000Z'
+                  wallet: 1
+
+  /api/wallet/withdraw:
+    post:
+      tags:
+        - Wallet
+      summary: Вывод
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  description: ''
+                  type: integer
+                  example: 100
+                contacts:
+                  description: 'Контакты для связи'
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                amount: '100'
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                amount: 'Запрос уже обрабатывается'
+  /api/wallet/appstore_validation:
+    post:
+      tags:
+        - Wallet
+      summary: Проверка чека и начисление дилсов
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                receipt:
+                  type: string
+                  example: base64
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: 'Кошелек пополнен на 5000 дилсов'
+                balance: '5000'
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                amount: 'Чек уже обработан'
+
+  /api/dashboard/my_campaigns/start_campaign:
+    post:
+      tags:
+        - Campaigns
+      summary: Создать копилку
+      description: ''
+      operationId: start_campaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  description: ''
+                  type: integer
+                  example: 1
+                title:
+                  description: ''
+                  type: string
+                  example: string
+                description:
+                  description: Пароль
+                  type: string
+                  example: string
+                goal:
+                  description: ''
+                  type: integer
+                  example: string
+                mainImg:
+                  description: ''
+                  type: string
+                  example: string
+                  format: binary
+                code:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+
+  /api/campaigns/donate:
+    post:
+      tags:
+        - Campaigns
+      summary: Донат в копилку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                campaign_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                amount:
+                  description: ''
+                  type: integer
+                  example: integer
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+  /api/campaigns/comment:
+    post:
+      tags:
+        - Campaigns
+      summary: Комментарий в копилку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                campaign_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                comment:
+                  description: ''
+                  type: string
+                  example: string
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Комментарий добавлен
+
+  /api/campaigns/{id}/comments:
+    get:
+      tags:
+        - Campaigns
+      summary: Список комментариев
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сторис
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          description: Страница
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 903
+                    user_id: 12
+                    campaign_id: 46231
+                    story_id: null
+                    comment_id: 0
+                    author_name: Alex
+                    author_email: ssn.work@mail.ru
+                    author_ip: '::1'
+                    comment: adasasd
+                    approved: '1'
+                    created_at: '2024-02-29T20:06:50.000000Z'
+                    updated_at: '2024-02-29T20:06:50.000000Z'
+                    user:
+                      id: 12
+                      name: Alex
+                      last_name: '12313132'
+                      email: ssn.work@mail.ru
+                      …: ...
+                current_page: 1
+                total_pages: 1
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Копилка не найдена
+
+  /api/campaigns/wallet_donate:
+    post:
+      tags:
+        - Campaigns
+      summary: Донат в копилку из кошелька
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                campaign_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                amount:
+                  description: ''
+                  type: integer
+                  example: integer
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                balance: 0
+                error: Недостаточно средств
+  /api/campaigns/like:
+    post:
+      tags:
+        - Campaigns
+      summary: Лайк копилки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                campaign_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                errors: Лайк добавлен
+
+
+  /api/campaigns/stories:
+    get:
+      tags:
+        - Stories
+      summary: Список сторис
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - popular
+              - new
+              - paid
+            example: 'popular'
+          description: 'popular - популярные, new - новые, paid - платные'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 52
+                    user_id: 12
+                    campaign_id: null
+                    media_id: 74
+                    description: "Мечтаю переехать в дом со своей собакой. Верю, что все возможно.\r\n\r\nСниму личное видео для всех неравнодушных"
+                    paid: 1
+                    amount: 1
+                    views: 0
+                    active: 1
+                    created_at: '2024-02-13T06:45:15.000000Z'
+                    updated_at: '2024-02-18T07:19:01.000000Z'
+                    declined: 0
+                    cover: null
+                    meta_title: null
+                    meta_description: null
+                    moderated: null
+                    comments_count: 0
+                    likes_count: 0
+                    views_count: 2
+                    campaign: {}
+                    user:
+                      id: 12
+                      name: Alex
+                      username: monk
+                      email: ssn.work@mail.ru
+                      trust_rating: 0
+                      …: null
+                    is_liked: false
+                    is_viewed: true
+                    path: https://deels.ru/api/stories/get_video/52
+                    filepath: https://deels.ru/uploads/stories/c_11615363-man-draws-a-technical-drawing-on-drawing-board-by-naizn-preview.mp4
+                    webp_filepath: null
+                    type: video
+                    thumbnail: https://deels.ru/uploads/stories/thumbs/story_52/thumb_11615363-man-draws-a-technical-drawing-on-drawing-board-by-naizn-preview.jpg
+                    video_preview: https://deels.ru/uploads/stories/preview_c_11615363-man-draws-a-technical-drawing-on-drawing-board-by-naizn-preview.mp4
+                    comments: []
+                    likes: []
+                    media:
+                      id: 74
+                      user_id: 12
+                      name: 11615363_man-draws-a-technical-drawing-on-drawing-board_by_naizn_preview.mp4
+                      type: video
+                      path_url: https://deels.ru/uploads/stories/c_11615363-man-draws-a-technical-drawing-on-drawing-board-by-naizn-preview.mp4
+                      webp_path_url: null
+                  - id: 53
+                    user_id: 12
+                    campaign_id: null
+                    media_id: 75
+                    description: Фото-сторис
+                    paid: 0
+                    amount: null
+                    views: 0
+                    active: 1
+                    created_at: '2026-06-22T10:15:00.000000Z'
+                    updated_at: '2026-06-22T10:15:00.000000Z'
+                    declined: 0
+                    cover: null
+                    comments_count: 0
+                    likes_count: 0
+                    views_count: 0
+                    campaign: {}
+                    user:
+                      id: 12
+                      name: Alex
+                      username: monk
+                    is_liked: false
+                    is_viewed: false
+                    path: https://deels.ru/api/stories/get_video/53
+                    filepath: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.jpg
+                    webp_filepath: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.webp
+                    type: image
+                    thumbnail: null
+                    video_preview: null
+                    comments: []
+                    likes: []
+                    media:
+                      id: 75
+                      user_id: 12
+                      name: photo.heic
+                      type: image
+                      path_url: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.jpg
+                      webp_path_url: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.webp
+
+                current_page: 1
+                total_pages: 4
+  /api/stories_list:
+    get:
+      tags:
+        - Stories
+      summary: Список сторис (без копилок)
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+  /api/stories/upload:
+    post:
+      tags:
+        - Stories
+      summary: Загрузить медиа для сторис
+      description: |-
+        Загружает файл и возвращает данные созданного media.
+        Поддерживаемые изображения: JPEG, JPG, PNG, HEIF, HEIC.
+        Поддерживаемые видео: MP4, MOV, AVI, MPEG.
+        Изображения на сервере конвертируются в две копии: JPEG fallback и WebP для современных устройств. Оригинал изображения не хранится.
+        Максимальный размер изображения: 10 Мб. Максимальный размер видео задается параметром STORY_MAX_UPLOAD_MB, по умолчанию 100 Мб.
+        Максимальная длительность видео для сторис: 60 секунд.
+        RAW/DNG/CR2/NEF и другие RAW-форматы не поддерживаются.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  description: 'Медиафайл сторис. Допустимые изображения: JPEG, JPG, PNG, HEIF, HEIC. Допустимые видео: MP4, MOV, AVI, MPEG.'
+                  type: string
+                  format: binary
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                type: image
+                file_size: 5242880
+                path: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.jpg
+                webp_path: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.webp
+        400:
+          description: ''
+          content:
+            application/json:
+              examples:
+                empty:
+                  summary: Файл не передан
+                  value:
+                    success: false
+                    error: Отсутствует контент
+                unsupported_image_format:
+                  summary: Неподдерживаемый формат изображения
+                  value:
+                    success: false
+                    error: Этот формат не поддерживается. Пожалуйста, загрузите фото в формате JPEG, JPG, PNG, HEIF или HEIC
+                file_too_large:
+                  summary: Превышен максимальный вес изображения
+                  value:
+                    success: false
+                    error: Вес файла превышает 10 Мб.
+                video_too_long:
+                  summary: Видео длиннее 60 секунд
+                  value:
+                    success: false
+                    error: Длительность видео превышает 60 сек. Пожалуйста, загрузите более короткое видео для сторис
+  /api/stories/store:
+    post:
+      tags:
+        - Stories
+      summary: Создать сторис
+      description: |-
+        Создает сторис из уже загруженного media_id или из переданного файла.
+        Для создания сторис копилки передайте campaign_id. Копилка должна принадлежать авторизованному пользователю.
+        Успешная сторис копилки увеличивает здоровье всех копилок пользователя на 3. Если вместе со сторис передан challenge_id, здоровье увеличивается на 5.
+        В поле file можно передать видео или изображение. Поддерживаемые изображения: JPEG, JPG, PNG, HEIF, HEIC.
+        Изображения сохраняются не как оригинал, а как две серверные копии: JPEG fallback и WebP.
+        Максимальный размер изображения: 10 Мб. Максимальный размер видео задается параметром STORY_MAX_UPLOAD_MB, по умолчанию 100 Мб.
+        Максимальная длительность видео: 60 секунд.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: 'Медиафайл сторис. Если передан media_id, file можно не передавать.'
+                  type: string
+                  format: binary
+                media_id:
+                  description: 'ID ранее загруженного media'
+                  type: integer
+                  example: 75
+                description:
+                  description: ''
+                  type: string
+                  example: string
+                amount:
+                  description: 'Стоимость сторис в дилсов'
+                  type: integer
+                  example: 100
+                campaign_id:
+                  description: 'ID копилки. Передайте для создания сторис копилки. Копилка должна принадлежать авторизованному пользователю.'
+                  type: integer
+                  example: 46231
+                challenge_id:
+                  description: 'ID челленджа'
+                  type: string
+                  example: 5
+                battle_id:
+                  description: 'ID батла'
+                  type: string
+                  example: 5
+                paid:
+                  description: 'Платное true \ false'
+                  type: integer
+                  example: 1
+                is_ad:
+                  description: 'Это реклама true \ false'
+                  type: integer
+                  example: 1
+                get_erid:
+                  description: 'Получить ЕРИД автоматически true \ false'
+                  type: integer
+                  example: 1
+                ads_data:
+                  description: 'Данные рекламы'
+                  type: object
+                  properties:
+                    advertiser:
+                      type: string
+                      example: 'ООО Рекламодатель'
+                    erid:
+                      type: string
+                      example: 'ERID123456789'
+                    additional_link:
+                      type: string
+                      example: 'https://example.com'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              examples:
+                campaign_story:
+                  summary: Сторис копилки создана
+                  value:
+                    success: true
+                    story_id: 1
+                regular_story:
+                  summary: Обычная сторис создана
+                  value:
+                    success: true
+                    story_id: 2
+        400:
+          description: ''
+          content:
+            application/json:
+              examples:
+                empty:
+                  summary: Файл или media_id не переданы
+                  value:
+                    success: false
+                    error: Отсутствует контент
+                unsupported_image_format:
+                  summary: Неподдерживаемый формат изображения
+                  value:
+                    success: false
+                    error: Этот формат не поддерживается. Пожалуйста, загрузите фото в формате JPEG, JPG, PNG, HEIF или HEIC
+                file_too_large:
+                  summary: Превышен максимальный вес изображения
+                  value:
+                    success: false
+                    error: Вес файла превышает 10 Мб.
+                video_too_long:
+                  summary: Видео длиннее 60 секунд
+                  value:
+                    success: false
+                    error: Длительность видео превышает 60 сек. Пожалуйста, загрузите более короткое видео для сторис
+                campaign_unavailable:
+                  summary: Копилка не найдена или недоступна пользователю
+                  value:
+                    success: false
+                    error: Копилка не найдена или недоступна
+
+  /api/stories/get/{id}:
+    get:
+      tags:
+        - Stories
+      summary: 'Просмотр сторис'
+      description: |-
+        Если сторис платная и пользователь авторизован, при достаточном количестве дилсов на балансе - они будут списаны. Проверку нужно сделать на клиенете (подтвреждение действия)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сторис
+          schema:
+            type: integer
+            example: 1
+        - name: user_id
+          in: query
+          required: false
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 12
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  story_id: 1
+                  views: 1
+                  paid: 0
+                  amount: null
+                  description: '123123'
+                  comments: [...]
+                  comments_count: 4
+                  path: https://deels.ru/api/stories/get_video/1
+                  filepath: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.jpg
+                  webp_filepath: https://deels.ru/uploads/stories/2026/06/22/fc1d0a32b4b5a8f6.webp
+                  likes: [...]
+                  likes_count: 0
+                  is_liked: false
+                  is_viewed: false
+                  is_blocked: false
+                  type: image
+                  thumbnail: null
+                  video_preview: null
+                  campaign: null
+                  show_story: true
+                  story_url: https://deels.ru/stories?show=1
+                  user: [...]
+        400:
+          description: 'Если сторис платная'
+          content:
+            application/json:
+              example:
+                success: false
+                error: Необходима авторизация
+        401:
+          description: 'Если сторис платная и недостаток дилсов или пустой кошелек'
+          content:
+            application/json:
+              example:
+                success: false
+                amount: 1213
+                balance: 0
+                error: Кошелёк пуст
+  /api/stories/custom_donate:
+    post:
+      tags:
+        - Stories
+      summary: Донат в сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                story_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                amount:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                amount: 100
+                balance: 60
+                error: Недостаточно средств
+  /api/stories/like:
+    post:
+      tags:
+        - Stories
+      summary: Лайк сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                story_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Лайк добавлен
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Лайк убран
+        403:
+          $ref: '#/components/responses/SuspiciousRestriction'
+  /api/stories/dislike:
+    post:
+      tags:
+        - Stories
+      summary: Дизлайк сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                story_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Дизлайк добавлен
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Дизлайк убран
+        403:
+          $ref: '#/components/responses/SuspiciousRestriction'
+  /api/stories/comment:
+    post:
+      tags:
+        - Stories
+      summary: Комментарий сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                story_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                comment:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                comment_id: 906
+                message: Комментарий опубликован
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Сторис не найдена
+        403:
+          $ref: '#/components/responses/SuspiciousRestriction'
+  /api/stories/comment/like:
+    post:
+      tags:
+        - Stories
+      summary: Лайк комментария сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Лайк добавлен
+                count: 1
+        400:
+          description: ''
+        403:
+          $ref: '#/components/responses/SuspiciousRestriction'
+          content:
+            application/json:
+              example:
+                success: true
+                message: Лайк убран
+                count: 0
+  /api/stories/delete:
+    post:
+      tags:
+        - Stories
+      summary: Удалить сторис
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                story_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                message: Сторис удалена
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Сторис не найдена
+        401:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                error: Вы не можете удалить эту сторис
+
+  /api/messages/get_list:
+    get:
+      tags:
+        - Messages
+      summary: Список чатов
+      description: ''
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 2
+                    unread_count: 0
+                    last_message: Текст сообщения
+                    user:
+                      id: 12
+                      avatar: https://deels.ru/default_avatars/robot.jpeg
+                      name: Robot
+  /api/messages/show:
+    get:
+      tags:
+        - Messages
+      summary: 'Просмотр беседы'
+      parameters:
+        - name: thread_id
+          in: query
+          required: true
+          description: ID беседы
+          schema:
+            type: integer
+            example: 1
+        - name: user_id
+          in: query
+          required: true
+          description: ID авторизованного пользователя
+          schema:
+            type: integer
+            example: 12
+        - name: page
+          in: query
+          required: false
+          description: Страница пагинации
+          schema:
+            type: integer
+            example: 1
+        - name: order_by
+          in: query
+          required: false
+          description: Сортировка
+          schema:
+            type: string
+            example: asc
+            enum:
+              - desc
+              - asc
+      responses:
+        200:
+          description: 'is_blocked в ответе - пользователь заблокировал авторизованного пользователя, и он не может писать ему сообщения'
+          content:
+            application/json:
+              example:
+                success: true
+                thread_id: 1
+                data:
+                  22.01.2024: [...]
+                  19.01.2024:
+                    - user:
+                        id: 12
+                        avatar: https://deels.ru/default_avatars/avatar_1.webp
+                        name: Alex
+                      message: 'Текст сообщения'
+                      my_message: true
+                      created_at: 19.01.2024 09:39:12
+                is_blocked: false
+                current_page: 2
+                total_pages: 2
+  /api/messages/send_message:
+    post:
+      tags:
+        - Messages
+      summary: Отправка сообщений
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                thread_id:
+                  description: ''
+                  type: integer
+                  example: integer
+                message:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                thread_id: 1
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Пользователь не найден
+        403:
+          $ref: '#/components/responses/SuspiciousRestriction'
+        401:
+          description: 'Заблокирован'
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Вы не можете писать этому пользователю
+  /api/messages/mark_as_read:
+    post:
+      tags:
+        - Messages
+      summary: Отправка сообщений
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                thread_id:
+                  description: ''
+                  type: integer
+                  example: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Чат не найден
+  /api/categories/list:
+    get:
+      tags:
+        - Content
+      summary: Категории
+      description: ''
+      operationId: categories
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - category_id: 1
+                    title: Развлечения
+                    slug: environment
+                  - category_id: 2
+                    title: Еда и Напитки
+                    slug: foods-and-drinks
+                  - category_id: 3
+                    title: Путешествия и Приключения
+                    slug: travels-outdoors
+                  - category_id: 5
+                    title: Инновации
+                    slug: innovation
+                  - category_id: 6
+                    title: Здоровье и Фитнес
+                    slug: health-and-fitness
+                  - category_id: 7
+                    title: Мода и Стиль
+                    slug: fashion
+                  - category_id: 8
+                    title: Другое
+                    slug: community-projects
+                  - category_id: 9
+                    title: Для Дома и Дачи
+                    slug: dlya-doma-i-daci
+                  - category_id: 10
+                    title: Мобильная техника
+                    slug: mobilnaya-texnika
+                  - category_id: 11
+                    title: Домашняя электроника
+                    slug: domasnyaya-elektronika
+                  - category_id: 12
+                    title: Бытовая техника
+                    slug: bytovaya-texnika
+                  - category_id: 13
+                    title: Образование
+                    slug: education
+
+  /api/services/chatgpt/moneybox:
+    post:
+      tags:
+        - AI
+      summary: 'Генерация описания для копилки'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  description: ''
+                  type: string
+                  example: Танцы
+                name:
+                  description: ''
+                  type: integer
+                  example: integer
+                description:
+                  description: ''
+                  type: string
+                  example: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                tries: 2
+                name: Шаг в Мир Танца
+                description: Приветствую друзья! 💃🕺 Я всегда мечтал(а) о том, чтобы танцевать как профессионал. И вот, я готов(а) сделать первый шаг к осуществлению моей мечты. Моя цель - собрать средства на обучение в престижной танцевальной школе. Это шанс не просто научиться танцевать, но и погрузиться в мир эмоций, грации и страсти, которые дарят танцы. Я посвящу каждое мгновение своего времени, чтобы достичь совершенства, и ваши вклады помогут мне начать этот путь. В будущем я обещаю делиться своими успехами и поднять мастерство до уровня, приносящего радость не только мне, но и всем вам. Заранее благодарю за любую поддержку - вместе мы сможем сделать этот мир немного ярче и танцевальнее! 🌟🎶
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Следующая бесплатная генерация будет доступна 13.03.2024 в 14:55
+  /api/services/chatgpt/copystories:
+    post:
+      tags:
+        - AI
+      summary: 'Генерация описания для сторис'
+      description: ''
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  description: ''
+                  type: string
+                  example: ем торт
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                tries: 2
+                description: Привет! 🍰 Сегодня я буду наслаждаться вкуснейшим тортом, и каждый ваш донат поможет мне купить ещё одно лакомство! Поддержите мою сладкую страсть и в следующем Сторис я покажу, что я куплю на эти средства! Каждый вклад ценен 🙏💸
+                scenario: Здравствуйте, друзья! 🎉 Сегодня у меня для вас особенный Сторис. Мы с вами проведём 'Операцию Торт'! 🍰 Сначала я покажу вам этот шедевр кондитерского искусства. (В кадре появляется торт). Смотрите на эти слои нежнейшего крема, украшенные свежими ягодами... Ах, как не хочется останавливаться на одном кусочке! 😍 Вот здесь на экране появляется кнопка доната. Если вам нравится моё увлечение сладким, можете поддержать его любым вкладом. За каждые 100 рублей я куплю что-то сладкое и поделюсь этим с вами в следующем Сторис! Ну что, помогите мне сделать этот день ещё сладким? Поехали! (Происходит дегустация торта, экспрессия удовольствия) 🤤 Спасибо за просмотр, жду вашу поддержку и до новых вкусных встреч в следующем Сторис! 🎬
+
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Следующая бесплатная генерация будет доступна 13.03.2024 в 14:55
+  /api/challenges:
+    get:
+      tags:
+        - Challenges
+      summary: 'Список челленджей'
+      description: 'participant - я участвую (если есть user_id),<br>finished - завершенные,<br>active - активные'
+      parameters:
+        - name: user_id
+          in: query
+          description: ID авторизованного пользователя
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          description: тип фильтра
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 3
+                    user_id: 67603
+                    media_id: 116
+                    description: asdasd
+                    by_comments: 0
+                    by_likes: 0
+                    by_views: 1
+                    active: 1
+                    declined: 0
+                    amount: 123
+                    start: '2024-05-13 00:00:00'
+                    finish: '2024-05-16 00:00:00'
+                    finished: 0
+                    finished_at: null
+                    blocked_at: null
+                    reason: null
+                    created_at: '2024-05-13T15:28:40.000000Z'
+                    updated_at: '2024-05-13T17:27:48.000000Z'
+                    title: asdasd
+                    user:
+                      id: 67603
+                      name: alex
+                      username: monk
+                      fullname: monk
+                      trust_rating: 0
+                      …: ...
+                    path: https://mypot.loc/api/challenges/get_video/3
+                    filepath: https://mypot.loc/uploads/challenges/fvfyvvfyv-fyv-fyvy-12-4.png
+                    type: video
+                    thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                    video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                    views_count: 0
+                    likes_count: 0
+                    comments_count: 0
+                    end_days: 3
+                    media:
+                      id: 116
+                      user_id: 67603
+                      name: фвфыввфыв фыв фывы 12 .png
+                      slug: fvfyvvfyv-fyv-fyvy-12-4
+                      …: ...
+                  - id: 2
+                    user_id: 12
+                    media_id: 61266
+                    description: sdsd
+                    by_comments: 0
+                    …: ...
+                  - id: 1
+                    user_id: 12
+                    media_id: 61266
+                    description: sdsd
+                    by_comments: 0
+                    …: ...
+                current_page: 1
+                total_pages: 1
+
+
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Текст ошибки
+  /api/challenges/store:
+    post:
+      tags:
+        - Challenges
+      summary: 'Создание челленджа'
+      description: |-
+        Создает челлендж. Запрос должен отправляться как multipart/form-data.
+        Обложка mainImg обязательна. Вводное сторис intro_story необязательно.
+        Если intro_story передан, он создается как main_story.
+        Если intro_story является видео, видео обрезается до 5 секунд и для него генерируется video_preview.
+        Челлендж-коин временно отключен: amount необязателен и сохраняется как 0.
+        Для редактирования передайте challenge_id. Неизмененные файлы повторно обрабатывать не требуется.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - min_participants
+                - days
+                - criteria[]
+                - mainImg
+              properties:
+                title:
+                  description: 'Название челленджа'
+                  type: string
+                  example: Название
+                description:
+                  description: 'Описание челленджа'
+                  type: string
+                  example: Описание
+                amount:
+                  description: 'Челлендж-коин временно отключен. Значение необязательно и сохраняется как 0.'
+                  type: integer
+                  minimum: 0
+                  maximum: 10000
+                  example: 0
+                min_participants:
+                  description: 'Минимальное количество участников для старта челленджа. Заполняется из participants_visual: 0 — не указывать, 1 — один участник, limit — значение min_participants_limit.'
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  example: 0
+                cost:
+                  description: 'Стоимость участия в челлендже'
+                  type: integer
+                  example: 0
+                days:
+                  description: 'Продолжительность челленджа в днях'
+                  type: integer
+                  minimum: 1
+                  example: 1
+                criteria[]:
+                  description: 'Критерии победителя. Минимум один элемент: by_views, by_comments, by_likes.'
+                  type: string
+                  example: by_likes
+                mainImg:
+                  description: 'Обязательная обложка челленджа: изображение или видео до 5 секунд.'
+                  type: string
+                  format: binary
+                intro_story:
+                  description: 'Необязательное вводное сторис: изображение или видео. Если передано, используется как main_story и как fallback для обложки/preview.'
+                  type: string
+                  format: binary
+                date_from_visual:
+                  description: 'Дата и время начала в формате ДД.ММ.ГГ ЧЧ:ММ. Необязательно, по умолчанию текущее время.'
+                  type: string
+                  example: '12.07.26 15:30'
+                date_to_visual:
+                  description: 'Дата и время окончания в формате ДД.ММ.ГГ ЧЧ:ММ. Необязательно.'
+                  type: string
+                  example: '19.07.26 15:30'
+                participants_visual:
+                  description: 'Число участников: 0 — не указывать, 1 — один участник, 2 — два участника, limit — значение из min_participants_limit.'
+                  type: string
+                  enum: ['0', '1', '2', limit]
+                  example: '0'
+                min_participants_limit:
+                  description: 'Лимит участников от 2 до 100. Обязателен, если participants_visual=limit.'
+                  type: integer
+                  minimum: 2
+                  maximum: 100
+                  example: 10
+                visibility:
+                  description: 'Видимость челленджа.'
+                  type: string
+                  example: all
+                rhythm_visual:
+                  description: 'Ритм челленджа.'
+                  type: string
+                  example: daily
+                checkin_visual:
+                  description: 'Тип чек-ина. Для выбора победителя по лайкам нужен story.'
+                  type: string
+                  example: story
+                reward_amount:
+                  description: 'Награда в дилсах. Необязательно, только положительное значение, не больше баланса автора.'
+                  type: integer
+                  minimum: 1
+                  example: 500
+                winner_selection:
+                  description: 'Выбор победителя: likes — по лайкам, creator — решение создателя. Если checkin_visual не story, likes автоматически заменяется на creator.'
+                  type: string
+                  enum: [likes, creator]
+                  example: likes
+                invite_user_ids[]:
+                  description: 'ID приглашенных пользователей.'
+                  type: integer
+                  example: 123
+                challenge_id:
+                  description: 'ID редактируемого челленджа. Если отсутствует, создается новый челлендж.'
+                  type: integer
+                  example: 5
+
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                challenge_id: 5
+                clear_challenge_create_draft: true
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors:
+                  mainImg:
+                    - Добавьте обложку
+                  criteria:
+                    - Поле Критерии должно быть массивом.
+                    - Количество элементов в поле Критерии должно быть не менее 1.
+                    - Выберите критерий победителя
+                  date_to:
+                    - В поле Дата окончания должна быть дата после 13.05.2024.
+
+  /api/challenges/get/{id}:
+    get:
+      tags:
+        - Challenges
+      summary: Получить челлендж
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID челленджа
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          description: Страница
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  challenge_id: 4
+                  views: 0
+                  amount: 21312
+                  description: null
+                  type: video
+                  declined: 0
+                  comments_count: 0
+                  path: https://mypot.loc/api/challenges/get_video/4
+                  likes_count: 0
+                  thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                  video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                  completion_status: completed
+                  participants_count: 10
+                  participant_user_ids: [12, 34]
+                  date_from: '2026-07-12T15:30:00.000000Z'
+                  date_to: '2026-07-19T15:30:00.000000Z'
+                  visibility: all
+                  rhythm: daily
+                  checkin: story
+                  reward_amount: 500
+                  winner_selection: creator
+                  winner_selection_status: pending
+                  winner_selection_deadline: '2026-07-22T15:30:00.000000Z'
+                  winner_selected_at: null
+                  winner_decided_by_user_id: null
+                  invite_user_ids: [123, 456]
+                  user:
+                    id: 12
+                    name: MarinaM
+                    username: ssn.work
+                    fullname: ssn.work
+                    trust_rating: 0
+                    …: null
+                  participant: null
+                  winners:
+                    - id: 12
+                      name: MarinaM
+                      last_name: null
+                      email: ssn.work@mail.ru
+                      …: null
+                    - id: 12
+                      name: MarinaM
+                      last_name: null
+                      email: ssn.work@mail.ru
+                      …: null
+                  main_story:
+                    id: 2691
+                    media_id: 64886
+                    challenge_id: 4
+                    is_main_story: true
+                    type: video
+                    thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                    video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                    story_preview:
+                      type: video
+                      url: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                      poster: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                  useful_stories: []
+                  stories: []
+                  current_page: 1
+                  total_pages: 1
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Челлендж не найден
+  /api/challenges/popular_answers:
+    get:
+      tags:
+        - Challenges
+      summary: Получить список ответов
+      description: ''
+      parameters:
+        - name: page
+          in: query
+          description: Страница
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 706
+                    user_id: 69139
+                    media_id: 61801
+                    campaign_id: null
+                    challenge_id: 41
+                    …: null
+                  - id: 744
+                    user_id: 69139
+                    media_id: 61860
+                    campaign_id: null
+                    challenge_id: 39
+                    …: null
+                current_page: 1
+                total_pages: 6
+  /api/battles:
+    get:
+      tags:
+        - Battles
+      summary: 'Список батлов'
+      description: 'participant - я участвую (если есть user_id),<br>finished - завершенные,<br>active - активные'
+      parameters:
+        - name: user_id
+          in: query
+          description: ID авторизованного пользователя
+          schema:
+            type: integer
+            format: int64
+        - name: type
+          in: query
+          description: тип фильтра
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 3
+                    user_id: 67603
+                    media_id: 116
+                    description: asdasd
+                    by_comments: 0
+                    by_likes: 0
+                    by_views: 1
+                    active: 1
+                    declined: 0
+                    amount: 123
+                    start: '2024-05-13 00:00:00'
+                    finish: '2024-05-16 00:00:00'
+                    finished: 0
+                    finished_at: null
+                    blocked_at: null
+                    reason: null
+                    created_at: '2024-05-13T15:28:40.000000Z'
+                    updated_at: '2024-05-13T17:27:48.000000Z'
+                    title: asdasd
+                    user:
+                      id: 67603
+                      name: alex
+                      username: monk
+                      fullname: monk
+                      …: ...
+                    path: https://mypot.loc/api/battles/get_video/3
+                    filepath: https://mypot.loc/uploads/battles/fvfyvvfyv-fyv-fyvy-12-4.png
+                    type: video
+                    thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                    video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                    views_count: 0
+                    likes_count: 0
+                    comments_count: 0
+                    end_days: 3
+                    media:
+                      id: 116
+                      user_id: 67603
+                      name: фвфыввфыв фыв фывы 12 .png
+                      slug: fvfyvvfyv-fyv-fyvy-12-4
+                      …: ...
+                  - id: 2
+                    user_id: 12
+                    media_id: 61266
+                    description: sdsd
+                    by_comments: 0
+                    …: ...
+                  - id: 1
+                    user_id: 12
+                    media_id: 61266
+                    description: sdsd
+                    by_comments: 0
+                    …: ...
+                current_page: 1
+                total_pages: 1
+
+
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Текст ошибки
+  /api/battles/store:
+    post:
+      tags:
+        - Battles
+      summary: 'Создание батла'
+      description: |-
+        Создает батл. Запрос должен отправляться как multipart/form-data.
+        Обложка mainImg обязательна. Вводное сторис intro_story необязательно.
+        Если intro_story передан, он создается как main_story.
+        Если intro_story является видео, видео обрезается до 5 секунд и для него генерируется video_preview.
+        called_user_id обязателен: это пользователь, которому отправлен вызов. Автор батла автоматически добавляется вторым участником.
+        Челлендж-коин временно отключен: amount необязателен и сохраняется как 0.
+        Для редактирования передайте battle_id. Автор остается активным участником батла.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - min_participants
+                - days
+                - criteria[]
+                - mainImg
+                - called_user_id
+              properties:
+                title:
+                  description: 'Название батла'
+                  type: string
+                  example: Название
+                description:
+                  description: 'Описание батла'
+                  type: string
+                  example: Описание
+                amount:
+                  description: 'Челлендж-коин временно отключен. Значение необязательно и сохраняется как 0.'
+                  type: integer
+                  minimum: 0
+                  maximum: 10000
+                  example: 0
+                min_participants:
+                  description: 'Минимальное количество участников для старта. Для батла используется значение 2.'
+                  type: integer
+                  minimum: 0
+                  maximum: 100
+                  example: 2
+                cost:
+                  description: 'Стоимость участия'
+                  type: integer
+                  example: 0
+                days:
+                  description: 'Продолжительность в днях'
+                  type: integer
+                  minimum: 1
+                  example: 1
+                criteria[]:
+                  description: 'Критерии победителя. Минимум один элемент: by_views, by_comments, by_likes.'
+                  type: string
+                  example: by_likes
+                mainImg:
+                  description: 'Обязательная обложка батла: изображение или видео до 5 секунд.'
+                  type: string
+                  format: binary
+                intro_story:
+                  description: 'Необязательное вводное сторис: изображение или видео. Если передано, используется как main_story и как fallback для обложки/preview.'
+                  type: string
+                  format: binary
+                called_user_id:
+                  description: 'ID пользователя в блоке Вызов. Не может совпадать с автором.'
+                  type: integer
+                  example: 123
+                date_from_visual:
+                  description: 'Дата и время начала в формате ДД.ММ.ГГ ЧЧ:ММ. Необязательно, по умолчанию текущее время.'
+                  type: string
+                  example: '12.07.26 15:30'
+                date_to_visual:
+                  description: 'Дата и время окончания в формате ДД.ММ.ГГ ЧЧ:ММ. Необязательно.'
+                  type: string
+                  example: '19.07.26 15:30'
+                participants_visual:
+                  description: 'Для батла используется 2 участника.'
+                  type: string
+                  enum: ['2']
+                  example: '2'
+                visibility:
+                  description: 'Видимость батла.'
+                  type: string
+                  example: all
+                rhythm_visual:
+                  description: 'Ритм батла.'
+                  type: string
+                  enum: [once, daily, three_days]
+                  example: daily
+                checkin_visual:
+                  description: 'Тип чек-ина.'
+                  type: string
+                  example: story
+                reward_amount:
+                  description: 'Награда в дилсах. Необязательно, только положительное значение, не больше баланса автора.'
+                  type: integer
+                  minimum: 1
+                  example: 500
+                invite_user_ids[]:
+                  description: 'ID приглашенных пользователей к просмотру.'
+                  type: integer
+                  example: 123
+                winner_selection:
+                  description: 'Для батла используется автоматический выбор по лайкам.'
+                  type: string
+                  enum: [likes]
+                  example: likes
+                battle_id:
+                  description: 'ID редактируемого батла. Если отсутствует, создается новый батл.'
+                  type: integer
+                  example: 5
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                battle_id: 5
+                clear_challenge_create_draft: true
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors:
+                  mainImg:
+                    - Добавьте обложку
+                  called_user_id:
+                    - Поле called user id обязательно для заполнения.
+  /api/battles/stories_list:
+    get:
+      tags:
+        - Battles
+      summary: Список сторис из батлов
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+  /api/battles/get/{id}:
+    get:
+      tags:
+        - Battles
+      summary: Получить батл
+      description: ''
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID батла
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          in: query
+          description: Страница
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  battle_id: 4
+                  views: 0
+                  amount: 21312
+                  description: null
+                  type: video
+                  declined: 0
+                  comments_count: 0
+                  path: https://mypot.loc/api/battles/get_video/4
+                  likes_count: 0
+                  thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                  video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                  completion_status: draw
+                  participants_count: 2
+                  participant_user_ids: [12, 789]
+                  date_from: '2026-07-12T15:30:00.000000Z'
+                  date_to: '2026-07-19T15:30:00.000000Z'
+                  visibility: participants
+                  rhythm: daily
+                  checkin: story
+                  reward_amount: 500
+                  winner_selection: likes
+                  invite_user_ids: [123, 456]
+                  called_user_id: 789
+                  user:
+                    id: 12
+                    name: MarinaM
+                    username: ssn.work
+                    fullname: ssn.work
+                    trust_rating: 0
+                    …: null
+                  participant: null
+                  winners:
+                    - id: 12
+                      name: MarinaM
+                      last_name: null
+                      email: ssn.work@mail.ru
+                      …: null
+                    - id: 12
+                      name: MarinaM
+                      last_name: null
+                      email: ssn.work@mail.ru
+                      …: null
+                  main_story:
+                    id: 2691
+                    media_id: 64886
+                    battle_id: 4
+                    is_main_story: true
+                    type: video
+                    thumbnail: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                    video_preview: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                    story_preview:
+                      type: video
+                      url: https://deels.ru/uploads/stories/2026/07/12/2691/preview_converted_intro.mp4
+                      poster: https://deels.ru/uploads/stories/2026/07/12/2691/thumb_2691.jpg
+                  useful_stories: []
+                  stories: []
+                  current_page: 1
+                  total_pages: 1
+
+
+        400:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: false
+                errors: Батл не найден
+  /api/battles/popular_answers:
+    get:
+      tags:
+        - Battles
+      summary: Получить список ответов
+      description: ''
+      parameters:
+        - name: page
+          in: query
+          description: Страница
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  - id: 706
+                    user_id: 69139
+                    media_id: 61801
+                    campaign_id: null
+                    battle_id: 41
+                    …: null
+                  - id: 744
+                    user_id: 69139
+                    media_id: 61860
+                    campaign_id: null
+                    battle_id: 39
+                    …: null
+                current_page: 1
+                total_pages: 6
+  # Новые методы раздела Games
+  /api/games:
+    get:
+      tags:
+        - Games
+      summary: 'Получить список игр'
+      description: 'Получение списка доступных игр с возможностью фильтрации по типу'
+      parameters:
+        - name: type
+          in: query
+          required: false
+          description: 'Тип игры для фильтрации'
+          schema:
+            type: string
+            enum:
+              - chests
+              - wheel
+            example: 'chests'
+      responses:
+        200:
+          description: 'Успешный ответ со списком игр'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      type:
+                        type: string
+                        example: "chests"
+                      settings:
+                        type: object
+                        properties:
+                          rare:
+                            type: string
+                            example: "50"
+                          time:
+                            type: string
+                            example: "2"
+                          likes:
+                            type: string
+                            example: "10"
+                          prize:
+                            type: string
+                            example: "50"
+                          chance:
+                            type: string
+                            example: "50"
+                          game_spawn:
+                            type: string
+                            example: "mid"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2025-09-04T14:55:51.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2025-09-04T14:56:07.000000Z"
+        400:
+          description: 'Ошибка запроса'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Неверный параметр type"
+  /api/game_session/create:
+    post:
+      tags:
+        - Games
+      summary: 'Создать игровую сессию'
+      description: 'Создание новой игровой сессии для пользователя'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: 'Тип игры'
+                  enum:
+                    - chests
+                    - wheel
+                  example: 'chests'
+                user_id:
+                  type: integer
+                  description: 'ID пользователя'
+                  example: 12
+      responses:
+        200:
+          description: 'Игровая сессия успешно создана'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Сессия 123 создана'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 123
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: '2025-09-11T14:30:45.000000Z'
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: '2025-09-11T14:30:45.000000Z'
+        400:
+          description: 'Ошибка при создании сессии'
+          content:
+            application/json:
+              example:
+                success: false
+                message: 'Сессия не создана. Проверьте корректность данных: Неверный тип игры'
+
+
+  /api/games/{type}:
+    get:
+      tags:
+        - Games
+      summary: 'Получить историю игры'
+      description: 'Получение истории участия пользователя в конкретной игре'
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: 'Тип игры'
+          schema:
+            type: string
+            enum:
+              - chests
+              - wheel
+            example: 'chests'
+        - name: page
+          in: query
+          required: false
+          description: 'Номер страницы для пагинации'
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: 'Успешный ответ с историей игры'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 12
+                        game:
+                          type: string
+                          example: "chests"
+                        status:
+                          type: string
+                          example: "win"
+                        tries:
+                          type: integer
+                          example: 0
+                        prize:
+                          type: integer
+                          example: 50
+                        created_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          example: null
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2025-09-04T15:23:44.000000Z"
+                  current_page:
+                    type: integer
+                    example: 1
+                  total_pages:
+                    type: integer
+                    example: 1
+                  total:
+                    type: integer
+                    example: 1
+        400:
+          description: 'Неверный тип игры'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Неверный тип игры. Доступные типы: chests, wheel"
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Требуется авторизация"
+
+  /api/game_session/{id}:
+    get:
+      tags:
+        - Games
+      summary: 'Получить информацию о игровой сессии'
+      description: 'Получение детальной информации о конкретной игровой сессии'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'ID игровой сессии'
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: 'Успешный ответ с информацией о сессии'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      user_id:
+                        type: integer
+                        example: 12
+                      game:
+                        type: string
+                        enum: ["chests", "wheel"]
+                        example: "chests"
+                      status:
+                        type: string
+                        enum: ["started", "win", "fail", "aborted"]
+                        example: "win"
+                      tries:
+                        type: integer
+                        nullable: true
+                        example: 0
+                      prize:
+                        type: integer
+                        nullable: true
+                        example: 50
+                      created_at:
+                        type: string
+                        format: date-time
+                        nullable: true
+                        example: null
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2025-09-04T15:23:44.000000Z"
+        404:
+          description: 'Сессия не найдена'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Сессия не найдена"
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Требуется авторизация"
+
+    post:
+      tags:
+        - Games
+      summary: 'Обновить игровую сессию'
+      description: 'Обновление информации о игровой сессии'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'ID игровой сессии'
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: 'ID пользователя'
+                  example: 12
+                game:
+                  type: string
+                  enum: ["chests", "wheel"]
+                  description: 'Тип игры'
+                  example: "chests"
+                status:
+                  type: string
+                  enum: ["started", "win", "fail", "aborted"]
+                  description: 'Статус сессии'
+                  example: "win"
+                tries:
+                  type: integer
+                  nullable: true
+                  description: 'Количество попыток'
+                  example: 0
+      responses:
+        200:
+          description: 'Сессия успешно обновлена'
+          content:
+            application/json:
+              example:
+                success: true
+                message: "Сессия 1 обновлена"
+        400:
+          description: 'Ошибка валидации'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Неверные параметры запроса"
+        404:
+          description: 'Сессия не найдена'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Сессия не найдена"
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                success: false
+                error: "Требуется авторизация"
+
+  /api/contacts/prompt-state:
+    get:
+      tags:
+        - Contact Discovery
+      summary: 'Статус показа запроса контактов'
+      description: 'Требуется Bearer token. Возвращает состояние запроса контактов для авторизованного пользователя. Таймер 5 минут активного времени считается на клиенте.'
+      operationId: contactsPromptState
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'Признак успешного выполнения запроса'
+                    example: true
+                  data:
+                    type: object
+                    description: 'Текущее состояние запроса доступа к контактам'
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - pending
+                          - allowed
+                          - denied
+                        description: 'Статус запроса контактов: pending — пользователь еще не выбирал действие; allowed — пользователь разрешил доступ и контакты были импортированы; denied — пользователь нажал "Позже".'
+                        example: pending
+                      source:
+                        type: string
+                        nullable: true
+                        enum:
+                          - phonebook
+                          - vk
+                          - mixed
+                        description: 'Источник полученных контактов: phonebook — телефонная книга; vk — друзья Вконтакте; mixed — использованы оба источника; null — контакты еще не импортировались.'
+                        example: null
+                      first_confirmed_at:
+                        type: string
+                        format: date-time
+                        nullable: true
+                        description: 'Дата и время первого подтвержденного доступа к контактам. null, если пользователь еще не нажимал "Разрешить".'
+                        example: null
+                      last_denied_at:
+                        type: string
+                        format: date-time
+                        nullable: true
+                        description: 'Дата и время последнего нажатия "Позже". null, если пользователь еще не откладывал запрос.'
+                        example: null
+                      next_prompt_at:
+                        type: string
+                        format: date-time
+                        nullable: true
+                        description: 'Дата и время, после которого клиенту можно снова показать окно запроса контактов. Заполняется после нажатия "Позже" как текущее время + 12 часов. null, если повторный показ не ограничен.'
+                        example: null
+                      can_prompt_now:
+                        type: boolean
+                        description: 'true, если серверное ограничение по next_prompt_at не мешает показу окна. Клиент дополнительно должен проверить, что пользователь провел в приложении 5 минут.'
+                        example: true
+              example:
+                success: true
+                data:
+                  status: pending
+                  source: null
+                  first_confirmed_at: null
+                  last_denied_at: null
+                  next_prompt_at: null
+                  can_prompt_now: true
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/contacts/deny:
+    post:
+      tags:
+        - Contact Discovery
+      summary: 'Пользователь нажал "Позже" в запросе контактов'
+      description: 'Требуется Bearer token. Сервер сохраняет отказ и время следующего возможного показа через 12 часов. Клиент снова показывает окно, когда next_prompt_at наступил и пользователь провел в приложении 5 минут.'
+      operationId: contactsDeny
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  next_prompt_at: '2026-06-24T09:00:00.000000Z'
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/contacts/import:
+    post:
+      tags:
+        - Contact Discovery
+      summary: 'Импорт хешей телефонов из контактной книги'
+      description: 'Требуется Bearer token. Клиент нормализует телефоны в единый формат, считает SHA-256 и отправляет только 64-символьные hex-хеши. Сырые телефоны на сервер не отправляются. Правила нормализации: удалить все символы кроме цифр; если 10 цифр и номер начинается с 9, добавить код РФ 7; если 11 цифр и номер начинается с 8, заменить 8 на 7; принимать только номера 11-15 цифр, не начинающиеся с 0; SHA-256 считать от строки с плюсом, например +79991234567.'
+      operationId: contactsImport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone_hashes
+              properties:
+                phone_hashes:
+                  description: 'Массив SHA-256 хешей телефонов'
+                  type: array
+                  maxItems: 5000
+                  items:
+                    type: string
+                    minLength: 64
+                    maxLength: 64
+                    example: 2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                found_users:
+                  - id: 123
+                    username: username1
+                    avatar: https://deels.ru/default_avatars/avatar_1.png
+                    source: phone
+                show_friends_popup: true
+        422:
+          description: 'Ошибка валидации'
+          content:
+            application/json:
+              example:
+                message: The given data was invalid.
+                errors:
+                  phone_hashes.0:
+                    - The phone_hashes.0 format is invalid.
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/contacts/suggestions:
+    get:
+      tags:
+        - Contact Discovery
+      summary: 'Найденные друзья в Deels'
+      description: 'Требуется Bearer token. Возвращает найденных пользователей, на которых текущий пользователь еще не подписался через окно предложения друзей.'
+      operationId: contactsSuggestions
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                found_users:
+                  - id: 123
+                    username: username1
+                    avatar: https://deels.ru/default_avatars/avatar_1.png
+                    source: phone
+                  - id: 456
+                    username: username2
+                    avatar: https://deels.ru/default_avatars/avatar_2.png
+                    source: vk
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/contacts/suggestions/follow:
+    post:
+      tags:
+        - Contact Discovery
+      summary: 'Подписаться на найденных друзей'
+      description: 'Требуется Bearer token. Используется при нажатии "Да" в окне "Ваши друзья уже на Deels". Подписывает текущего пользователя только на тех пользователей, которые были найдены через импорт контактов или VK-друзей.'
+      operationId: contactsSuggestionsFollow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_ids
+              properties:
+                user_ids:
+                  description: 'ID найденных пользователей'
+                  type: array
+                  maxItems: 500
+                  items:
+                    type: integer
+                    example: 123
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                followed_user_ids:
+                  - 123
+                  - 456
+        422:
+          description: 'Ошибка валидации'
+          content:
+            application/json:
+              example:
+                message: The given data was invalid.
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/vk/friends/import:
+    post:
+      tags:
+        - Contact Discovery
+      summary: 'Импорт ID друзей Вконтакте'
+      description: 'Требуется Bearer token. Используется после VK-регистрации/авторизации, если клиент запросил право доступа к списку друзей. Сервер сохраняет VK ID друзей и ищет среди них пользователей Deels по users.vk_id.'
+      operationId: vkFriendsImport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - vk_friend_ids
+              properties:
+                vk_friend_ids:
+                  description: 'Массив VK ID друзей пользователя'
+                  type: array
+                  maxItems: 10000
+                  items:
+                    type: string
+                    example: '123456789'
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              example:
+                success: true
+                found_users:
+                  - id: 456
+                    username: username2
+                    avatar: https://deels.ru/default_avatars/avatar_2.png
+                    source: vk
+                show_friends_popup: true
+        422:
+          description: 'Ошибка валидации'
+          content:
+            application/json:
+              example:
+                message: The given data was invalid.
+        401:
+          description: 'Пользователь не авторизован'
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+
+  /api/challenges/select_winners:
+    post:
+      tags: [Challenges]
+      summary: Ручной выбор победителей челленджа
+      description: Доступно автору в течение трех дней после завершения, когда winner_selection=creator и winner_selection_status=pending.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challenge_id, winner_user_ids]
+              properties:
+                challenge_id:
+                  type: integer
+                winner_user_ids:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: Победители сохранены
+          content:
+            application/json:
+              example: {success: true, winner_user_ids: [12, 34]}
+        422:
+          description: Выбор недоступен, просрочен или содержит недопустимых пользователей
+
+  /api/challenges/delete:
+    post:
+      tags: [Challenges]
+      summary: Удалить челлендж
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [challenge_id]
+              properties:
+                challenge_id: {type: integer}
+      responses:
+        200:
+          description: Результат удаления
+          content:
+            application/json:
+              example: {success: true, message: Челлендж удален}
+
+  /api/battles/delete:
+    post:
+      tags: [Battles]
+      summary: Удалить батл
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [battle_id]
+              properties:
+                battle_id: {type: integer}
+      responses:
+        200:
+          description: Результат удаления
+
+  /api/challenges/preview/{id}:
+    get:
+      tags: [Challenges]
+      summary: HTML-превью челленджа для модального окна
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+        - {name: user_id, in: query, required: false, schema: {type: integer}}
+      responses:
+        200:
+          description: HTML находится в поле data
+
+  /api/battles/preview/{id}:
+    get:
+      tags: [Battles]
+      summary: HTML-превью батла для модального окна
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+        - {name: user_id, in: query, required: false, schema: {type: integer}}
+      responses:
+        200:
+          description: HTML находится в data, данные батла находятся в battle
+
+  /api/challenges/get_video/{id}:
+    get:
+      tags: [Challenges]
+      summary: Поток основного медиа вводного сторис или обложки челленджа
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200: {description: Медиафайл с поддержкой Range-запросов}
+        404: {description: Челлендж или медиа недоступны}
+
+  /api/battles/get_video/{id}:
+    get:
+      tags: [Battles]
+      summary: Поток основного медиа вводного сторис или обложки батла
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200: {description: Медиафайл с поддержкой Range-запросов}
+        404: {description: Батл или медиа недоступны}
+
+  /api/contests/{type}/{id}/join:
+    post:
+      tags: [Challenges, Battles]
+      summary: Принять участие
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200:
+          description: Пользователь стал участником без перехода к загрузке сторис
+          content:
+            application/json:
+              example: {success: true, status: active, message: Вы участвуете}
+
+  /api/contests/{type}/{id}/leave:
+    post:
+      tags: [Challenges, Battles]
+      summary: Выйти из участия
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200:
+          description: Участие прекращено
+          content:
+            application/json:
+              example: {success: true, status: left, message: Участие прекращено}
+
+  /api/contests/{type}/{id}/rejoin:
+    post:
+      tags: [Challenges, Battles]
+      summary: Возобновить участие
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200:
+          description: Участие возобновлено
+
+  /api/battles/{id}/accept:
+    post:
+      tags: [Battles]
+      summary: Принять вызов в батл
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200:
+          description: Пользователь добавлен в участники
+          content:
+            application/json:
+              example: {success: true, status: active, message: Вызов принят}
+
+  /api/battles/{id}/decline:
+    post:
+      tags: [Battles]
+      summary: Отклонить вызов в батл
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      responses:
+        200:
+          description: Вызов отклонен, автор получает уведомление
+          content:
+            application/json:
+              example: {success: true, status: declined, message: Вызов отклонен}
+
+  /api/contests/{type}/{id}/invites/users:
+    get:
+      tags: [Challenges, Battles]
+      summary: Пользователи для приглашения или вызова
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+        - {name: search, in: query, required: false, schema: {type: string}}
+      responses:
+        200: {description: Списки друзей, случайных пользователей и результаты поиска}
+
+  /api/contests/invites/users:
+    get:
+      tags: [Challenges, Battles]
+      summary: Пользователи для приглашения до создания челленджа или батла
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: search, in: query, required: false, schema: {type: string}}
+        - {name: friends_only, in: query, required: false, schema: {type: boolean}}
+        - {name: exclude_ids, in: query, required: false, schema: {type: string}, description: ID через запятую}
+      responses:
+        200: {description: Списки друзей, случайных пользователей и результаты поиска}
+
+  /api/contests/{type}/{id}/invites:
+    post:
+      tags: [Challenges, Battles]
+      summary: Добавить приглашенных пользователей
+      description: При редактировании существующие приглашения не удаляются.
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_ids]
+              properties:
+                user_ids:
+                  type: array
+                  minItems: 1
+                  items: {type: integer}
+      responses:
+        200:
+          description: Новые приглашения
+          content:
+            application/json:
+              example: {success: true, invited_ids: [123, 456]}
+
+  /api/contests/{type}/{id}/reports:
+    post:
+      tags: [Challenges, Battles]
+      summary: Отправить чек-ин без сторис
+      security:
+        - bearerAuth: []
+      parameters:
+        - {name: type, in: path, required: true, schema: {type: string, enum: [challenge, battle]}}
+        - {name: id, in: path, required: true, schema: {type: integer}}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                  description: Обязательно для checkin=value
+      responses:
+        200: {description: Созданный или обновленный отчет и суммарное значение}
+
+  /api/stories/exclude-useful:
+    post:
+      tags: [Stories, Challenges, Battles]
+      summary: Исключить сторис из блока Полезное
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [story_id]
+              properties:
+                story_id: {type: integer}
+      responses:
+        200:
+          description: Сторис остается в профиле, но отвязывается от челленджа или батла
+          content:
+            application/json:
+              example: {success: true}
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+  responses:
+    SuspiciousRestriction:
+      description: 'Действие ограничено для подозрительного аккаунта'
+      headers:
+        Retry-After:
+          description: 'Оставшееся время блокировки в секундах'
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuspiciousRestrictionResponse'
+  schemas:
+    SuspiciousRestrictionResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - need_actions
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: 'Ваша активность слишком великая, наш сервер перегрелся и ему нужно отдохнуть. Все возможности восстановятся через 1 ч.'
+        message:
+          type: string
+          example: 'Ваша активность слишком великая, наш сервер перегрелся и ему нужно отдохнуть. Все возможности восстановятся через 1 ч.'
+        need_actions:
+          type: object
+          additionalProperties:
+            type: string
+          example: {}
+        shouldShowEmailPrompt:
+          type: boolean
+          example: false
+        shouldShowPhonePrompt:
+          type: boolean
+          example: false
+        suspicious_blocked_until:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-07-17T13:00:00+03:00'
+        suspicious_retry_after:
+          type: integer
+          nullable: true
+          description: 'Оставшееся время блокировки в секундах'
+          example: 3600
+        retry_after:
+          type: integer
+          nullable: true
+          description: 'Совместимое поле оставшегося времени в секундах'
+          example: 3600
+
+tags:
+  - name: Auth
+    description: Регистрация, авторизация
+  - name: Campaigns
+    description: ''
+  - name: Stories
+    description: ''
+  - name: Challenges
+    description: ''
+  - name: Battles
+    description: ''
+  - name: Users
+    description: ''
+  - name: Messages
+    description: ''
+  - name: Wallet
+    description: ''
+  - name: Content
+    description: ''
+  - name: Games
+    description: ''
+  - name: Contact Discovery
+    description: Запрос контактов, импорт хешей телефонов и друзей Вконтакте
+
+  - name: AI
+    description: Веб-сервис по взаимодействию с chatgpt

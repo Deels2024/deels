@@ -1,0 +1,17 @@
+.main-content__donate-submit {
+  padding: 15px 48px;
+  border: none;
+  border-radius: 10px;
+  width: 180px;
+  background: linear-gradient(90deg, #b224ef 0%, #7579ff 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-submit {
+    width: 100%;
+  }
+}

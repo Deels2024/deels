@@ -1,0 +1,13 @@
+.pop-up__button-donate {
+    padding: 20px 40px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(90deg, #B224EF 0%, #7579FF 100%);
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    position: absolute;
+    bottom: -100px;
+    left: 9%;
+    cursor: pointer;
+}

@@ -1,0 +1,34 @@
+.main-content__donate-repost-icon {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 47px;
+  position: relative;
+  margin-left: 22px;
+  margin-right: 23px;
+}
+
+.main-content__donate-repost-icon::before {
+  content: "";
+  width: 20px;
+  height: 3px;
+  bottom: 0;
+  background-color: #00f0ff;
+  position: absolute;
+  box-shadow: 0 0 8px #00f0ff;
+}
+
+.main-content__donate-repost-icon::after {
+  content: "";
+  width: 3px;
+  height: 46px;
+  background-color: #00f0ff;
+  position: absolute;
+  box-shadow: 0 0 8px #00f0ff;
+}
+
+@media screen and (max-width: 600px) {
+  .main-content__donate-repost-icon {
+    display: none;
+  }
+}

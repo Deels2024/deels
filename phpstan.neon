@@ -1,0 +1,15 @@
+parameters:
+    paths:
+        - app
+        - bootstrap
+        - config
+        - database
+        - public
+        - resources/views
+        - routes
+        - tests
+    excludePaths:
+        - vendor
+    level: 3
+    inferPrivatePropertyTypeFromConstructor: true
+    checkMissingIterableValueType: false
