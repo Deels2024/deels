@@ -23,6 +23,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="{{ext_asset('/dist/css/app.min.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
+    <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
         window.Laravel = {!! json_encode([
