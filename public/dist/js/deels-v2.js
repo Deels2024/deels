@@ -81,7 +81,7 @@
   }
 
   function upgradeCatalogCards() {
-    var selectors = ['.challenge-item', '.story-item', '.finish-item', '.bank__item', '.campaign-card'];
+    var selectors = ['.challenge-item', '.story-item', '.finish-item', '.bank__item', '.campaign-card', '.challenge-card', '.copystories-item', '.tops-story'];
     document.querySelectorAll(selectors.join(',')).forEach(function (card) {
       card.classList.add('deels-v2-live-card');
     });
@@ -93,6 +93,90 @@
     });
   }
 
+  function storyItems() {
+    return Array.prototype.slice.call(document.querySelectorAll('.show_story[data-route]'));
+  }
+
+  function openStory(item) {
+    if (!item) return;
+    item.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+  }
+
+  function storyNeighbor(direction) {
+    var popup = document.getElementById('story-popup');
+    if (!popup) return;
+    var currentId = popup.getAttribute('data-current-story');
+    var items = storyItems();
+    if (!items.length) return;
+    var index = items.findIndex(function (item) {
+      return String(item.getAttribute('data-story') || '') === String(currentId || '');
+    });
+    if (index < 0) index = 0;
+    var next = (index + direction + items.length) % items.length;
+    if (window.jQuery && window.jQuery.magnificPopup) window.jQuery.magnificPopup.close();
+    window.setTimeout(function () { openStory(items[next]); }, 80);
+  }
+
+  function enhanceStoryPopup() {
+    var popup = document.getElementById('story-popup');
+    if (!popup || popup.dataset.deelsV2Enhanced === '1') return;
+    popup.dataset.deelsV2Enhanced = '1';
+
+    var nav = document.createElement('div');
+    nav.className = 'story-swipe-nav';
+    nav.innerHTML = '<button type="button" class="story-swipe-prev" aria-label="Предыдущая сторис">‹</button><button type="button" class="story-swipe-next" aria-label="Следующая сторис">›</button>';
+    popup.appendChild(nav);
+
+    var hint = document.createElement('div');
+    hint.className = 'story-swipe-hint';
+    hint.textContent = 'Свайп ← →';
+    popup.appendChild(hint);
+
+    nav.querySelector('.story-swipe-prev').addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      storyNeighbor(-1);
+    });
+    nav.querySelector('.story-swipe-next').addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      storyNeighbor(1);
+    });
+
+    var startX = null;
+    popup.addEventListener('touchstart', function (event) {
+      if (event.touches && event.touches.length === 1) startX = event.touches[0].clientX;
+    }, { passive: true });
+    popup.addEventListener('touchend', function (event) {
+      if (startX === null || !event.changedTouches || !event.changedTouches.length) return;
+      var delta = event.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(delta) < 50) return;
+      storyNeighbor(delta < 0 ? 1 : -1);
+    }, { passive: true });
+
+    document.addEventListener('keydown', function (event) {
+      if (!document.querySelector('.mfp-wrap') || !document.querySelector('.mfp-content #story-popup')) return;
+      if (event.key === 'ArrowLeft') storyNeighbor(-1);
+      if (event.key === 'ArrowRight') storyNeighbor(1);
+    });
+
+    document.addEventListener('click', function (event) {
+      var trigger = event.target.closest && event.target.closest('.show_story[data-story]');
+      if (!trigger) return;
+      popup.setAttribute('data-current-story', trigger.getAttribute('data-story') || '');
+    }, true);
+  }
+
+  function observeDynamicContent() {
+    if (!window.MutationObserver) return;
+    var observer = new MutationObserver(function () {
+      upgradeCatalogCards();
+      enhanceStoryPopup();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
   ready(function () {
     document.body.classList.add('deels-v2-enabled');
     upgradeHeader();
@@ -100,5 +184,7 @@
     labelPage();
     upgradeCatalogCards();
     upgradeHeadings();
+    enhanceStoryPopup();
+    observeDynamicContent();
   });
 })();
