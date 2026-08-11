@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-compat.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-create.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-social.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-account.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
