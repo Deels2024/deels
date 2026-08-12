@@ -58,7 +58,7 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapApiRoutes();
-
+        $this->mapDeelsCompatibilityRoutes();
         $this->mapWebRoutes();
     }
 
@@ -85,5 +85,15 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    /**
+     * REST aliases/adapters used by the new Deels design.
+     */
+    protected function mapDeelsCompatibilityRoutes(): void
+    {
+        Route::prefix('api')
+             ->middleware('api')
+             ->group(base_path('routes/deels_compat.php'));
     }
 }
