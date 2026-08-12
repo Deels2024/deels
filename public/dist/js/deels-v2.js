@@ -2,15 +2,8 @@
   'use strict';
 
   function ready(fn) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn, { once: true });
-    } else {
-      fn();
-    }
-  }
-
-  function route(path) {
-    return window.location.pathname === path;
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
+    else fn();
   }
 
   function ensureNavLink(label, href, beforeLabel) {
@@ -19,55 +12,50 @@
       var links = Array.prototype.slice.call(list.querySelectorAll('a'));
       if (links.some(function (link) { return link.textContent.trim() === label; })) return;
       var li = document.createElement('li');
+      li.className = 'deels-source-nav-link';
       var a = document.createElement('a');
       a.href = href;
       a.textContent = label;
       li.appendChild(a);
       var before = links.find(function (link) { return link.textContent.trim() === beforeLabel; });
-      if (before && before.parentElement && before.parentElement.parentElement === list) {
-        list.insertBefore(li, before.parentElement);
-      } else {
-        list.appendChild(li);
-      }
+      if (before && before.parentElement && before.parentElement.parentElement === list) list.insertBefore(li, before.parentElement);
+      else list.appendChild(li);
     });
   }
 
-  function upgradeHeader() {
+  function normalizeNav() {
+    ensureNavLink('Лента', '/stories?type=new', 'Челленджи');
     ensureNavLink('Баттлы', '/battles', 'Сторис');
-    ensureNavLink('Копилки', '/campaign', 'Контакты');
-    var header = document.querySelector('.header');
-    if (header) header.classList.add('deels-v2-header');
+    ensureNavLink('Копилки', '/campaigns', 'Контакты');
+
+    document.querySelectorAll('.header__list ul, .header__menu-list').forEach(function (list) {
+      Array.prototype.slice.call(list.querySelectorAll('a')).forEach(function (link) {
+        var text = link.textContent.trim();
+        if (text === 'Сторис') link.textContent = 'Истории';
+        if (['Главная', 'Контакты', 'О нас', 'Начать копить'].indexOf(text) !== -1) {
+          if (link.parentElement) link.parentElement.classList.add('deels-source-hide');
+        }
+      });
+    });
   }
 
-  function buildHomeHero() {
-    if (!route('/') || document.querySelector('.deels-v2-home-hero')) return;
-    var anchor = document.querySelector('header');
-    if (!anchor) return;
+  function ensureCreateButton() {
+    var actions = document.querySelector('.header__icons');
+    if (!actions || actions.querySelector('.deels-source-create')) return;
+    var create = document.createElement('a');
+    create.className = 'deels-source-create';
+    create.href = '/dashboard/challenges/create';
+    create.innerHTML = '<span aria-hidden="true">+</span> Создать';
+    var profile = actions.querySelector('.header_profile');
+    if (profile) actions.insertBefore(create, profile);
+    else actions.appendChild(create);
+  }
 
-    var section = document.createElement('section');
-    section.className = 'deels-v2-home-hero';
-    section.innerHTML = '' +
-      '<div class="container deels-v2-home-hero__grid">' +
-        '<div class="deels-v2-home-hero__copy">' +
-          '<span class="deels-v2-eyebrow">Твоя площадка для движения</span>' +
-          '<h1>Создавай. Участвуй. <em>Побеждай.</em></h1>' +
-          '<p>Челленджи, баттлы, вертикальные видео и копилки в одном месте. Снимай ответы, голосуй, общайся и получай награды.</p>' +
-          '<div class="deels-v2-home-hero__actions">' +
-            '<a class="btn" href="/dashboard/challenges/create">Создать челлендж</a>' +
-            '<a class="btn btn-grey" href="/stories">Смотреть ленту</a>' +
-          '</div>' +
-          '<div class="deels-v2-home-hero__proof"><span>● Живые челленджи</span><span>● Реальные голоса</span><span>● Награды и донаты</span></div>' +
-        '</div>' +
-        '<div class="deels-v2-home-phone" aria-hidden="true">' +
-          '<div class="deels-v2-home-phone__screen">' +
-            '<div class="deels-v2-home-phone__badge">В ТРЕНДЕ</div>' +
-            '<div class="deels-v2-home-phone__emoji">🔥</div>' +
-            '<div class="deels-v2-home-phone__copy"><small>@deels</small><strong>Покажи, на что ты способен</strong><span>Свайпай ленту и выбирай следующий челлендж</span></div>' +
-            '<div class="deels-v2-home-phone__rail"><b>♡</b><b>◉</b><b>↗</b></div>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    anchor.insertAdjacentElement('afterend', section);
+  function upgradeHeader() {
+    normalizeNav();
+    ensureCreateButton();
+    var header = document.querySelector('.header');
+    if (header) header.classList.add('deels-source-header');
   }
 
   function labelPage() {
@@ -82,14 +70,12 @@
 
   function upgradeCatalogCards() {
     var selectors = ['.challenge-item', '.story-item', '.finish-item', '.bank__item', '.campaign-card', '.challenge-card', '.copystories-item', '.tops-story'];
-    document.querySelectorAll(selectors.join(',')).forEach(function (card) {
-      card.classList.add('deels-v2-live-card');
-    });
+    document.querySelectorAll(selectors.join(',')).forEach(function (card) { card.classList.add('deels-v2-live-card'); });
   }
 
   function upgradeHeadings() {
     document.querySelectorAll('h1, h2').forEach(function (heading) {
-      if (!heading.closest('header, footer, .chat')) heading.classList.add('deels-v2-heading');
+      if (!heading.closest('header, footer, .chat, .deels-source-home')) heading.classList.add('deels-v2-heading');
     });
   }
 
@@ -133,14 +119,10 @@
     popup.appendChild(hint);
 
     nav.querySelector('.story-swipe-prev').addEventListener('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      storyNeighbor(-1);
+      event.preventDefault(); event.stopPropagation(); storyNeighbor(-1);
     });
     nav.querySelector('.story-swipe-next').addEventListener('click', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      storyNeighbor(1);
+      event.preventDefault(); event.stopPropagation(); storyNeighbor(1);
     });
 
     var startX = null;
@@ -180,7 +162,6 @@
   ready(function () {
     document.body.classList.add('deels-v2-enabled');
     upgradeHeader();
-    buildHomeHero();
     labelPage();
     upgradeCatalogCards();
     upgradeHeadings();
