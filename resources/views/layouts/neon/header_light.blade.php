@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-auth-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-auth-functions-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-unified-theme.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-qa-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-auth-functions-v2.js')}}"></script>
 
@@ -66,7 +67,7 @@
 		async function registerSW() {
 			if ('serviceWorker' in navigator) {
 				try {
-					await navigator.serviceWorker.register('/sw.js');
+					await serviceWorker.register('/sw.js');
 				} catch (e) {
 					console.log('ServiceWorker registration failed. Sorry about that.');
 				}
