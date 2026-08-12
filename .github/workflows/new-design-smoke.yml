@@ -10,6 +10,7 @@ on:
       - public/dist/css/deelsweb-*.css
       - public/dist/js/deels-v2.js
       - public/dist/js/deels-functional-v2.js
+      - public/dist/js/deels-admin-v2.js
       - .github/workflows/new-design-smoke.yml
   workflow_dispatch:
 
@@ -53,11 +54,16 @@ jobs:
             public/dist/css/deelsweb-dashboard-source.css \
             public/dist/css/deelsweb-create-source.css \
             public/dist/css/deelsweb-auth-source.css \
+            public/dist/css/deelsweb-auth-functions-source.css \
             public/dist/css/deelsweb-functional-source.css \
             public/dist/css/deelsweb-contest-actions-source.css \
             public/dist/css/deelsweb-wallet-tools-source.css \
+            public/dist/css/deelsweb-profile-functions-source.css \
+            public/dist/css/deelsweb-messages-functions-source.css \
+            public/dist/css/deelsweb-admin-source.css \
             public/dist/js/deels-v2.js \
-            public/dist/js/deels-functional-v2.js; do
+            public/dist/js/deels-functional-v2.js \
+            public/dist/js/deels-admin-v2.js; do
             test -s "$file" || { echo "Missing or empty asset: $file"; exit 1; }
           done
 
@@ -76,7 +82,8 @@ jobs:
             resources/views/admin/profile_edit.blade.php \
             resources/views/dashboard/wallet/wallet_index.blade.php \
             resources/views/auth/login.blade.php \
-            resources/views/auth/register.blade.php; do
+            resources/views/auth/register.blade.php \
+            resources/views/layouts/admin/parts/admin_menu.blade.php; do
             test -s "$file" || { echo "Missing Blade surface: $file"; exit 1; }
           done
 
@@ -159,6 +166,45 @@ jobs:
           grep -q 'contest-journal' public/dist/css/deelsweb-contest-actions-source.css
           grep -q 'battle-reports' public/dist/css/deelsweb-contest-actions-source.css
 
+      - name: Verify profile and messaging functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'profile-reflink' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'profile-dignity' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'profile-donate' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'profile-statistics' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'header-chat__btn--notifications' public/dist/css/deelsweb-messages-functions-source.css
+          grep -q 'abuse_modal' public/dist/css/deelsweb-messages-functions-source.css
+          grep -q 'chat-form' public/dist/css/deelsweb-messages-functions-source.css
+
+      - name: Verify auth security functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'registration_fill_time_ms' resources/views/auth/register.blade.php
+          grep -q 'registration_keypress_count' resources/views/auth/register.blade.php
+          grep -q 'registration_paste_insert_count' resources/views/auth/register.blade.php
+          grep -q 'registration_browser_autofill' resources/views/auth/register.blade.php
+          grep -q 'name="contact_url"' resources/views/auth/register.blade.php
+          grep -q 'emailCodeField' resources/views/auth/register.blade.php
+          grep -q 'name="phone"' resources/views/auth/register.blade.php
+          grep -q "route('password.request')" resources/views/auth/register.blade.php
+          grep -q "auth.socials_light" resources/views/auth/register.blade.php
+          grep -q 'enable_recaptcha_registration' resources/views/auth/register.blade.php
+          grep -q 'agree_1' resources/views/auth/register.blade.php
+          grep -q 'agree_2' resources/views/auth/register.blade.php
+          grep -q 'agree_3' resources/views/auth/register.blade.php
+          grep -q 'agree_4' resources/views/auth/register.blade.php
+
+      - name: Verify permission-driven admin center
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'document.querySelector(.admin_menu' public/dist/js/deels-admin-v2.js || grep -q "document.querySelector('.admin_menu')" public/dist/js/deels-admin-v2.js
+          grep -q 'collectAdminLinks' public/dist/js/deels-admin-v2.js
+          grep -q 'deels-admin-hub' public/dist/css/deelsweb-admin-source.css
+
       - name: Verify no duplicate scripted homepage hero
         shell: bash
         run: |
@@ -205,7 +251,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          php artisan route:list --columns=method,uri,name 2>&1 | tee /tmp/routes.txt
+          php artisan route:list 2>&1 | tee /tmp/routes.txt
 
       - name: Verify runtime routes
         shell: bash
