@@ -37,6 +37,79 @@
     else account.insertBefore(nav, account.firstChild);
   }
 
+  function ensureWalletGuidance() {
+    if (window.location.pathname !== '/dashboard/wallet') return;
+    var withdraw = document.getElementById('withdraw');
+    if (!withdraw || withdraw.dataset.guidanceEnhanced === '1') return;
+    withdraw.dataset.guidanceEnhanced = '1';
+
+    var form = withdraw.querySelector('#walletWithdraw');
+    if (!form) return;
+    var amount = form.querySelector('[name="withdraw_input"]');
+    var button = form.querySelector('.btn_withdraw');
+    if (!amount || !button) return;
+
+    var guide = document.createElement('div');
+    guide.className = 'deels-wallet-guidance';
+    guide.innerHTML = '' +
+      '<strong>Условия вывода</strong>' +
+      '<ul>' +
+        '<li>Минимальная сумма — 500 ₽.</li>' +
+        '<li>Комиссия проекта — 20%; к выплате поступает 80% запрошенной суммы.</li>' +
+        '<li>Одновременно может обрабатываться только одна заявка.</li>' +
+        '<li>Повторный вывод доступен не чаще одного раза в 30 дней.</li>' +
+        '<li>Фактическая доступность и реквизиты повторно проверяются сервером.</li>' +
+      '</ul>';
+    form.insertBefore(guide, form.firstChild);
+
+    var status = document.createElement('div');
+    status.className = 'deels-wallet-client-status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    button.parentNode.insertBefore(status, button);
+
+    function validateAmount() {
+      var value = Number(String(amount.value || '').replace(/[^0-9]/g, ''));
+      if (!value) {
+        status.textContent = '';
+        button.removeAttribute('aria-disabled');
+        return true;
+      }
+      if (value < 500) {
+        status.textContent = 'Минимальная сумма для вывода — 500 ₽.';
+        status.className = 'deels-wallet-client-status is-error';
+        button.setAttribute('aria-disabled', 'true');
+        return false;
+      }
+      status.textContent = 'Предварительно к выплате: ' + Math.floor(value * 0.8).toLocaleString('ru-RU') + ' ₽ после комиссии 20%.';
+      status.className = 'deels-wallet-client-status is-ok';
+      button.removeAttribute('aria-disabled');
+      return true;
+    }
+
+    amount.addEventListener('input', validateAmount);
+    button.addEventListener('click', function (event) {
+      if (!validateAmount()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        amount.focus();
+      }
+    }, true);
+  }
+
+  function ensureDepositGuidance() {
+    if (window.location.pathname !== '/dashboard/wallet') return;
+    var deposit = document.getElementById('deposit');
+    if (!deposit || deposit.dataset.guidanceEnhanced === '1') return;
+    deposit.dataset.guidanceEnhanced = '1';
+    var form = deposit.querySelector('form');
+    if (!form) return;
+    var note = document.createElement('div');
+    note.className = 'deels-wallet-guidance deels-wallet-guidance--compact';
+    note.innerHTML = '<strong>Пополнение</strong><p>После подтверждения Deels перенаправит вас на защищённую платёжную страницу. Результат платежа вернётся в кошелёк автоматически.</p>';
+    form.insertBefore(note, form.firstChild);
+  }
+
   function ensureGuestContestPrompt() {
     if (Number(window.userId || 0) !== 0) return;
     if (!/^\/(challenges|battles)\/show\//.test(window.location.pathname)) return;
@@ -92,6 +165,8 @@
     if (!window.MutationObserver) return;
     var observer = new MutationObserver(function () {
       ensureWalletTools();
+      ensureWalletGuidance();
+      ensureDepositGuidance();
       ensureGuestContestPrompt();
       enhanceContestState();
     });
@@ -100,6 +175,8 @@
 
   ready(function () {
     ensureWalletTools();
+    ensureWalletGuidance();
+    ensureDepositGuidance();
     ensureGuestContestPrompt();
     enhanceContestState();
     observeFunctionalStates();
