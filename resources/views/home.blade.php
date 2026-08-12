@@ -24,13 +24,8 @@
             <div class="container source-hero-grid">
                 <div class="source-hero-copy">
                     <span class="eyebrow">✦ Здесь начинается движение</span>
-                    <h1>
-                        Твоя идея<br>
-                        может стать <em>движением</em>
-                    </h1>
-                    <p>
-                        Создавай челленджи, снимай ответы, участвуй в баттлах, рассказывай истории и собирай поддержку на идеи, которые важны тебе.
-                    </p>
+                    <h1>Твоя идея<br>может стать <em>движением</em></h1>
+                    <p>Создавай челленджи, снимай ответы, участвуй в баттлах и поддерживай истории, которые хочется разделить.</p>
                     <div class="source-hero-actions">
                         <a href="{{ route('challenges.create') }}" class="button button-primary">Создать челлендж →</a>
                         <a href="{{ route('stories.catalog') }}" class="button button-glass">▶ Смотреть ленту</a>
@@ -39,7 +34,7 @@
                         <div class="source-avatar-stack" aria-hidden="true">
                             <span>АК</span><span>МС</span><span>ОЛ</span><span>+{{ number_format($usersCount ?? 0, 0, ',', ' ') }}</span>
                         </div>
-                        <p><strong>{{ number_format($usersCount ?? 0, 0, ',', ' ') }}+</strong><br>пользователей уже в Deels</p>
+                        <p><strong>{{ number_format($usersCount ?? 0, 0, ',', ' ') }}+</strong><br>уже создают в Deels</p>
                     </div>
                 </div>
 
@@ -54,9 +49,8 @@
                     <div class="source-floating-chip source-chip-trend">
                         <span>↗</span>
                         <strong>В тренде</strong>
-                        <small>{{ number_format($storiesCount ?? 0, 0, ',', ' ') }} сторис</small>
+                        <small>{{ number_format($storiesCount ?? 0, 0, ',', ' ') }} ответов</small>
                     </div>
-
                     <div class="source-phone-frame">
                         <div class="source-phone-top">
                             <span class="source-brand"><span class="source-brand-mark">D</span></span>
@@ -84,26 +78,6 @@
                         </div>
                         <div class="source-phone-nav"><span>⌂</span><span>⌕</span><b>+</b><span>◌</span><span>●</span></div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="source-ecosystem" aria-labelledby="ecosystem-title">
-            <div class="container">
-                <div class="source-section-head" style="margin-bottom:28px">
-                    <div>
-                        <span class="eyebrow">✦ Больше, чем лента</span>
-                        <h2 id="ecosystem-title">Всё, что можно делать в Deels</h2>
-                        <p>Один профиль объединяет творчество, соревнования, поддержку авторов и общение.</p>
-                    </div>
-                </div>
-                <div class="source-ecosystem-grid">
-                    <a class="source-ecosystem-card" href="{{ route('challenges.catalog', ['content' => 'challenges']) }}"><span class="source-ecosystem-icon">✦</span><strong>Челленджи</strong><span>Запускай идеи, отвечай видео и собирай голоса.</span></a>
-                    <a class="source-ecosystem-card" href="{{ route('challenges.catalog', ['content' => 'battles']) }}"><span class="source-ecosystem-icon">⚡</span><strong>Баттлы</strong><span>Вызывай соперников и соревнуйся один на один.</span></a>
-                    <a class="source-ecosystem-card" href="{{ route('stories.catalog') }}"><span class="source-ecosystem-icon">▶</span><strong>Истории</strong><span>Публикуй вертикальные видео и находи аудиторию.</span></a>
-                    <a class="source-ecosystem-card" href="{{ route('browse_campaign') }}"><span class="source-ecosystem-icon">💜</span><strong>Копилки</strong><span>Собирай поддержку на мечты, проекты и добрые дела.</span></a>
-                    <a class="source-ecosystem-card" href="{{ Auth::check() ? route('user_wallet') : route('login') }}"><span class="source-ecosystem-icon">₽</span><strong>Кошелёк</strong><span>Пополняй баланс, получай поддержку и следи за операциями.</span></a>
-                    <a class="source-ecosystem-card" href="{{ Auth::check() ? route('messages') : route('login') }}"><span class="source-ecosystem-icon">✉</span><strong>Общение</strong><span>Подписывайся, находи авторов и общайся напрямую.</span></a>
                 </div>
             </div>
         </section>
@@ -154,23 +128,6 @@
             </div>
         </section>
         @endif
-
-        <section class="source-live-stats" aria-labelledby="live-stats-title">
-            <div class="container">
-                <div class="source-live-stats-card">
-                    <div class="source-live-stats-head">
-                        <div><span class="eyebrow">✦ Deels прямо сейчас</span><h2 id="live-stats-title">Это уже действующая экосистема</h2></div>
-                        <p>Не рекламные обещания: цифры ниже считаются из текущих данных платформы и обновляются автоматически.</p>
-                    </div>
-                    <div class="source-live-stats-grid">
-                        <div class="source-live-stat"><strong>{{ number_format($usersCount ?? 0, 0, ',', ' ') }}</strong><span>пользователей</span></div>
-                        <div class="source-live-stat"><strong>{{ number_format($storiesViewsCount ?? 0, 0, ',', ' ') }}</strong><span>просмотров контента</span></div>
-                        <div class="source-live-stat"><strong>{{ number_format($campaignsCount ?? 0, 0, ',', ' ') }}</strong><span>активных копилок</span></div>
-                        <div class="source-live-stat"><strong>{{ number_format($fundRaised ?? 0, 0, ',', ' ') }} ₽</strong><span>привлечено через платформу</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <section class="source-section theme-dark-card">
             <div class="container">
@@ -252,37 +209,14 @@
         </section>
         @endif
 
-        <section class="source-economy" aria-labelledby="economy-title">
-            <div class="container source-economy-grid">
-                <div class="source-economy-copy">
-                    <span class="eyebrow">✦ Творчество может приносить больше</span>
-                    <h2 id="economy-title">Создавай. Получай поддержку. Расти.</h2>
-                    <p>Deels объединяет контент и инструменты монетизации в одном профиле: автору не нужно уводить аудиторию на сторонние сервисы, чтобы получать донаты, вести копилку или контролировать баланс.</p>
-                    <div class="source-economy-actions">
-                        <a href="{{ route('stories.catalog') }}" class="button button-primary">Смотреть контент →</a>
-                        <a href="{{ Auth::check() ? route('user_wallet') : route('register') }}" class="button button-glass">{{ Auth::check() ? 'Открыть кошелёк' : 'Создать профиль' }}</a>
-                    </div>
-                </div>
-                <div class="source-economy-list">
-                    <article class="source-economy-item"><b>♡</b><strong>Донаты авторам</strong><p>Поддержка любимого контента остаётся внутри экосистемы Deels.</p></article>
-                    <article class="source-economy-item"><b>▶</b><strong>Контент с доступом</strong><p>Платные сторис и механики поддержки уже работают на существующем backend.</p></article>
-                    <article class="source-economy-item"><b>₽</b><strong>Единый кошелёк</strong><p>История движений, пополнений, донатов и вывод средств в личном кабинете.</p></article>
-                    <article class="source-economy-item"><b>💜</b><strong>Копилки</strong><p>Отдельный инструмент для сбора поддержки на мечты, проекты и инициативы.</p></article>
-                </div>
-            </div>
-        </section>
-
         <section class="source-section">
             <div class="container source-cta-card theme-dark-card">
                 <div>
                     <span class="eyebrow" style="color:#fff">✦ Твой ход</span>
-                    <h2>Не просто смотри.<br>Стань частью движения.</h2>
-                    <p>Создай челлендж, расскажи историю или собери поддержку на свою идею.</p>
+                    <h2>Готов создать то,<br>что подхватят другие?</h2>
+                    <p>Начни с первого челленджа. Это займёт меньше пяти минут.</p>
                 </div>
-                <div class="source-final-actions">
-                    <a href="{{ route('challenges.create') }}" class="button button-white">Создать челлендж →</a>
-                    <a href="{{ route('stories.create') }}" class="button button-glass" style="color:#fff;border-color:rgba(255,255,255,.2)">Создать сторис</a>
-                </div>
+                <a href="{{ route('challenges.create') }}" class="button button-white">Создать в Deels →</a>
             </div>
         </section>
     </main>
