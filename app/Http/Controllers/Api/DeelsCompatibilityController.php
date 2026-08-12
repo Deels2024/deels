@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Controller;
 use App\Models\Likes;
 use App\Models\Payment;
@@ -11,11 +12,123 @@ use App\Models\Story;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\WithdrawalRequest;
+use App\Services\ApiAccountInfoService;
+use App\Services\ApiTokenAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DeelsCompatibilityController extends Controller
 {
+    public function login(Request $request): JsonResponse
+    {
+        $validator = validator($request->all(), [
+            'login' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Проверьте заполненные поля',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $login = trim((string) $request->input('login'));
+        $request->merge([
+            'email' => $login,
+            'device_name' => $request->input('device_name', 'deels-new-web'),
+        ]);
+
+        $result = app(ApiTokenAuthService::class)->createToken($request);
+        $payload = $result['payload'];
+        $status = (int) $result['status'];
+
+        if (empty($payload['success'])) {
+            if ($status === 200) {
+                $status = 401;
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $payload['error'] ?? 'Не удалось войти',
+                'error' => $payload['error'] ?? 'Не удалось войти',
+                'retry_after' => $payload['retry_after'] ?? null,
+            ], $status);
+        }
+
+        $loginField = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $user = User::where($loginField, $login)->firstOrFail();
+        $userData = app(ApiAccountInfoService::class)->build((int) $user->id, true) ?: $user->toArray();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => $userData,
+                'access_token' => $payload['access_token'],
+                'token_type' => $payload['token_type'] ?? 'Bearer',
+            ],
+        ]);
+    }
+
+    public function register(Request $request): JsonResponse
+    {
+        $consentValidator = validator($request->all(), [
+            'terms_accepted' => 'accepted',
+            'privacy_accepted' => 'accepted',
+            'content_rules_accepted' => 'accepted',
+        ]);
+
+        if ($consentValidator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Необходимо принять обязательные документы',
+                'errors' => $consentValidator->errors(),
+            ], 422);
+        }
+
+        $request->merge([
+            'password_confirmation' => $request->input('password_confirmation'),
+            'username' => $request->input('username'),
+        ]);
+
+        $legacy = app(RegisterController::class)->api_register($request);
+        $payload = $legacy->getData(true);
+
+        if (empty($payload['success'])) {
+            return response()->json([
+                'success' => false,
+                'message' => $payload['error'] ?? 'Проверьте заполненные поля',
+                'error' => $payload['error'] ?? null,
+                'errors' => $payload['errors'] ?? [],
+            ], 422);
+        }
+
+        $user = User::find((int) ($payload['user_id'] ?? 0));
+        $userData = $user
+            ? (app(ApiAccountInfoService::class)->build((int) $user->id, true) ?: $user->toArray())
+            : [];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => $userData,
+                'access_token' => $payload['access_token'] ?? null,
+                'token_type' => $payload['token_type'] ?? 'Bearer',
+                'email_verification_required' => false,
+            ],
+        ]);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $token = $request->user()?->currentAccessToken();
+        if ($token) {
+            $token->delete();
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function stats(): JsonResponse
     {
         return response()->json([
