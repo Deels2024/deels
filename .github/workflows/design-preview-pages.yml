@@ -6,6 +6,7 @@ on:
       - codex/new-design-migration
     paths:
       - 'public/design-preview.html'
+      - 'public/design-preview-home-enhancements.js'
       - 'public/dist/css/deelsweb-*.css'
       - 'public/dist/css/deels-v2*.css'
       - 'public/dist/js/deels-*.js'
@@ -46,10 +47,14 @@ jobs:
           set -euo pipefail
           mkdir -p _preview/source
           cp laravel/public/design-preview.html _preview/index.html
+          cp laravel/public/design-preview-home-enhancements.js _preview/source/design-preview-home-enhancements.js
           cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
           cp deelsweb/app/styles.css _preview/source/styles.css
           cp deelsweb/app/pages.css _preview/source/pages.css
+          cp laravel/public/dist/css/deelsweb-home-enhancements.css _preview/source/deelsweb-home-enhancements.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
+          sed -i 's#</head>#<link rel="stylesheet" href="./source/deelsweb-home-enhancements.css">\n</head>#' _preview/index.html
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n</body>#' _preview/index.html
           touch _preview/.nojekyll
 
       - name: Verify preview screens
@@ -59,6 +64,8 @@ jobs:
             grep -q "id=\"screen-$id\"" _preview/index.html
           done
           grep -q 'deelsweb-qa-source.css' _preview/index.html
+          grep -q 'deelsweb-home-enhancements.css' _preview/index.html
+          grep -q 'design-preview-home-enhancements.js' _preview/index.html
           grep -q 'INTERACTIVE PREVIEW' _preview/index.html
 
       - name: Configure Pages
