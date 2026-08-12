@@ -42,9 +42,9 @@ jobs:
       - name: Verify payment safety source
         run: |
           grep -Fq "'NotificationURL' => route('deels.compat.campaigns.donations.callback')" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
-          grep -Fq "($anonymous ? '_anon' : '')" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
-          grep -Fq "hash_equals(hash('sha256', $source), $received)" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
-          grep -Fq "session()->put('cart.contributor_name_display', $displayName)" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq '($anonymous ? '\''_anon'\'' : '\'''\'')' app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq 'hash_equals(hash('\''sha256'\'', $source), $received)' app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq 'session()->put('\''cart.contributor_name_display'\'', $displayName)' app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
           grep -Fq 'CampaignsController::class)->confirmPayment' app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
 
       - name: Install Laravel dependencies
