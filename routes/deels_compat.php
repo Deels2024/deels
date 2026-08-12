@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\DeelsCompatibilityController;
+use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,18 @@ Route::get('challenges/{id}', [DeelsCompatibilityController::class, 'challenge']
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
     Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
         ->name('deels.compat.auth.logout');
+
+    Route::post('challenges', [DeelsContentCompatibilityController::class, 'createChallenge'])
+        ->name('deels.compat.challenges.store');
+    Route::put('challenges/{id}', [DeelsContentCompatibilityController::class, 'updateChallenge'])
+        ->whereNumber('id')
+        ->name('deels.compat.challenges.update');
+    Route::post('challenges/{id}/responses', [DeelsContentCompatibilityController::class, 'joinChallenge'])
+        ->whereNumber('id')
+        ->name('deels.compat.challenges.responses.store');
+    Route::post('stories', [DeelsContentCompatibilityController::class, 'createStory'])
+        ->name('deels.compat.stories.store');
+
     Route::get('wallet', [DeelsCompatibilityController::class, 'wallet'])
         ->name('deels.compat.wallet');
     Route::get('messages/dialogs', [DeelsCompatibilityController::class, 'dialogs'])
