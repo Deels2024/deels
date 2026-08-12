@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UserController;
 use App\Models\Likes;
 use App\Models\Payment;
 use App\Models\Story;
@@ -66,6 +67,7 @@ class DeelsCompatibilityController extends Controller
                 'user' => $userData,
                 'access_token' => $payload['access_token'],
                 'token_type' => $payload['token_type'] ?? 'Bearer',
+                'email_verification_required' => $user->emailVerificationPending(),
             ],
         ]);
     }
@@ -114,7 +116,7 @@ class DeelsCompatibilityController extends Controller
                 'user' => $userData,
                 'access_token' => $payload['access_token'] ?? null,
                 'token_type' => $payload['token_type'] ?? 'Bearer',
-                'email_verification_required' => false,
+                'email_verification_required' => $user?->emailVerificationPending() ?? false,
             ],
         ]);
     }
@@ -127,6 +129,40 @@ class DeelsCompatibilityController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function verifyEmail(Request $request, string $token): JsonResponse
+    {
+        if (!preg_match('/^\d{6}$/', $token)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Неверный формат кода подтверждения',
+            ], 422);
+        }
+
+        $request->merge(['code' => $token]);
+        return app(UserController::class)->verifyEmailCode($request);
+    }
+
+    public function resendEmailVerification(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user || empty($user->email)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Сначала укажите адрес электронной почты',
+            ], 422);
+        }
+
+        if (!$user->emailVerificationPending()) {
+            return response()->json([
+                'success' => true,
+                'email_verification_required' => false,
+            ]);
+        }
+
+        $request->merge(['email' => $user->email]);
+        return app(UserController::class)->saveEmailAndSendCode($request);
     }
 
     public function stats(): JsonResponse
