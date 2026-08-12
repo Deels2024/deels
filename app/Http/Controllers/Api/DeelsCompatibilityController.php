@@ -163,6 +163,17 @@ class DeelsCompatibilityController extends Controller
         $data['prize_amount'] = $data['reward_amount'] ?? 0;
         $data['media_url'] = $data['video_preview'] ?? $data['path'] ?? null;
 
+        $user = $request->user();
+        $saved = false;
+        if ($user) {
+            $meta = is_array($user->meta_data) ? $user->meta_data : [];
+            $saved = collect($meta['saved_challenge_ids'] ?? [])
+                ->map(fn ($value) => (int) $value)
+                ->contains((int) $id);
+        }
+        $data['saved'] = $saved;
+        $data['is_saved'] = $saved;
+
         return response()->json(['success' => true, 'data' => $data]);
     }
 
