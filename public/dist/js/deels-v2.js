@@ -32,15 +32,10 @@
       Array.prototype.slice.call(list.querySelectorAll('a')).forEach(function (link) {
         var text = link.textContent.trim();
         if (text === 'Челленджи') link.href = '/challenges?content=challenges';
-        if (text === 'Сторис') {
-          link.textContent = 'Истории';
-          link.href = '/stories?type=popular';
-        }
+        if (text === 'Сторис') { link.textContent = 'Истории'; link.href = '/stories?type=popular'; }
         if (text === 'Баттлы') link.href = '/challenges?content=battles';
         if (text === 'Копилки') link.href = '/campaign';
-        if (['Главная', 'Контакты', 'О нас', 'Начать копить'].indexOf(text) !== -1) {
-          if (link.parentElement) link.parentElement.classList.add('deels-source-hide');
-        }
+        if (['Главная', 'Контакты', 'О нас', 'Начать копить'].indexOf(text) !== -1 && link.parentElement) link.parentElement.classList.add('deels-source-hide');
       });
     });
   }
@@ -81,12 +76,33 @@
 
   function upgradeHeadings() {
     document.querySelectorAll('h1, h2').forEach(function (heading) {
-      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog')) heading.classList.add('deels-v2-heading');
+      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview')) heading.classList.add('deels-v2-heading');
     });
   }
 
   function storyItems() {
     return Array.prototype.slice.call(document.querySelectorAll('.show_story[data-route]'));
+  }
+
+  function updateStoryProgress(popup) {
+    if (!popup) return;
+    var items = storyItems();
+    var progress = popup.querySelector('.deels-v2-story-progress');
+    if (!progress) {
+      progress = document.createElement('div');
+      progress.className = 'deels-v2-story-progress';
+      popup.appendChild(progress);
+    }
+    progress.innerHTML = '';
+    var currentId = String(popup.getAttribute('data-current-story') || '');
+    var max = Math.min(items.length, 12);
+    for (var i = 0; i < max; i++) {
+      var segment = document.createElement('span');
+      if (String(items[i].getAttribute('data-story') || '') === currentId) segment.className = 'active';
+      progress.appendChild(segment);
+    }
+    if (!max) progress.style.display = 'none';
+    else progress.style.display = 'flex';
   }
 
   function openStory(item) {
@@ -100,9 +116,7 @@
     var currentId = popup.getAttribute('data-current-story');
     var items = storyItems();
     if (!items.length) return;
-    var index = items.findIndex(function (item) {
-      return String(item.getAttribute('data-story') || '') === String(currentId || '');
-    });
+    var index = items.findIndex(function (item) { return String(item.getAttribute('data-story') || '') === String(currentId || ''); });
     if (index < 0) index = 0;
     var next = (index + direction + items.length) % items.length;
     if (window.jQuery && window.jQuery.magnificPopup) window.jQuery.magnificPopup.close();
@@ -123,13 +137,10 @@
     hint.className = 'story-swipe-hint';
     hint.textContent = 'Свайп ← →';
     popup.appendChild(hint);
+    updateStoryProgress(popup);
 
-    nav.querySelector('.story-swipe-prev').addEventListener('click', function (event) {
-      event.preventDefault(); event.stopPropagation(); storyNeighbor(-1);
-    });
-    nav.querySelector('.story-swipe-next').addEventListener('click', function (event) {
-      event.preventDefault(); event.stopPropagation(); storyNeighbor(1);
-    });
+    nav.querySelector('.story-swipe-prev').addEventListener('click', function (event) { event.preventDefault(); event.stopPropagation(); storyNeighbor(-1); });
+    nav.querySelector('.story-swipe-next').addEventListener('click', function (event) { event.preventDefault(); event.stopPropagation(); storyNeighbor(1); });
 
     var startX = null;
     popup.addEventListener('touchstart', function (event) {
@@ -153,6 +164,7 @@
       var trigger = event.target.closest && event.target.closest('.show_story[data-story]');
       if (!trigger) return;
       popup.setAttribute('data-current-story', trigger.getAttribute('data-story') || '');
+      updateStoryProgress(popup);
     }, true);
   }
 
@@ -161,6 +173,7 @@
     var observer = new MutationObserver(function () {
       upgradeCatalogCards();
       enhanceStoryPopup();
+      updateStoryProgress(document.getElementById('story-popup'));
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
