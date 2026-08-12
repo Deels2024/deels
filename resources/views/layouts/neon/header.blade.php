@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-contest-actions-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-wallet-tools-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-profile-functions-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-messages-functions-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     <script defer src="{{ext_asset('/dist/js/deels-functional-v2.js')}}"></script>
     @yield('page-css')
