@@ -1,9 +1,15 @@
 @extends('layouts.neon.app')
 
-@section('title') {{'Челленджи на платформе Deels - Заработок онлайн на контенте для творческих людей'}} @parent @endsection
+@php
+    $contentMode = request('content', 'challenges');
+    $isBattlesCatalog = $contentMode === 'battles';
+    $catalogTitle = $isBattlesCatalog ? 'Баттлы' : 'Челленджи';
+@endphp
+
+@section('title') {{$catalogTitle.' на платформе Deels'}} @parent @endsection
 
 @push('meta-data')
-    <meta name="description" content="Челленджи | Deels.ru — платформа для творчества, сторис, баттлов и участия в челленджах">
+    <meta name="description" content="{{$catalogTitle}} | Deels.ru — платформа для творчества, вертикальных видео и соревнований">
 @endpush
 
 @section('content')
@@ -20,14 +26,18 @@
 <div class="source-catalog light_theme light_there">
     <section class="source-catalog-hero">
         <div class="container">
-            <span class="eyebrow">✦ Выбирай свой вызов</span>
-            <h1>Челленджи</h1>
-            <p>Тренды, творчество, спорт, музыка и добрые дела — найди идею, которую захочется повторить.</p>
+            <span class="eyebrow">✦ {{ $isBattlesCatalog ? 'Выбирай своего соперника' : 'Выбирай свой вызов' }}</span>
+            <h1>{{ $catalogTitle }}</h1>
+            <p>
+                {{ $isBattlesCatalog
+                    ? 'Два участника, один вызов и голоса сообщества — смотри активные баттлы и выбирай сильнейшего.'
+                    : 'Тренды, творчество, спорт, музыка и добрые дела — найди идею, которую захочется повторить.' }}
+            </p>
             <div class="source-catalog-actions">
                 @auth
-                    <a href="{{ route('challenges.create') }}" class="button button-primary">+ Создать челлендж</a>
+                    <a href="{{ route('challenges.create') }}{{ $isBattlesCatalog ? '?mode=battle' : '' }}" class="button button-primary">+ {{ $isBattlesCatalog ? 'Создать баттл' : 'Создать челлендж' }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="button button-primary">+ Создать челлендж</a>
+                    <a href="{{ route('login') }}" class="button button-primary">+ {{ $isBattlesCatalog ? 'Создать баттл' : 'Создать челлендж' }}</a>
                 @endauth
                 <a href="{{ route('stories.catalog') }}" class="button button-glass">▶ Смотреть ленту</a>
             </div>
@@ -35,10 +45,10 @@
     </section>
 
     <div class="container">
-        <nav class="source-filter-row" aria-label="Фильтры челленджей">
+        <nav class="source-filter-row" aria-label="Фильтры каталога">
             @foreach($filters as $type => $label)
                 @if($type !== 'participant' || auth()->check())
-                    <a href="{{ route('challenges.catalog', ['type' => $type]) }}" class="{{ $activeType === $type ? 'active' : '' }}">{{ $label }}</a>
+                    <a href="{{ route('challenges.catalog', ['content' => $contentMode, 'type' => $type]) }}" class="{{ $activeType === $type ? 'active' : '' }}">{{ $label }}</a>
                 @endif
             @endforeach
         </nav>
@@ -93,7 +103,7 @@
         @else
             <div class="source-catalog-empty">
                 <h2>Пока ничего не найдено</h2>
-                <p>Попробуй другой фильтр или создай свой челлендж.</p>
+                <p>Попробуй другой фильтр или создай свой {{ $isBattlesCatalog ? 'баттл' : 'челлендж' }}.</p>
             </div>
         @endif
 
