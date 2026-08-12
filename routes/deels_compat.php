@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\DeelsCampaignCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
+use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,6 +59,43 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
         ->name('deels.compat.stories.store');
     Route::post('campaigns', [DeelsCampaignCompatibilityController::class, 'store'])
         ->name('deels.compat.campaigns.store');
+
+    Route::get('profile', [DeelsSocialCompatibilityController::class, 'profile'])
+        ->name('deels.compat.profile.show');
+    Route::patch('profile', [DeelsSocialCompatibilityController::class, 'updateProfile'])
+        ->name('deels.compat.profile.update');
+    Route::post('profile/avatar', [DeelsSocialCompatibilityController::class, 'avatar'])
+        ->name('deels.compat.profile.avatar');
+    Route::get('users/{id}', [DeelsSocialCompatibilityController::class, 'user'])
+        ->whereNumber('id')
+        ->name('deels.compat.users.show');
+    Route::get('users/{id}/content', [DeelsSocialCompatibilityController::class, 'userContent'])
+        ->whereNumber('id')
+        ->name('deels.compat.users.content');
+    Route::post('users/{id}/follow', [DeelsSocialCompatibilityController::class, 'follow'])
+        ->whereNumber('id')
+        ->middleware('suspicious.restricted')
+        ->name('deels.compat.users.follow');
+
+    Route::post('{type}/{id}/like', [DeelsSocialCompatibilityController::class, 'like'])
+        ->where('type', 'stories|story|challenges|challenge-responses')
+        ->whereNumber('id')
+        ->middleware(['suspicious.restricted', 'action.limit.like'])
+        ->name('deels.compat.social.like');
+    Route::delete('{type}/{id}/like', [DeelsSocialCompatibilityController::class, 'unlike'])
+        ->where('type', 'stories|story|challenges|challenge-responses')
+        ->whereNumber('id')
+        ->middleware('suspicious.restricted')
+        ->name('deels.compat.social.unlike');
+    Route::post('{type}/{id}/comments', [DeelsSocialCompatibilityController::class, 'comment'])
+        ->where('type', 'stories|story|challenges|challenge-responses')
+        ->whereNumber('id')
+        ->middleware('suspicious.restricted')
+        ->name('deels.compat.social.comment');
+    Route::post('{type}/{id}/share', [DeelsSocialCompatibilityController::class, 'share'])
+        ->where('type', 'stories|story|challenges|challenge-responses')
+        ->whereNumber('id')
+        ->name('deels.compat.social.share');
 
     Route::get('wallet', [DeelsCompatibilityController::class, 'wallet'])
         ->name('deels.compat.wallet');
