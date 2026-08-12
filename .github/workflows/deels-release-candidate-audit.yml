@@ -1,0 +1,189 @@
+name: Deels release candidate audit
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/Deels*CompatibilityController.php'
+      - 'app/Http/Requests/Deels*.php'
+      - 'app/Providers/RouteServiceProvider.php'
+      - 'routes/deels_compat.php'
+      - 'resources/views/**'
+      - 'public/design-preview*.js'
+      - 'public/dist/css/deelsweb-*.css'
+      - 'public/dist/js/deels-*.js'
+      - '.github/workflows/deels-release-candidate-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  laravel-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Laravel branch
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: PHP syntax compatibility layer
+        run: |
+          set -euo pipefail
+          find app/Http/Controllers/Api -maxdepth 1 -name 'Deels*CompatibilityController.php' -print0 | xargs -0 -n1 php -l
+          find app/Http/Requests -maxdepth 1 -name 'Deels*.php' -print0 | xargs -0 -r -n1 php -l
+          php -l routes/deels_compat.php
+          php -l app/Providers/RouteServiceProvider.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+            echo 'TINKOFF_TERMINAL_KEY=test-terminal'
+            echo 'TINKOFF_SECRET_KEY=test-secret'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Export Laravel routes
+        run: php artisan route:list --path=api --json > /tmp/routes.json
+
+      - name: Verify canonical compatibility route names
+        run: |
+          set -euo pipefail
+          names=(
+            deels.compat.auth.login
+            deels.compat.auth.register
+            deels.compat.auth.logout
+            deels.compat.auth.forgot-password
+            deels.compat.auth.reset-password
+            deels.compat.auth.verify-email
+            deels.compat.auth.resend-verification
+            deels.compat.stats
+            deels.compat.feed
+            deels.compat.stories.index
+            deels.compat.stories.show
+            deels.compat.stories.store
+            deels.compat.challenges.show
+            deels.compat.challenges.store
+            deels.compat.challenges.update
+            deels.compat.challenges.responses.store
+            deels.compat.challenges.save
+            deels.compat.challenge-responses.vote
+            deels.compat.battles.index
+            deels.compat.battles.vote
+            deels.compat.campaigns.index
+            deels.compat.campaigns.show
+            deels.compat.campaigns.store
+            deels.compat.campaigns.donations.store
+            deels.compat.campaigns.donations.callback
+            deels.compat.profile.show
+            deels.compat.profile.update
+            deels.compat.profile.avatar
+            deels.compat.users.show
+            deels.compat.users.content
+            deels.compat.users.follow
+            deels.compat.social.like
+            deels.compat.social.unlike
+            deels.compat.social.comment
+            deels.compat.social.share
+            deels.compat.media.store
+            deels.compat.wallet
+            deels.compat.messages.dialogs
+            deels.compat.messages.thread
+            deels.compat.messages.send
+            deels.compat.notifications.index
+            deels.compat.notifications.read
+            deels.compat.notifications.read-all
+            deels.compat.settings.preferences
+            deels.compat.settings.password
+            deels.compat.settings.sessions
+            deels.compat.settings.sessions.close-others
+            deels.compat.search
+            deels.compat.contacts.store
+          )
+          for name in "${names[@]}"; do
+            jq -e --arg name "$name" '.[] | select(.name==$name)' /tmp/routes.json >/dev/null || { echo "Missing route: $name"; exit 1; }
+          done
+
+      - name: Verify legacy wallet routes retained
+        run: |
+          jq -e '.[] | select(.name=="wallet.api.transactions" and .uri=="api/wallet/transactions")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="wallet.api.deposit" and .uri=="api/wallet/deposit" and .method=="POST")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="wallet.api.withdraw" and .uri=="api/wallet/withdraw" and .method=="POST")' /tmp/routes.json >/dev/null
+
+      - name: Verify critical runtime matchers
+        run: |
+          set -euo pipefail
+          check_match() {
+            local uri="$1" method="$2" expected="$3"
+            php artisan tinker --execute="echo app('router')->getRoutes()->match(\\Illuminate\\Http\\Request::create('$uri', '$method'))->getName();" > /tmp/match.txt
+            grep -Fq "$expected" /tmp/match.txt || { cat /tmp/match.txt; exit 1; }
+          }
+          check_match '/api/profile' 'GET' 'deels.compat.profile.show'
+          check_match '/api/campaigns' 'GET' 'deels.compat.campaigns.index'
+          check_match '/api/battles' 'GET' 'deels.compat.battles.index'
+          check_match '/api/search?q=test' 'GET' 'deels.compat.search'
+          check_match '/api/campaigns/123/donations' 'POST' 'deels.compat.campaigns.donations.store'
+          check_match '/api/auth/verify-email/123456' 'POST' 'deels.compat.auth.verify-email'
+
+      - name: Verify frontend endpoint map against supported contract
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > /tmp/endpoints.ts
+          for token in \
+            'auth/login' 'auth/register' 'auth/logout' 'auth/forgot-password' 'auth/reset-password' \
+            'auth/verify-email/' 'auth/email/verification-notification' \
+            'stats' 'feed' 'challenges/' 'challenge-responses/' 'battles/' 'stories/' 'campaigns/' \
+            'profile' 'profile/avatar' 'users/' 'wallet' 'messages/dialogs' 'notifications' \
+            'settings/preferences' 'settings/password' 'settings/sessions' 'search?q=' 'media' 'contacts'; do
+            grep -Fq "$token" /tmp/endpoints.ts || { echo "Frontend endpoint token missing: $token"; exit 1; }
+          done
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source design/frontend
+        uses: actions/checkout@v4
+        with:
+          repository: Deels2024/deelsweb
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run frontend tests
+        run: node --test tests/*.test.mjs
