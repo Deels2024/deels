@@ -69,6 +69,44 @@
     if (path.indexOf('/dashboard') === 0) document.body.classList.add('deels-v2-page-dashboard');
   }
 
+  function functionalHubItems() {
+    return [
+      ['✦', 'Мои челленджи', 'Создание, редактирование и управление', '/dashboard/challenges'],
+      ['▶', 'Мои сторис', 'Опубликованные видео и истории', '/dashboard/stories'],
+      ['♡', 'Мои копилки', 'Сборы, редактирование и статусы', '/dashboard/my_campaigns'],
+      ['₽', 'Кошелёк', 'Баланс, пополнение и вывод', '/dashboard/wallet'],
+      ['✉', 'Сообщения', 'Диалоги с пользователями', '/dashboard/messages'],
+      ['♥', 'Мои лайки', 'Сохранённая активность', '/dashboard/user_likes'],
+      ['◎', 'Друзья', 'Взаимные подписки', '/dashboard/user_friends'],
+      ['↑', 'Подписки', 'На кого вы подписаны', '/dashboard/user_followings'],
+      ['↓', 'Подписчики', 'Кто подписан на вас', '/dashboard/user_followers'],
+      ['↻', 'Автоплатежи', 'Управление регулярными платежами', '/dashboard/autopayments'],
+      ['✓', 'Спасибо', 'Благодарности и отклики', '/dashboard/thanks']
+    ];
+  }
+
+  function ensureFunctionalHub() {
+    if (window.location.pathname.indexOf('/dashboard') !== 0) return;
+    if (document.querySelector('.deels-functional-hub')) return;
+    var account = document.querySelector('.account-main, .account__content .account-main, .dashboard-content');
+    if (!account) return;
+
+    var section = document.createElement('section');
+    section.className = 'deels-functional-hub';
+    var cards = functionalHubItems().map(function (item) {
+      return '<a class="deels-functional-card" href="' + item[3] + '">' +
+        '<span class="deels-functional-icon">' + item[0] + '</span>' +
+        '<span class="deels-functional-copy"><strong>' + item[1] + '</strong><small>' + item[2] + '</small></span>' +
+        '<span class="deels-functional-arrow">→</span>' +
+      '</a>';
+    }).join('');
+    section.innerHTML = '<div class="deels-functional-head"><div><span class="deels-functional-eyebrow">Все возможности Deels</span><h2>Мои разделы</h2><p>Функции старого кабинета сохранены и доступны в новом интерфейсе.</p></div></div><div class="deels-functional-grid">' + cards + '</div>';
+
+    var head = account.querySelector('.account-main__head, .dashboard-title');
+    if (head && head.nextSibling) head.parentNode.insertBefore(section, head.nextSibling);
+    else account.insertBefore(section, account.firstChild);
+  }
+
   function upgradeCatalogCards() {
     var selectors = ['.challenge-item', '.story-item', '.finish-item', '.bank__item', '.campaign-card', '.challenge-card', '.copystories-item', '.tops-story'];
     document.querySelectorAll(selectors.join(',')).forEach(function (card) { card.classList.add('deels-v2-live-card'); });
@@ -76,7 +114,7 @@
 
   function upgradeHeadings() {
     document.querySelectorAll('h1, h2').forEach(function (heading) {
-      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview')) heading.classList.add('deels-v2-heading');
+      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview, .deels-functional-hub')) heading.classList.add('deels-v2-heading');
     });
   }
 
@@ -174,6 +212,7 @@
       upgradeCatalogCards();
       enhanceStoryPopup();
       updateStoryProgress(document.getElementById('story-popup'));
+      ensureFunctionalHub();
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
@@ -182,6 +221,7 @@
     document.body.classList.add('deels-v2-enabled');
     upgradeHeader();
     labelPage();
+    ensureFunctionalHub();
     upgradeCatalogCards();
     upgradeHeadings();
     enhanceStoryPopup();
