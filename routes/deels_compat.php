@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\DeelsCampaignCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,12 @@ Route::get('challenges/{id}', [DeelsCompatibilityController::class, 'challenge']
     ->whereNumber('id')
     ->name('deels.compat.challenges.show');
 
+Route::get('campaigns', [DeelsCampaignCompatibilityController::class, 'index'])
+    ->name('deels.compat.campaigns.index');
+Route::get('campaigns/{id}', [DeelsCampaignCompatibilityController::class, 'show'])
+    ->where('id', '[A-Za-z0-9_-]+')
+    ->name('deels.compat.campaigns.show');
+
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
     Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
         ->name('deels.compat.auth.logout');
@@ -49,6 +56,8 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
         ->name('deels.compat.challenges.responses.store');
     Route::post('stories', [DeelsContentCompatibilityController::class, 'createStory'])
         ->name('deels.compat.stories.store');
+    Route::post('campaigns', [DeelsCampaignCompatibilityController::class, 'store'])
+        ->name('deels.compat.campaigns.store');
 
     Route::get('wallet', [DeelsCompatibilityController::class, 'wallet'])
         ->name('deels.compat.wallet');
