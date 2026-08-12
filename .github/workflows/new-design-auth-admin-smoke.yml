@@ -10,6 +10,7 @@ on:
       - resources/views/layouts/neon/header*.blade.php
       - public/dist/css/deelsweb-auth-functions-source.css
       - public/dist/css/deelsweb-admin-lists-source.css
+      - public/dist/css/deelsweb-qa-source.css
       - public/dist/js/deels-auth-functions-v2.js
       - .github/workflows/new-design-auth-admin-smoke.yml
   workflow_dispatch:
@@ -46,6 +47,8 @@ jobs:
           test -s public/dist/css/deelsweb-admin-lists-source.css
           grep -q 'deelsweb-admin-lists-source.css' resources/views/layouts/neon/header.blade.php
           grep -q 'admin-main' public/dist/css/deelsweb-admin-lists-source.css
+          grep -q 'deels-admin-empty' public/dist/js/deels-admin-v2.js
+          grep -q 'deels-admin-filter-note' public/dist/js/deels-admin-v2.js
           grep -q 'admin_challenges.confirm' resources/views/admin/challenges.blade.php
           grep -q 'type=declined' resources/views/admin/challenges.blade.php
           grep -q 'type=active' resources/views/admin/challenges.blade.php
@@ -59,3 +62,15 @@ jobs:
           grep -q "data-action') === 'restart'" resources/views/admin/challenges.blade.php
           grep -q "action == 'approve'" resources/views/admin/challenges.blade.php
           grep -q 'challenges.remove' resources/views/admin/challenges.blade.php
+
+      - name: Verify final QA layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s public/dist/css/deelsweb-qa-source.css
+          grep -q 'deelsweb-qa-source.css' resources/views/layouts/neon/header.blade.php
+          grep -q 'deelsweb-qa-source.css' resources/views/layouts/neon/header_light.blade.php
+          grep -q 'focus-visible' public/dist/css/deelsweb-qa-source.css
+          grep -q 'prefers-reduced-motion' public/dist/css/deelsweb-qa-source.css
+          grep -q 'touch-action' public/dist/css/deelsweb-qa-source.css
+          grep -q 'font-size:16px' public/dist/css/deelsweb-qa-source.css
