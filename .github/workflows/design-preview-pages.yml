@@ -53,8 +53,9 @@ jobs:
           cp deelsweb/app/pages.css _preview/source/pages.css
           cp laravel/public/dist/css/deelsweb-home-source.css _preview/source/deelsweb-home-source.css
           cp laravel/public/dist/css/deelsweb-home-enhancements.css _preview/source/deelsweb-home-enhancements.css
+          cp laravel/public/dist/css/deelsweb-footer-source.css _preview/source/deelsweb-footer-source.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
-          sed -i 's#</head>#<link rel="stylesheet" href="./source/deelsweb-home-source.css">\n<link rel="stylesheet" href="./source/deelsweb-home-enhancements.css">\n</head>#' _preview/index.html
+          sed -i 's#</head>#<link rel="stylesheet" href="./source/deelsweb-home-source.css">\n<link rel="stylesheet" href="./source/deelsweb-home-enhancements.css">\n<link rel="stylesheet" href="./source/deelsweb-footer-source.css">\n</head>#' _preview/index.html
           sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n</body>#' _preview/index.html
           touch _preview/.nojekyll
 
@@ -67,6 +68,7 @@ jobs:
           grep -q 'deelsweb-qa-source.css' _preview/index.html
           grep -q 'deelsweb-home-source.css' _preview/index.html
           grep -q 'deelsweb-home-enhancements.css' _preview/index.html
+          grep -q 'deelsweb-footer-source.css' _preview/index.html
           grep -q 'design-preview-home-enhancements.js' _preview/index.html
           grep -q 'INTERACTIVE PREVIEW' _preview/index.html
 
