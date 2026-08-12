@@ -29,6 +29,7 @@ jobs:
           php-version: '8.1'
           coverage: none
           tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
 
       - name: Composer manifest
         run: composer validate --no-check-publish
@@ -201,7 +202,10 @@ jobs:
           mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 
       - name: Laravel route bootstrap
-        run: php artisan route:list --columns=method,uri,name > /tmp/routes.txt
+        shell: bash
+        run: |
+          set -o pipefail
+          php artisan route:list --columns=method,uri,name 2>&1 | tee /tmp/routes.txt
 
       - name: Verify runtime routes
         shell: bash
