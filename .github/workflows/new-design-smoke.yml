@@ -1,0 +1,101 @@
+name: New design smoke checks
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - app/Services/Contests/ContestListService.php
+      - resources/views/**
+      - public/dist/css/deelsweb-*.css
+      - public/dist/js/deels-v2.js
+      - .github/workflows/new-design-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: PHP syntax
+        run: php -l app/Services/Contests/ContestListService.php
+
+      - name: Verify final design assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            public/dist/css/deels-v2.css \
+            public/dist/css/deels-v2-compat.css \
+            public/dist/css/deelsweb-home-source.css \
+            public/dist/css/deelsweb-header-source.css \
+            public/dist/css/deelsweb-catalog-source.css \
+            public/dist/css/deelsweb-detail-source.css \
+            public/dist/css/deelsweb-feed-source.css \
+            public/dist/css/deelsweb-campaign-detail-source.css \
+            public/dist/css/deelsweb-dashboard-source.css \
+            public/dist/css/deelsweb-create-source.css \
+            public/dist/css/deelsweb-auth-source.css \
+            public/dist/js/deels-v2.js; do
+            test -s "$file" || { echo "Missing or empty asset: $file"; exit 1; }
+          done
+
+      - name: Verify critical Blade surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            resources/views/home.blade.php \
+            resources/views/challenges_index.blade.php \
+            resources/views/challenges/page_front.blade.php \
+            resources/views/challenges/partials/create_form.blade.php \
+            resources/views/stories_index.blade.php \
+            resources/views/stories/story_item.blade.php \
+            resources/views/campaign_single_new.blade.php \
+            resources/views/admin/profile_edit.blade.php \
+            resources/views/dashboard/wallet/wallet_index.blade.php \
+            resources/views/auth/login.blade.php \
+            resources/views/auth/register.blade.php; do
+            test -s "$file" || { echo "Missing Blade surface: $file"; exit 1; }
+          done
+
+      - name: Verify route contracts used by new UI
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "name('home')" routes/web.php
+          grep -q "'as' => 'challenges.catalog'" routes/web.php
+          grep -q "'as' => 'challenge_page'" routes/web.php
+          grep -q "'as' => 'battle_page'" routes/web.php
+          grep -q "name('campaign_single')" routes/web.php
+          grep -q "'as' => 'stories.catalog'" routes/web.php
+          grep -q "'as' => 'stories.create'" routes/web.php
+
+      - name: Verify no duplicate scripted homepage hero
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -q "deels-v2-home-hero" public/dist/js/deels-v2.js; then
+            echo "Legacy scripted homepage hero is still present"
+            exit 1
+          fi
+
+      - name: Verify source-faithful home markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "Твоя идея" resources/views/home.blade.php
+          grep -q "может стать" resources/views/home.blade.php
+          grep -q "source-phone-frame" resources/views/home.blade.php
+          grep -q "source-campaign-grid" resources/views/home.blade.php
