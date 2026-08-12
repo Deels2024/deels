@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-profile-functions-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-messages-functions-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-admin-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-admin-lists-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     <script defer src="{{ext_asset('/dist/js/deels-functional-v2.js')}}"></script>
     <script defer src="{{ext_asset('/dist/js/deels-admin-v2.js')}}"></script>
