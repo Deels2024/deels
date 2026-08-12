@@ -80,6 +80,8 @@ jobs:
             deels.compat.auth.reset-password
             deels.compat.auth.verify-email
             deels.compat.auth.resend-verification
+            deels.compat.auth.oauth.vk.redirect
+            deels.compat.auth.oauth.vk.callback
             deels.compat.stats
             deels.compat.feed
             deels.compat.stories.index
@@ -147,6 +149,23 @@ jobs:
           check_match '/api/search?q=test' 'GET' 'deels.compat.search'
           check_match '/api/campaigns/123/donations' 'POST' 'deels.compat.campaigns.donations.store'
           check_match '/api/auth/verify-email/123456' 'POST' 'deels.compat.auth.verify-email'
+          check_match '/api/auth/oauth/vk/redirect?return_url=/profile' 'GET' 'deels.compat.auth.oauth.vk.redirect'
+          check_match '/api/auth/oauth/vk/callback?code=x&device_id=y&state=z' 'GET' 'deels.compat.auth.oauth.vk.callback'
+
+      - name: Verify VK OAuth safety contract
+        run: |
+          set -euo pipefail
+          file=app/Http/Controllers/Api/DeelsOAuthCompatibilityController.php
+          grep -Fq "Str::random(48)" "$file"
+          grep -Fq "bin2hex(random_bytes(48))" "$file"
+          grep -Fq "hash_equals((string) \$pending['state']" "$file"
+          grep -Fq "Auth::guard('web')->login(\$user)" "$file"
+          grep -Fq "session()->regenerate()" "$file"
+          grep -Fq "safeReturnUrl" "$file"
+          if grep -Eq 'access_token.*return_url|return_url.*access_token' "$file"; then
+            echo 'Bearer token must never be placed in OAuth return URL'
+            exit 1
+          fi
 
       - name: Verify frontend endpoint map against supported contract
         run: |
@@ -154,7 +173,7 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > /tmp/endpoints.ts
           for token in \
             'auth/login' 'auth/register' 'auth/logout' 'auth/forgot-password' 'auth/reset-password' \
-            'auth/verify-email/' 'auth/email/verification-notification' \
+            'auth/verify-email/' 'auth/email/verification-notification' 'auth/oauth/' \
             'stats' 'feed' 'challenges/' 'challenge-responses/' 'battles/' 'stories/' 'campaigns/' \
             'profile' 'profile/avatar' 'users/' 'wallet' 'messages/dialogs' 'notifications' \
             'settings/preferences' 'settings/password' 'settings/sessions' 'search?q=' 'media' 'contacts'; do
