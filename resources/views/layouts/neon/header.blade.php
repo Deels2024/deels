@@ -33,13 +33,11 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-wallet-auth.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-register-campaigns.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-campaigns-auth.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-home-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
-        window.Laravel = {!! json_encode([
-            'csrfToken' => csrf_token(),
-        ]) !!};
-
+        window.Laravel = {!! json_encode(['csrfToken' => csrf_token()]) !!};
         window.userId = {{Auth::id() ?? 0}}
     </script>
     @if(request()->cookie('web_app'))
@@ -47,7 +45,6 @@
     @endif
     @include('layouts/neon/partials/counters')
 </head>
-
 <body>
 @include('layouts/neon/partials/header_modal')
 @include('layouts.neon.main_menu')
