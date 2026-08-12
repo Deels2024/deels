@@ -9,6 +9,7 @@ on:
       - resources/views/**
       - public/dist/css/deelsweb-*.css
       - public/dist/js/deels-v2.js
+      - public/dist/js/deels-functional-v2.js
       - .github/workflows/new-design-smoke.yml
   workflow_dispatch:
 
@@ -52,7 +53,10 @@ jobs:
             public/dist/css/deelsweb-create-source.css \
             public/dist/css/deelsweb-auth-source.css \
             public/dist/css/deelsweb-functional-source.css \
-            public/dist/js/deels-v2.js; do
+            public/dist/css/deelsweb-contest-actions-source.css \
+            public/dist/css/deelsweb-wallet-tools-source.css \
+            public/dist/js/deels-v2.js \
+            public/dist/js/deels-functional-v2.js; do
             test -s "$file" || { echo "Missing or empty asset: $file"; exit 1; }
           done
 
@@ -84,6 +88,14 @@ jobs:
             "'as' => 'challenges.catalog'" \
             "'as' => 'challenge_page'" \
             "'as' => 'battle_page'" \
+            "name('contests.invites.users')" \
+            "name('contests.invites.store')" \
+            "name('contests.participation.leave')" \
+            "name('contests.participation.rejoin')" \
+            "name('contests.participation.join')" \
+            "name('battles.participation.accept')" \
+            "name('battles.participation.decline')" \
+            "name('contests.reports.store')" \
             "name('campaign_single')" \
             "name('campaign_backers')" \
             "name('campaign_updates')" \
@@ -131,6 +143,20 @@ jobs:
             /faqs; do
             grep -q "$path" public/dist/js/deels-v2.js || { echo "Missing restored UI link: $path"; exit 1; }
           done
+          grep -q '/dashboard/wallet?type=billing' public/dist/js/deels-functional-v2.js
+          grep -q '/dashboard/wallet?type=donate' public/dist/js/deels-functional-v2.js
+          grep -q '/dashboard/autopayments' public/dist/js/deels-functional-v2.js
+
+      - name: Verify contest actions remain visible
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'challenge-participation-actions' public/dist/css/deelsweb-contest-actions-source.css
+          grep -q 'contest-page-invite' public/dist/css/deelsweb-contest-actions-source.css
+          grep -q 'contest-reporting' public/dist/css/deelsweb-contest-actions-source.css
+          grep -q 'contest-winner-selection-action' public/dist/css/deelsweb-contest-actions-source.css
+          grep -q 'contest-journal' public/dist/css/deelsweb-contest-actions-source.css
+          grep -q 'battle-reports' public/dist/css/deelsweb-contest-actions-source.css
 
       - name: Verify no duplicate scripted homepage hero
         shell: bash
@@ -182,7 +208,10 @@ jobs:
         run: |
           set -euo pipefail
           for route in \
-            home challenges.catalog challenge_page battle_page campaign_single campaign_backers campaign_updates campaign_faqs \
+            home challenges.catalog challenge_page battle_page \
+            contests.invites.users contests.invites.store contests.participation.leave contests.participation.rejoin contests.participation.join \
+            battles.participation.accept battles.participation.decline contests.reports.store \
+            campaign_single campaign_backers campaign_updates campaign_faqs \
             stories.catalog stories.create user_challenges user_stories my_campaigns edit_campaign_rewards edit_campaign_updates edit_campaign_faqs \
             user_wallet messages user_likes user_followers user_friends user_followings autopayments thank_list; do
             grep -q "$route" /tmp/routes.txt || { echo "Missing runtime route: $route"; exit 1; }
