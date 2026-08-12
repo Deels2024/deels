@@ -36,7 +36,7 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$src"
           grep -q 'forgotPassword: api("auth/forgot-password")' "$src"
           grep -q 'resetPassword: api("auth/reset-password")' "$src"
-          grep -q 'me: api("user")' "$src"
+          grep -q 'me: api("profile")' "$src"
           grep -q 'search: (query: string) => api(`search?q=${encode(query)}`)' "$src"
           grep -q 'uploads: api("media")' "$src"
           grep -q 'contacts: api("contacts")' "$src"
@@ -68,14 +68,14 @@ jobs:
           php artisan route:list --path=api --json > /tmp/routes.json
           jq -e '.[] | select(.name=="deels.compat.auth.forgot-password" and .uri=="api/auth/forgot-password" and .method=="POST")' /tmp/routes.json >/dev/null
           jq -e '.[] | select(.name=="deels.compat.auth.reset-password" and .uri=="api/auth/reset-password" and .method=="POST")' /tmp/routes.json >/dev/null
-          jq -e '.[] | select(.name=="deels.compat.auth.me" and .uri=="api/user" and (.method|contains("GET")))' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.compat.profile.show" and .uri=="api/profile" and (.method|contains("GET")))' /tmp/routes.json >/dev/null
           jq -e '.[] | select(.name=="deels.compat.search" and .uri=="api/search" and (.method|contains("GET")))' /tmp/routes.json >/dev/null
           jq -e '.[] | select(.name=="deels.compat.media.store" and .uri=="api/media" and .method=="POST")' /tmp/routes.json >/dev/null
           jq -e '.[] | select(.name=="deels.compat.contacts.store" and .uri=="api/contacts" and .method=="POST")' /tmp/routes.json >/dev/null
 
       - name: Verify runtime matchers
         run: |
-          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/user", "GET"))->getName();' | tee /tmp/user-match.txt
-          grep -Fq 'deels.compat.auth.me' /tmp/user-match.txt
+          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/profile", "GET"))->getName();' | tee /tmp/profile-match.txt
+          grep -Fq 'deels.compat.profile.show' /tmp/profile-match.txt
           php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/search?q=test", "GET"))->getName();' | tee /tmp/search-match.txt
           grep -Fq 'deels.compat.search' /tmp/search-match.txt
