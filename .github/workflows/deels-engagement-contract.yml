@@ -1,0 +1,77 @@
+name: Deels engagement API contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/DeelsEngagementCompatibilityController.php'
+      - 'app/Http/Controllers/Api/DeelsCompatibilityController.php'
+      - 'routes/deels_compat.php'
+      - '.github/workflows/deels-engagement-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: PHP syntax
+        run: |
+          php -l app/Http/Controllers/Api/DeelsEngagementCompatibilityController.php
+          php -l app/Http/Controllers/Api/DeelsCompatibilityController.php
+          php -l routes/deels_compat.php
+
+      - name: Verify source contracts
+        run: |
+          src=$(mktemp)
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$src"
+          grep -q 'save: (id: string) => api(`challenges/${encode(id)}/save`)' "$src"
+          grep -q 'api(`challenge-responses/${encode(id)}/vote`)' "$src"
+          grep -q 'list: api("battles")' "$src"
+          grep -q 'api(`battles/${encode(id)}/vote`)' "$src"
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare Laravel
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Verify engagement routes
+        run: |
+          php artisan route:list --path=api --json > /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.battles.index" and .uri=="api/battles" and (.method|contains("GET")))' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.compat.challenges.save" and .uri=="api/challenges/{id}/save" and .method=="POST")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.compat.challenge-responses.vote" and .uri=="api/challenge-responses/{id}/vote" and .method=="POST")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.compat.battles.vote" and .uri=="api/battles/{id}/vote" and .method=="POST")' /tmp/routes.json >/dev/null
+
+      - name: Verify battle runtime matcher
+        run: |
+          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/battles", "GET"))->getName();' | tee /tmp/battles-match.txt
+          grep -Fq 'deels.compat.battles.index' /tmp/battles-match.txt
