@@ -1,0 +1,70 @@
+name: Deels settings API contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/DeelsSettingsCompatibilityController.php'
+      - 'routes/deels_compat.php'
+      - '.github/workflows/deels-settings-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+      - name: PHP syntax
+        run: |
+          php -l app/Http/Controllers/Api/DeelsSettingsCompatibilityController.php
+          php -l routes/deels_compat.php
+      - name: Verify source contracts
+        run: |
+          src=$(mktemp)
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$src"
+          grep -q 'preferences: api("settings/preferences")' "$src"
+          grep -q 'password: api("settings/password")' "$src"
+          grep -q 'sessions: api("settings/sessions")' "$src"
+          grep -q 'closeSessions: api("settings/sessions/close-others")' "$src"
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Prepare Laravel
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+      - name: Verify settings routes
+        run: |
+          php artisan route:list --path=api --json > /tmp/routes.json
+          for spec in \
+            'deels.compat.settings.preferences|api/settings/preferences|PATCH' \
+            'deels.compat.settings.password|api/settings/password|PUT' \
+            'deels.compat.settings.sessions|api/settings/sessions|GET|HEAD' \
+            'deels.compat.settings.sessions.close-others|api/settings/sessions/close-others|POST'; do
+            name=${spec%%|*}; rest=${spec#*|}; uri=${rest%%|*}; method=${rest#*|}
+            grep -Fq '"name":"'"$name"'"' /tmp/routes.json || { echo "Missing $name"; exit 1; }
+            grep -Fq '"uri":"'"$uri"'"' /tmp/routes.json || { echo "Missing $uri"; exit 1; }
+          done
