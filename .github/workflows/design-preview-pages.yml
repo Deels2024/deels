@@ -8,6 +8,7 @@ on:
       - 'public/design-preview.html'
       - 'public/design-preview-home-enhancements.js'
       - 'public/design-preview-polish.js'
+      - 'public/design-preview-feed-ux.js'
       - 'public/dist/css/deelsweb-*.css'
       - 'public/dist/css/deels-v2*.css'
       - 'public/dist/js/deels-*.js'
@@ -50,11 +51,12 @@ jobs:
           cp laravel/public/design-preview.html _preview/index.html
           cp laravel/public/design-preview-home-enhancements.js _preview/source/design-preview-home-enhancements.js
           cp laravel/public/design-preview-polish.js _preview/source/design-preview-polish.js
+          cp laravel/public/design-preview-feed-ux.js _preview/source/design-preview-feed-ux.js
           cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
           cp deelsweb/app/styles.css _preview/source/styles.css
           cp deelsweb/app/pages.css _preview/source/pages.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
-          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n</body>#' _preview/index.html
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n</body>#' _preview/index.html
           touch _preview/.nojekyll
 
       - name: Verify preview screens
@@ -66,6 +68,7 @@ jobs:
           grep -q 'deelsweb-qa-source.css' _preview/index.html
           grep -q 'design-preview-home-enhancements.js' _preview/index.html
           grep -q 'design-preview-polish.js' _preview/index.html
+          grep -q 'design-preview-feed-ux.js' _preview/index.html
           grep -q 'INTERACTIVE PREVIEW' _preview/index.html
           if grep -q 'deelsweb-home-enhancements.css' _preview/index.html; then exit 1; fi
           if grep -q 'deelsweb-unified-theme.css' _preview/index.html; then exit 1; fi
