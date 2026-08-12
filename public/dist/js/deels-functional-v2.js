@@ -37,7 +37,71 @@
     else account.insertBefore(nav, account.firstChild);
   }
 
+  function ensureGuestContestPrompt() {
+    if (Number(window.userId || 0) !== 0) return;
+    if (!/^\/(challenges|battles)\/show\//.test(window.location.pathname)) return;
+    if (document.querySelector('.deels-guest-contest-prompt')) return;
+
+    var actions = document.querySelector('.contest-overview__actions');
+    if (!actions) return;
+
+    var disabledParticipation = actions.querySelector('.challenge-participation-actions button[disabled]');
+    if (disabledParticipation) disabledParticipation.style.display = 'none';
+
+    var prompt = document.createElement('div');
+    prompt.className = 'deels-guest-contest-prompt';
+    var next = encodeURIComponent(window.location.pathname + window.location.search);
+    prompt.innerHTML = '' +
+      '<div><strong>Хотите участвовать?</strong><span>Войдите — после этого Deels покажет доступное действие для этого челленджа или баттла.</span></div>' +
+      '<a href="/login?next=' + next + '">Войти</a>';
+    actions.insertBefore(prompt, actions.firstChild);
+  }
+
+  function enhanceContestState() {
+    var actions = document.querySelector('.contest-overview__actions');
+    if (!actions || actions.dataset.stateEnhanced === '1') return;
+    actions.dataset.stateEnhanced = '1';
+
+    var participation = actions.querySelector('.challenge-participation-actions');
+    if (!participation) return;
+    var text = (participation.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    var state = 'neutral';
+    if (text.indexOf('принять') !== -1) state = 'invited';
+    else if (text.indexOf('выйти из участия') !== -1) state = 'participating';
+    else if (text.indexOf('участвовать') !== -1) state = 'available';
+    else if (text.indexOf('заверш') !== -1) state = 'finished';
+    else if (text.indexOf('закрыт') !== -1) state = 'closed';
+    actions.setAttribute('data-participation-state', state);
+
+    var labels = {
+      invited: 'Вас пригласили',
+      participating: 'Вы участвуете',
+      available: 'Можно участвовать',
+      finished: 'Завершено',
+      closed: 'Набор закрыт'
+    };
+    if (labels[state] && !actions.querySelector('.deels-contest-state-chip')) {
+      var chip = document.createElement('span');
+      chip.className = 'deels-contest-state-chip deels-contest-state-chip--' + state;
+      chip.textContent = labels[state];
+      actions.insertBefore(chip, actions.firstChild);
+    }
+  }
+
+  function observeFunctionalStates() {
+    if (!window.MutationObserver) return;
+    var observer = new MutationObserver(function () {
+      ensureWalletTools();
+      ensureGuestContestPrompt();
+      enhanceContestState();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
   ready(function () {
     ensureWalletTools();
+    ensureGuestContestPrompt();
+    enhanceContestState();
+    observeFunctionalStates();
   });
 })();
