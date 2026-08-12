@@ -58,8 +58,6 @@ Route::post('contacts', [DeelsUtilityCompatibilityController::class, 'contact'])
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
     Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
         ->name('deels.compat.auth.logout');
-    Route::get('user', [DeelsUtilityCompatibilityController::class, 'me'])
-        ->name('deels.compat.auth.me');
 
     Route::post('challenges', [DeelsContentCompatibilityController::class, 'createChallenge'])
         ->name('deels.compat.challenges.store');
