@@ -25,13 +25,19 @@
 
   function normalizeNav() {
     ensureNavLink('Лента', '/stories?type=new', 'Челленджи');
-    ensureNavLink('Баттлы', '/battles', 'Сторис');
-    ensureNavLink('Копилки', '/campaigns', 'Контакты');
+    ensureNavLink('Баттлы', '/challenges?content=battles', 'Сторис');
+    ensureNavLink('Копилки', '/campaign', 'Контакты');
 
     document.querySelectorAll('.header__list ul, .header__menu-list').forEach(function (list) {
       Array.prototype.slice.call(list.querySelectorAll('a')).forEach(function (link) {
         var text = link.textContent.trim();
-        if (text === 'Сторис') link.textContent = 'Истории';
+        if (text === 'Челленджи') link.href = '/challenges?content=challenges';
+        if (text === 'Сторис') {
+          link.textContent = 'Истории';
+          link.href = '/stories?type=popular';
+        }
+        if (text === 'Баттлы') link.href = '/challenges?content=battles';
+        if (text === 'Копилки') link.href = '/campaign';
         if (['Главная', 'Контакты', 'О нас', 'Начать копить'].indexOf(text) !== -1) {
           if (link.parentElement) link.parentElement.classList.add('deels-source-hide');
         }
@@ -75,7 +81,7 @@
 
   function upgradeHeadings() {
     document.querySelectorAll('h1, h2').forEach(function (heading) {
-      if (!heading.closest('header, footer, .chat, .deels-source-home')) heading.classList.add('deels-v2-heading');
+      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog')) heading.classList.add('deels-v2-heading');
     });
   }
 
