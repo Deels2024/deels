@@ -25,7 +25,6 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-compat.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-home-source.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-home-enhancements.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-header-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-catalog-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-detail-source.css')}}"/>
@@ -41,7 +40,6 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-admin-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-admin-lists-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-footer-source.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-unified-theme.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-qa-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     <script defer src="{{ext_asset('/dist/js/deels-functional-v2.js')}}"></script>
