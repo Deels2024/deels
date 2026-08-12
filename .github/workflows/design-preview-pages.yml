@@ -1,0 +1,49 @@
+name: Deels design preview
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - public/design-preview.html
+      - public/dist/css/deels-v2*.css
+      - .github/workflows/design-preview-pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deels-design-preview-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout preview branch
+        uses: actions/checkout@v4
+
+      - name: Prepare static preview
+        run: |
+          mkdir -p _preview/dist/css
+          cp public/design-preview.html _preview/index.html
+          cp public/dist/css/deels-v2*.css _preview/dist/css/
+          touch _preview/.nojekyll
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload preview artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _preview
+
+      - name: Deploy preview
+        id: deployment
+        uses: actions/deploy-pages@v4
