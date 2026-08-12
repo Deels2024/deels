@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DeelsCampaignCompatibilityController;
 use App\Http\Controllers\Api\DeelsCommunicationCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
+use App\Http\Controllers\Api\DeelsSettingsCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
 use Illuminate\Support\Facades\Route;
 
@@ -117,4 +118,13 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
         ->name('deels.compat.notifications.read');
     Route::post('notifications/read-all', [DeelsCommunicationCompatibilityController::class, 'readAllNotifications'])
         ->name('deels.compat.notifications.read-all');
+
+    Route::patch('settings/preferences', [DeelsSettingsCompatibilityController::class, 'preferences'])
+        ->name('deels.compat.settings.preferences');
+    Route::put('settings/password', [DeelsSettingsCompatibilityController::class, 'changePassword'])
+        ->name('deels.compat.settings.password');
+    Route::get('settings/sessions', [DeelsSettingsCompatibilityController::class, 'sessions'])
+        ->name('deels.compat.settings.sessions');
+    Route::post('settings/sessions/close-others', [DeelsSettingsCompatibilityController::class, 'closeOtherSessions'])
+        ->name('deels.compat.settings.sessions.close-others');
 });
