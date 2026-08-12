@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-register-campaigns.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-campaigns-auth.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-home-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-header-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
