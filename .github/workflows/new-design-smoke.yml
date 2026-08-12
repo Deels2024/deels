@@ -51,6 +51,7 @@ jobs:
             public/dist/css/deelsweb-dashboard-source.css \
             public/dist/css/deelsweb-create-source.css \
             public/dist/css/deelsweb-auth-source.css \
+            public/dist/css/deelsweb-functional-source.css \
             public/dist/js/deels-v2.js; do
             test -s "$file" || { echo "Missing or empty asset: $file"; exit 1; }
           done
@@ -85,6 +86,33 @@ jobs:
           grep -q "name('campaign_single')" routes/web.php
           grep -q "'as' => 'stories.catalog'" routes/web.php
           grep -q "'as' => 'stories.create'" routes/web.php
+          grep -q "'as' => 'user_challenges'" routes/web.php
+          grep -q "'as' => 'user_stories'" routes/web.php
+          grep -q "'as' => 'my_campaigns'" routes/web.php
+          grep -q "'as' => 'user_wallet'" routes/web.php
+          grep -q "'as' => 'messages'" routes/web.php
+          grep -q "'as' => 'user_likes'" routes/web.php
+          grep -q "'as' => 'user_followers'" routes/web.php
+          grep -q "'as' => 'user_friends'" routes/web.php
+          grep -q "'as' => 'user_followings'" routes/web.php
+          grep -q "name('autopayments')" routes/web.php
+          grep -q "name('thank_list')" routes/web.php
+
+      - name: Verify functional hub links
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '/dashboard/challenges' public/dist/js/deels-v2.js
+          grep -q '/dashboard/stories' public/dist/js/deels-v2.js
+          grep -q '/dashboard/my_campaigns' public/dist/js/deels-v2.js
+          grep -q '/dashboard/wallet' public/dist/js/deels-v2.js
+          grep -q '/dashboard/messages' public/dist/js/deels-v2.js
+          grep -q '/dashboard/user_likes' public/dist/js/deels-v2.js
+          grep -q '/dashboard/user_friends' public/dist/js/deels-v2.js
+          grep -q '/dashboard/user_followings' public/dist/js/deels-v2.js
+          grep -q '/dashboard/user_followers' public/dist/js/deels-v2.js
+          grep -q '/dashboard/autopayments' public/dist/js/deels-v2.js
+          grep -q '/dashboard/thanks' public/dist/js/deels-v2.js
 
       - name: Verify no duplicate scripted homepage hero
         shell: bash
@@ -135,10 +163,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'home' /tmp/routes.txt
-          grep -q 'challenges.catalog' /tmp/routes.txt
-          grep -q 'challenge_page' /tmp/routes.txt
-          grep -q 'battle_page' /tmp/routes.txt
-          grep -q 'campaign_single' /tmp/routes.txt
-          grep -q 'stories.catalog' /tmp/routes.txt
-          grep -q 'stories.create' /tmp/routes.txt
+          for route in \
+            home challenges.catalog challenge_page battle_page campaign_single stories.catalog stories.create \
+            user_challenges user_stories my_campaigns user_wallet messages user_likes user_followers user_friends user_followings autopayments thank_list; do
+            grep -q "$route" /tmp/routes.txt || { echo "Missing runtime route: $route"; exit 1; }
+          done
