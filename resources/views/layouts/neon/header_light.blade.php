@@ -37,8 +37,6 @@
     <link rel="stylesheet" href=" {{ext_asset('/dist/css/app.css')}}"/>
     <link rel="stylesheet" href=" {{ext_asset('/dist/css/main.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-wallet-auth.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-campaigns-auth.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-auth-source.css')}}"/>
 
     @yield('page-css')
@@ -70,7 +68,7 @@
 					console.log('ServiceWorker registration failed. Sorry about that.');
 				}
 			} else {
-				document.querySelector('.alert').removeAttribute('hidden');
+				document.querySelector('.alert')?.removeAttribute('hidden');
 			}
 		}
     </script>
@@ -98,7 +96,6 @@
 
     <script>window.yaContextCb = window.yaContextCb || []</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
-    <!-- Yandex.RTB R-A-2121442-1 -->
     <script>
 		window.setTimeout(() => {
 			window.yaContextCb.push(() => {
@@ -110,7 +107,6 @@
 			})
 		}, 5000);
     </script>
-    <!-- Top.Mail.Ru counter -->
     <script type="text/javascript">
         var _tmr = window._tmr || (window._tmr = []);
         _tmr.push({id: "3511033", type: "pageView", start: (new Date()).getTime()});
@@ -123,7 +119,6 @@
         })(document, window, "tmr-code");
     </script>
     <noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3511033;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript>
-    <!-- /Top.Mail.Ru counter -->
     <script type="text/javascript">!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src='https://vk.ru/js/api/openapi.js?173',t.onload=function(){VK.Retargeting.Init("VK-RTRG-1891647-73Ile"),VK.Retargeting.Hit()},document.head.appendChild(t)}();</script><noscript><img src="https://vk.ru/rtrg?p=VK-RTRG-1891647-73Ile" style="position:fixed; left:-999px;" alt=""/></noscript>
 </head>
 
