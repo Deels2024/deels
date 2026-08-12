@@ -8,6 +8,7 @@ on:
       - 'app/Http/Controllers/Api/DeelsCompatibilityController.php'
       - 'app/Http/Controllers/Api/DeelsContentCompatibilityController.php'
       - 'app/Http/Controllers/Api/DeelsCampaignCompatibilityController.php'
+      - 'app/Http/Controllers/Api/DeelsSocialCompatibilityController.php'
       - 'app/Http/Requests/DeelsCampaignStoreRequest.php'
       - 'app/Providers/RouteServiceProvider.php'
       - 'routes/deels_compat.php'
@@ -37,6 +38,7 @@ jobs:
           php -l app/Http/Controllers/Api/DeelsCompatibilityController.php
           php -l app/Http/Controllers/Api/DeelsContentCompatibilityController.php
           php -l app/Http/Controllers/Api/DeelsCampaignCompatibilityController.php
+          php -l app/Http/Controllers/Api/DeelsSocialCompatibilityController.php
           php -l app/Http/Requests/DeelsCampaignStoreRequest.php
           php -l app/Providers/RouteServiceProvider.php
           php -l routes/deels_compat.php
@@ -60,6 +62,14 @@ jobs:
           grep -q 'list: api("campaigns")' "$src"
           grep -q 'create: api("campaigns")' "$src"
           grep -q 'api(`campaigns/${encode(id)}`)' "$src"
+          grep -q 'me: api("profile")' "$src"
+          grep -q 'uploadAvatar: api("profile/avatar")' "$src"
+          grep -q 'api(`users/${encode(id)}`)' "$src"
+          grep -q 'api(`users/${encode(id)}/content`)' "$src"
+          grep -q 'api(`users/${encode(id)}/follow`)' "$src"
+          grep -q 'api(`${encode(type)}/${encode(id)}/like`)' "$src"
+          grep -q 'api(`${encode(type)}/${encode(id)}/comments`)' "$src"
+          grep -q 'api(`${encode(type)}/${encode(id)}/share`)' "$src"
           grep -q 'api("wallet")' "$src"
           grep -q 'api("messages/dialogs")' "$src"
 
@@ -105,6 +115,14 @@ jobs:
             'api/challenges/{id}/responses' \
             'api/campaigns' \
             'api/campaigns/{id}' \
+            'api/profile' \
+            'api/profile/avatar' \
+            'api/users/{id}' \
+            'api/users/{id}/content' \
+            'api/users/{id}/follow' \
+            'api/{type}/{id}/like' \
+            'api/{type}/{id}/comments' \
+            'api/{type}/{id}/share' \
             'api/wallet' \
             'api/messages/dialogs' \
             'api/messages/dialogs/{id}'; do
@@ -119,6 +137,13 @@ jobs:
           grep -E 'POST +api/challenges/\{id\}/responses ' /tmp/api-routes.txt
           grep -E 'POST +api/stories ' /tmp/api-routes.txt
           grep -E 'POST +api/campaigns ' /tmp/api-routes.txt
+          grep -E 'PATCH +api/profile ' /tmp/api-routes.txt
+          grep -E 'POST +api/profile/avatar ' /tmp/api-routes.txt
+          grep -E 'POST +api/users/\{id\}/follow ' /tmp/api-routes.txt
+          grep -E 'POST +api/\{type\}/\{id\}/like ' /tmp/api-routes.txt
+          grep -E 'DELETE +api/\{type\}/\{id\}/like ' /tmp/api-routes.txt
+          grep -E 'POST +api/\{type\}/\{id\}/comments ' /tmp/api-routes.txt
+          grep -E 'POST +api/\{type\}/\{id\}/share ' /tmp/api-routes.txt
 
       - name: Verify compatibility route names
         run: |
@@ -139,14 +164,26 @@ jobs:
             deels.compat.campaigns.index \
             deels.compat.campaigns.show \
             deels.compat.campaigns.store \
+            deels.compat.profile.show \
+            deels.compat.profile.update \
+            deels.compat.profile.avatar \
+            deels.compat.users.show \
+            deels.compat.users.content \
+            deels.compat.users.follow \
+            deels.compat.social.like \
+            deels.compat.social.unlike \
+            deels.compat.social.comment \
+            deels.compat.social.share \
             deels.compat.wallet \
             deels.compat.messages.dialogs \
             deels.compat.messages.thread; do
             grep -Fq '"name":"'"$name"'"' /tmp/api-routes.json || { echo "Missing compatibility route name: $name"; exit 1; }
           done
 
-      - name: Verify campaign runtime matcher
+      - name: Verify runtime matchers
         run: |
           set -euo pipefail
           php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/campaigns", "GET"))->getName();' | tee /tmp/campaign-match.txt
           grep -Fq 'deels.compat.campaigns.index' /tmp/campaign-match.txt
+          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/profile", "GET"))->getName();' | tee /tmp/profile-match.txt
+          grep -Fq 'deels.compat.profile.show' /tmp/profile-match.txt
