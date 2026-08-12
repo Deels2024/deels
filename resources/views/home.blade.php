@@ -1,9 +1,9 @@
 @extends('layouts.neon.app')
+
 @section('title')
-    @if(!empty($title))
-        {{ $title }}
-    @endif
+    @if(!empty($title)){{ $title }}@endif
 @endsection
+
 @if(!empty($description))
     @push('meta-data')
         <meta name="description" content="{{ $description }}">
@@ -11,603 +11,222 @@
 @endif
 
 @section('content')
-    <div class="background">
-        <div class="background__filter">
+@php
+    $heroChallenge = $topChallenges->first();
+    $homeChallenges = $topChallenges->take(4);
+    $homeStories = $topStories->take(3);
+    $homeCampaigns = $fundedCampaigns->take(3);
+@endphp
 
-            <div style="display:block; padding-bottom:70px; margin-bottom: 70px"></div>
-            @if(isset($topChallenges) && count($topChallenges) > 0)
-            <div class="ch-block">
-                <div class="container">
-                    <div class="ch-block-wrap">
-                        <div class="ch-block-title text-center d-block d-lg-none">Топ челленджей</div>
-                        <div class="ch-block-row">
-                            <a href="{{route('challenges.create')}}" class="ch-block-side">
-                                <img src="{{ ext_asset('img/ch-block-image.png') }}" width="470" height="713" alt="">
+<div class="deels-source-home light_theme light_there">
+    <main>
+        <section class="source-hero theme-gradient">
+            <div class="container source-hero-grid">
+                <div class="source-hero-copy">
+                    <span class="eyebrow">✦ Здесь начинается движение</span>
+                    <h1>
+                        Твоя идея<br>
+                        может стать <em>движением</em>
+                    </h1>
+                    <p>
+                        Создавай челленджи, снимай ответы, участвуй в баттлах и поддерживай истории, которые хочется разделить.
+                    </p>
+                    <div class="source-hero-actions">
+                        <a href="{{ route('challenges.create') }}" class="button button-primary">Создать челлендж →</a>
+                        <a href="{{ route('stories.catalog') }}" class="button button-glass">▶ Смотреть ленту</a>
+                    </div>
+                    <div class="source-hero-proof">
+                        <div class="source-avatar-stack" aria-hidden="true">
+                            <span>АК</span><span>МС</span><span>ОЛ</span><span>+{{ number_format($usersCount ?? 0, 0, ',', ' ') }}</span>
+                        </div>
+                        <p><strong>{{ number_format($usersCount ?? 0, 0, ',', ' ') }}+</strong><br>уже создают в Deels</p>
+                    </div>
+                </div>
+
+                <div class="source-hero-visual">
+                    <div class="source-orbit source-orbit-one"></div>
+                    <div class="source-orbit source-orbit-two"></div>
+                    <div class="source-floating-chip source-chip-prize">
+                        <span>🏆</span>
+                        <strong>{{ $heroChallenge && $heroChallenge->reward_amount ? number_format($heroChallenge->reward_amount, 0, ',', ' ').' ₽' : '50 000 ₽' }}</strong>
+                        <small>призовой фонд</small>
+                    </div>
+                    <div class="source-floating-chip source-chip-trend">
+                        <span>↗</span>
+                        <strong>В тренде</strong>
+                        <small>{{ number_format($storiesCount ?? 0, 0, ',', ' ') }} ответов</small>
+                    </div>
+
+                    <div class="source-phone-frame">
+                        <div class="source-phone-top">
+                            <span class="source-brand"><span class="source-brand-mark">D</span></span>
+                            <span>◌</span>
+                        </div>
+                        <div class="source-phone-video">
+                            @if($heroChallenge && $heroChallenge->type === 'video' && $heroChallenge->video_preview)
+                                <video src="{{ $heroChallenge->video_preview }}" poster="{{ $heroChallenge->thumbnail }}" muted loop autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>
+                            @elseif($heroChallenge && ($heroChallenge->thumbnail || $heroChallenge->path))
+                                <img src="{{ $heroChallenge->thumbnail ?: $heroChallenge->path }}" alt="{{ $heroChallenge->title }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+                            @else
+                                <span class="source-poster-emoji">🕺</span>
+                            @endif
+                            <span class="source-phone-live">DEELS • LIVE</span>
+                            <div class="source-phone-side">
+                                <span>♡<small>{{ number_format($heroChallenge->likes_count ?? 0, 0, ',', ' ') }}</small></span>
+                                <span>◯<small>{{ number_format($heroChallenge->comments_count ?? 0, 0, ',', ' ') }}</small></span>
+                                <span>↗<small>92</small></span>
+                            </div>
+                            <div class="source-phone-caption">
+                                <small>{{ $heroChallenge && $heroChallenge->user ? '@'.$heroChallenge->user->username : '@deels' }}</small>
+                                <strong>{{ $heroChallenge->title ?? 'Повтори летний движ' }}</strong>
+                                <span>#челлендж #deels</span>
+                            </div>
+                        </div>
+                        <div class="source-phone-nav"><span>⌂</span><span>⌕</span><b>+</b><span>◌</span><span>●</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @if($homeChallenges->count())
+        <section class="source-section">
+            <div class="container">
+                <div class="source-section-head">
+                    <div>
+                        <span class="eyebrow">✦ Горячее сейчас</span>
+                        <h2>Челленджи, о которых говорят</h2>
+                        <p>Выбирай идею, снимай свой ответ и забирай внимание аудитории.</p>
+                    </div>
+                    <a href="{{ route('challenges.catalog') }}" class="source-text-link">Смотреть все →</a>
+                </div>
+                <div class="source-horizontal-cards">
+                    @foreach($homeChallenges as $challenge)
+                        @php
+                            $participants = $challenge->stories()->active()->count();
+                            $reward = (int)($challenge->reward_amount ?? 0);
+                        @endphp
+                        <article class="source-video-card">
+                            <a href="{{ route('challenge_page', $challenge->id) }}" class="source-poster">
+                                @if($challenge->type === 'video' && $challenge->video_preview)
+                                    <video src="{{ $challenge->video_preview }}" poster="{{ $challenge->thumbnail }}" muted loop autoplay playsinline></video>
+                                @elseif($challenge->thumbnail || $challenge->path)
+                                    <img src="{{ $challenge->thumbnail ?: $challenge->path }}" alt="{{ $challenge->title }}">
+                                @else
+                                    <span class="source-poster-placeholder"></span><span class="source-poster-emoji-card">✦</span>
+                                @endif
+                                <div class="source-poster-top">
+                                    <span class="source-poster-tag">Челлендж</span>
+                                    <span class="source-round-action">♡</span>
+                                </div>
+                                <div class="source-poster-caption">
+                                    <span>{{ $challenge->user ? '@'.$challenge->user->username : '@deels' }}</span>
+                                    <strong>{{ $challenge->title }}</strong>
+                                </div>
+                                <span class="source-play-button">▶</span>
                             </a>
-                            <div class="ch-block-main">
-                                <div class="ch-block-main__top d-none d-lg-flex">
-                                    <h1 class="ch-block-title text-uppercase">Топ челленджей</h1>
-                                    <div class="d-none d-lg-block">
-                                        <a href="{{route('challenges.catalog')}}" class="ch-block__btn ch-block__btn--xs ch-block__btn--outline">Смотреть все</a>
-                                        <a href="{{route('challenges.create')}}" class="ch-block__btn ch-block__btn--xs ch-block__btn--fill">Создать свой</a>
-                                    </div>
-                                </div>
-                                <a href="{{route('challenges.create')}}" class="ch-block__btn ch-block__btn--xl ch-block__btn--fill text-uppercase d-flex d-md-none">Создать свой челлендж</a>
-
-                                <div class="ch-block-slider owl-carousel owl-theme">
-
-                                    @foreach($topChallenges as $challenge)
-                                        @include('challenges.challenge_item', ['route' => route('challenge_page', $challenge->id)])
-                                    @endforeach
-                                </div>
-                                <div class="d-flex d-lg-none gap-3">
-                                    <a href="{{route('challenges.create')}}" class="ch-block__btn ch-block__btn--xl ch-block__btn--fill text-uppercase d-none d-md-flex">Создать свой челлендж</a>
-                                    <a href="{{route('challenges.catalog')}}" class="ch-block__btn ch-block__btn--xl ch-block__btn--outline">Смотреть все челенджи</a>
-                                </div>
+                            <div class="source-card-meta">
+                                <div><strong>{{ $reward > 0 ? number_format($reward, 0, ',', ' ').' ₽' : 'Без приза' }}</strong><span>призовой фонд</span></div>
+                                <div><strong>{{ number_format($participants, 0, ',', ' ') }}</strong><span>участников</span></div>
                             </div>
-                        </div>
-                    </div>
+                        </article>
+                    @endforeach
                 </div>
             </div>
-            @endif
-
-            <div class="showcase">
-                <div class="wrapper-container">
-                    <div class="showcase__start">
-                        <div class="showcase__start-info">
-                            <h2 class="showcase__start-title">
-                                Начни уже сегодня
-                            </h2>
-                            <div class="showcase__start-mob">
-                                <img alt="" src="/images/action-top-banner/startmob.webp"></div>
-                            <div class="buttons-row buttons-row-small mb-5">
-                                <a href="{{route('stories.create')}}" class="hero-btn">Создать сторис</a>
-                                <a href="{{route('start_campaign')}}" class="hero-btn hero-btn-dark"  onclick="window.location='{{route('start_campaign')}}'">Начать копить</a>
-
-                            </div>
-                            <div class="showcase__start-follow">
-                                <div class="showcase__start-icon">
-                                    <a href="https://t.me/deels_ru" target="_blank">
-                                        <img alt="" src="/images/action-top-banner/tg.svg">
-                                    </a>
-                                    <a href="https://vk.com/deels" target="_blank">
-                                        <img alt="" src="/images/action-top-banner/vk.svg">
-                                    </a>
-                                </div>
-                                <div class="showcase__start-message">
-                                    Подпишись, чтобы не пропустить последние новости!
-                                </div>
-                            </div>
-                            <a href="https://play.google.com/store/apps/details?id=com.kts.kopiberi_application" target="_blank"><img src="/images/promo/android.png" class="app_image"></a>
-                            <a href="https://apps.apple.com/us/app/deels/id6480409656" target="_blank"><img src="/images/promo/appstore.png" class="app_image"></a>
-                        </div>
-                        <div class="showcase__start-img">
-                            <div class="main_promo_slider owl-carousel owl-theme">
-                                <div class="item"><img alt="" src="/images/promo/banner1.png"></div>
-                                <div class="item"><img alt="" src="/images/promo/banner2.png"></div>
-                                <div class="item"><img alt="" src="/images/promo/banner3.png"></div>
-                                <div class="item"><img alt="" src="/images/promo/banner4.png"></div>
-                                <div class="item"><img alt="" src="/images/promo/banner5.png"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <script type="text/javascript" src="/dist/js/number-flip.js"></script>
-
-            <div class="section bcounter">
-                <div class="container">
-                    <h2 class="bcounter__title">
-                        КОИНЫ
-                        <b>DEELS</b>
-                    </h2>
-                    <small style="display: block; text-align: center; position: relative; top: -30px">Виртуальная внутренняя единица платформы</small>
-                    <div class="d-flex">
-                        <div class="bcounter-wrap">
-                            @php
-                                $deels_bank_user = \App\Models\User::where('email', 'moderdeels@mail.ru')->first();
-                                $transactions_total = \Bavix\Wallet\Models\Transaction::where('meta', 'like', '%"get":"coins","old_connected"%')->sum('amount');
-                                if($deels_bank_user) {
-                                    $deels_wallet_balance = intval($deels_bank_user->wallet_balance ?? 0);
-//                                    $bank = intval($deels_wallet_balance-intval($transactions_total));
-                                    $bank = $deels_wallet_balance;
-                                    if($bank < 0) {
-                                        $bank = 0;
-                                    }
-                                } else {
-                                    $bank = intval(10000000-$transactions_total);
-                                }
-
-                            @endphp
-                               <div class="numCounter" data-value="{{$bank}}"><div>
-                                       <b data-value="0"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="0"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="1"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="2"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="3"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="4" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="5" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="6" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div></div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-
-               <script>
-                   var counter = new Counter('.numCounter', {
-                       direction : 'rtl',
-                       delay     : 100,
-                       digits    : 8
-                   })
-               </script>
-            @push('after_scripts')
-              <script>
-                  function get_bank() {
-                      $.ajax({
-                          type: 'GET',
-                          url: '{{ route('coins_bank') }}',
-                          success: function (data) {
-                              counter.count(data.count);
-                              setTimeout(function() {
-                                  get_bank();
-                              }, 10000);
-                          }
-                      });
-                  }
-                  setTimeout(function() {
-                      get_bank();
-                  }, 10000);
-
-              </script>
-            @endpush
-
-               @if(count($topStories))
-                   <!-- tops-section -->
-                   <section class="tops">
-                       <div class="container">
-                           <h2 class="tops-title"><a href="{{route('stories.catalog',['type' => 'popular'])}}">Топ сторис</a></h2>
-                           <div class="index-carousel owl-carousel owl-theme">
-                               @foreach($topStories as $story)
-                                   @include('stories.story_item', ['story' => $story])
-                               @endforeach
-                           </div>
-                       </div>
-                   </section>
-               @endif
-
-               @if(count($donateStories))
-                   <section class="tops">
-                       <div class="container">
-                           <h2 class="tops-title"><a href="{{route('stories.catalog',['type' => 'paid'])}}">Сторис за донаты</a></h2>
-                           <div class="index-carousel owl-carousel owl-theme">
-                               @foreach($donateStories as $story)
-                                   @include('stories.story_item', ['story' => $story])
-                               @endforeach
-                           </div>
-                       </div>
-                   </section>
-               @endif
-
-               @if(count($newStories))
-                   <section class="tops">
-                       <div class="container">
-                           <h2 class="tops-title"><a href="{{route('stories.catalog',['type' => 'new'])}}">Новинки</a></h2>
-                           <div class="index-carousel owl-carousel owl-theme">
-                               @foreach($newStories as $story)
-                                   @include('stories.story_item', ['story' => $story])
-                               @endforeach
-                           </div>
-                       </div>
-                   </section>
-               @endif
-               <!-- End tops-section -->
-
-               <!-- info  -->
-            @include('partials.home.stats')
-               <!-- End info -->
-
-               <!-- finish -->
-               <div class="finish">
-                   <div class="container">
-                       <h2 class="finish__title">Поздравляем с<br>
-                           осуществлением мечты! <span>Поздравляем с<br>
-                       осуществлением мечты!</span></h2>
-
-                       <div class="index-carousel owl-carousel owl-theme">
-                           @foreach($completedCampaigns as $campaign)
-                               <a href="{{route('campaign_single', $campaign->slug)}}" class="finish-item">
-                                   <div class="finish-item__img">
-                                       <img src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt="">
-                                       <span>100%</span>
-                                   </div>
-                                   @if(isset($campaign->user))
-                                   <div class="finish-item__head">
-                                       <img src="{{$campaign->user->avatar()}}" alt="" width="25" height="25">
-                                       <span>{{$campaign->user->fullname}}</span>
-                                   </div>
-                                   @endif
-                                   <div class="finish-item__name">{{$campaign->title}}</div>
-                                   <ul class="finish-item__content">
-                                       <li>
-                                           <span>Осталось дней:</span>
-                                           <span class="text-accent">∞</span>
-                                       </li>
-                                       <li>
-                                           <span>Спонсоры: </span>
-                                           <span class="text-accent">{!! $campaign->success_payments->count() !!}</span>
-                                       </li>
-                                       <li>
-                                           <span>Финансировано:</span>
-                                           <span class="text-accent">{!! get_amount($campaign->goal) !!}</span>
-                                       </li>
-                                   </ul>
-                               </a>
-                           @endforeach
-                       </div>
-                   </div>
-               </div>
-               <!-- End finish -->
-
-               <div class="container">
-                   <div class="bank bank_index">
-                       <h2>
-                           <a href="/campaigns">Финансируемые копилки</a>
-                       </h2>
-                       <div class="owl-carousel owl-theme bank__carousel">
-
-                           @foreach($fundedCampaigns as $campaign)
-                               @include('campaigns.campaign_card', ['campaign' => $campaign])
-                           @endforeach
-                       </div>
-                   </div>
-
-                   <div class="bank bank_index">
-                       <h2>
-                           <a href="/campaigns">Недавно пополненные копилки</a>
-                       </h2>
-                       <div class="owl-carousel owl-theme bank__carousel">
-                           @foreach($latestFundedCampaigns as $campaign)
-                               @include('campaigns.campaign_card', ['campaign' => $campaign])
-                           @endforeach
-                       </div>
-                   </div>
-
-                   <div class="bank bank_index">
-                       <h2>
-                           <a href="/campaigns?type=new">Новые копилки</a>
-                       </h2>
-                       <div class="owl-carousel owl-theme bank__carousel">
-                           @foreach($newCampaigns as $campaign)
-                               @php
-                                   $percent_raised = $campaign->percent_raised();
-                            @endphp
-                               @include('campaigns.campaign_card', ['campaign' => $campaign])
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            @include('partials.home.whydeels')
-
-            @include('partials.home.deels_info')
-
-            @include('partials.home.bottom_start')
-
-
-
-            @if(get_option('ad_popup_active'))
-                <a href="#promo_popup" class="hero-list__item popup_block" style="width: 0;height: 0;position: absolute;bottom: 0;z-index: -1"></a>
-            @endif
-            <a href="#mobile_app_popup" class="hero-list__item popup_block" style="width: 0;height: 0;position: absolute;bottom: 0;z-index: -1"></a>
-        </div>
-    </div>
-
-
-
-
-
-    @include('stories.modal')
-<style>
-    .demo-video video {
-        height: auto!important;
-    }
-</style>
-    <div class="story story--media demo-video mfp-hide" id="hero-video-popup">
-        <div class="story-wrap">
-            <div class="story-media">
-                <video src=""></video>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .promo_popup_block {
-            max-width: 80%;
-            max-height: 710px;
-        }
-        .promo_popup_block img{
-            position: relative;
-        }
-        .promo_popup_block .mfp-close {
-            z-index: 3;
-        }
-        .promo_popup_block .story-media {
-            text-align: center;
-            background: transparent!important;
-        }
-    </style>
-    @if(get_option('ad_popup_active', true))
-
-        <div class="story story--media demo-video mfp-hide promo_popup_block" id="promo_popup">
-            <div class="story-wrap">
-                <div class="story-media">
-                    <a href="{{get_option('ad_popup_url', true)}}"><img src="{{get_option('ad_popup_image', true)}}"></a>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <style>
-        .mobile_app_popup {
-            h5 {
-                margin-bottom: 20px!important;
-                display: block!important;
-            }
-            .app_image {
-                height: 40px!important;
-                width: auto!important;
-                margin: 5px!important;
-            }
-            .modal_close {
-                display: block!important;
-                margin-top: 20px!important;
-                text-decoration: underline!important;
-                opacity: .6!important;
-            }
-            .mobile_content {
-                margin-top: 100px!important;
-                border: 2px solid #fff!important;
-                border-radius: 10px!important;
-                padding: 20px!important;
-                background-color: #0D102C!important;
-                -webkit-box-shadow: 0 0 8px rgba(255, 255, 255, .5), inset 0 0 8px rgba(255, 255, 255, .5)!important;
-                box-shadow: 0 0 8px rgba(255, 255, 255, .5), inset 0 0 8px rgba(255, 255, 255, .5)!important;
-            }
-        }
-    </style>
-    <div class="story story--media demo-video mfp-hide promo_popup_block mobile_app_popup" id="mobile_app_popup">
-        <div class="story-wrap">
-            <div class="story-media">
-                <div class="mobile_content">
-                    <h5>Скачайте наше приложение:</h5>
-                    <a href="https://play.google.com/store/apps/details?id=com.kts.kopiberi_application" target="_blank"><img src="/images/promo/android.png" class="app_image"></a>
-                    <a href="https://apps.apple.com/us/app/deels/id6480409656" target="_blank"><img src="/images/promo/appstore.png" class="app_image"></a>
-                    <span class="modal_close">Остаться в браузере</span>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-
-
-@endsection
-
-@section('page-js')
-    <script type="text/javascript" src="{{ asset('/js/libs/jquery-cookies/jquery-cookies.js') }}"></script>
-    <script>
-        @if(!\Cookie::get('mobile_app'))
-        $( document ).ready(function() {
-            if ($(window).width() < 767) {
-                $.cookie('mobile_app', true, {expires: 14, path: '/'});
-                $('.modal_close').click(() => {
-                    $.magnificPopup.close({
-                        items: {
-                            src: '#mobile_app_popup'
-                        },
-                        type: 'inline'
-                    });
-                });
-                searchTimer = setTimeout(function () {
-                    $.magnificPopup.open({
-                        items: {
-                            src: '#mobile_app_popup'
-                        },
-                        type: 'inline'
-                    });
-                }, 1000);
-            }
-        });
+        </section>
         @endif
 
-        @if(get_option('ad_popup_active', true) && get_option('ad_popup_image', true) && \Cookie::get('mobile_app') && !\Cookie::get('promo_block'))
-            $( document ).ready(function() {
-                searchTimer = setTimeout(function() {
-                    $.magnificPopup.open({
-                        items: {
-                            src: '#promo_popup'
-                        },
-                        type: 'inline'
-                    });
-                    $.cookie('promo_block', true, { expires: 14, path: '/' });
-                    var popup_height = $('.promo_popup_block').height();
-                    var image_height = $('.promo_popup_block img').height();
-                    var image_width = $('.promo_popup_block img').width();
-                    if(image_height > image_width || image_height > popup_height) {
-                        $('.promo_popup_block img').height(popup_height);
-                    }
+        <section class="source-section theme-dark-card">
+            <div class="container">
+                <div class="source-section-head">
+                    <div>
+                        <span class="eyebrow" style="color:#fff">✦ Простая механика</span>
+                        <h2>От идеи до победы — три шага</h2>
+                        <p style="color:rgba(255,255,255,.7)">Никаких сложных правил. Только ты, камера и желание попробовать.</p>
+                    </div>
+                </div>
+                <div class="source-steps-grid">
+                    <article><span>01</span><div class="source-step-icon">✦</div><h3>Найди свой вызов</h3><p>Выбери челлендж, который тебя цепляет.</p></article>
+                    <article><span>02</span><div class="source-step-icon">▶</div><h3>Сними ответ</h3><p>Покажи свой вариант в коротком вертикальном видео.</p></article>
+                    <article><span>03</span><div class="source-step-icon">🏆</div><h3>Собери голоса</h3><p>Делись, получай поддержку и выходи в топ.</p></article>
+                </div>
+            </div>
+        </section>
 
-                    searchTimer = setTimeout(function() {
-                        $.magnificPopup.close({
-                            items: {
-                                src: '#promo_popup'
-                            },
-                            type: 'inline'
-                        });
-                    }, 5000);
-
-                }, 3000);
-
-            });
+        @if($homeStories->count())
+        <section class="source-section">
+            <div class="container source-split-feature">
+                <div>
+                    <div class="source-section-head" style="display:block;margin-bottom:28px">
+                        <span class="eyebrow">✦ Истории Deels</span>
+                        <h2>Не просто видео. Настоящие истории</h2>
+                        <p>Люди рассказывают о шагах, которые изменили их жизнь. Иногда достаточно одного честного ролика, чтобы вдохновить тысячи.</p>
+                    </div>
+                    <a href="{{ route('stories.catalog') }}" class="button button-dark">Смотреть истории →</a>
+                </div>
+                <div class="source-stories-stack">
+                    @foreach($homeStories as $story)
+                        <a href="#story-popup" class="source-story-card show_story" data-route="{{ route('stories.preview', ['id' => $story->id, 'user_id' => Auth::id()]) }}" data-story="{{ $story->id }}" data-type="{{ $story->type }}" data-paid="{{ $story->paid }}" data-amount="{{ $story->amount }}">
+                            <div class="source-story-icon">{{ ['✨','🎭','🏆'][$loop->index] ?? '✦' }}</div>
+                            <div>
+                                <span>{{ optional($story->created_at)->diffForHumans() }} • {{ $story->user ? '@'.$story->user->username : '@deels' }}</span>
+                                <h3>{{ $story->title ?: 'История участника Deels' }}</h3>
+                                <span class="source-story-more">Смотреть историю →</span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
         @endif
-        $('[data-video-link]').magnificPopup({
-            type : 'inline',
-            callbacks : {
-                open : function() {
-                    var mp = $.magnificPopup.instance,
-                        t = $(mp.currItem.el[0]),
-                        videoUrl = t[0].dataset.videoLink,
-                        thVideo = this.content.find('video');
-                    thVideo.attr('src', videoUrl)
-                    thVideo[0].play()
-                },
-                close: function() {
-                    var thVideo = this.content.find('video');
-                    thVideo[0].pause();
-                    thVideo[0].currentTime = 0;
-                }
-            }
-        });
 
-        $('.popup_block').magnificPopup({
-            type : 'inline',
-            callbacks : {
-                open : function() {
-                    var mp = $.magnificPopup.instance,
-                        t = $(mp.currItem.el[0]),
-                        videoUrl = t[0].dataset.videoLink,
-                        thVideo = this.content.find('img');
-                    thVideo.attr('src', videoUrl);
-                },
-                close: function() {
+        @if($homeCampaigns->count())
+        <section class="source-section source-section-tint">
+            <div class="container">
+                <div class="source-section-head">
+                    <div>
+                        <span class="eyebrow">✦ Делись добром</span>
+                        <h2>Копилки, которые меняют жизнь</h2>
+                        <p>Поддерживай проверенные сборы и следи за результатом вместе с сообществом.</p>
+                    </div>
+                    <a href="/campaigns" class="source-text-link">Смотреть все →</a>
+                </div>
+                <div class="source-campaign-grid">
+                    @foreach($homeCampaigns as $campaign)
+                        @php $raised = min(100, max(0, (int)$campaign->percent_raised())); @endphp
+                        <article class="source-campaign-card">
+                            <a href="{{ route('campaign_single', $campaign->slug) }}" class="source-campaign-cover">
+                                @if($campaign->feature_img_url())
+                                    <img src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt="{{ $campaign->title }}">
+                                @else
+                                    <span>💜</span>
+                                @endif
+                                <span class="source-poster-tag">Проверенная копилка</span>
+                            </a>
+                            <div class="source-campaign-body">
+                                <h3>{{ $campaign->title }}</h3>
+                                <div class="source-progress-line"><span style="width:{{ $raised }}%"></span></div>
+                                <div class="source-progress-meta"><strong>{{ get_amount($campaign->success_payments->sum('amount')) }}</strong><span>из {{ get_amount($campaign->goal) }}</span></div>
+                                <a href="{{ route('campaign_single', $campaign->slug) }}" class="button button-soft">Поддержать</a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
 
-                }
-            }
-        });
+        <section class="source-section">
+            <div class="container source-cta-card theme-dark-card">
+                <div>
+                    <span class="eyebrow" style="color:#fff">✦ Твой ход</span>
+                    <h2>Готов создать то,<br>что подхватят другие?</h2>
+                    <p>Начни с первого челленджа. Это займёт меньше пяти минут.</p>
+                </div>
+                <a href="{{ route('challenges.create') }}" class="button button-white">Создать в Deels →</a>
+            </div>
+        </section>
+    </main>
+</div>
 
-        $( document ).ready(function() {
-            $('.ch-block-slider').hide();
-            $('.ch-block-slider').owlCarousel({
-                margin: 20,
-                loop: false,
-                dots: false,
-                nav: true,
-                autoWidth:true,
-                responsive:{
-                    0:{
-                        margin: 10,
-                        dots: true,
-                        nav: false
-                    },
-                    981:{
-                        dots: false,
-                        nav: true
-                    }
-                },
-                navText: [
-                    '<svg width="16" height="34" viewBox="0 0 16 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 32.5L1.70148 19.0601C1.4869 18.8459 1.30952 18.5436 1.1866 18.1826C1.06368 17.8216 0.999397 17.4142 1.00001 17C0.999397 16.5858 1.06368 16.1784 1.1866 15.8174C1.30952 15.4564 1.4869 15.1541 1.70148 14.9399L15 1.5" stroke="#00F0FF" stroke-width="2"/></svg>',
-                    '<svg width="16" height="34" viewBox="0 0 16 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 32.5L14.2985 19.0601C14.5131 18.8459 14.6905 18.5436 14.8134 18.1826C14.9363 17.8216 15.0006 17.4142 15 17C15.0006 16.5858 14.9363 16.1784 14.8134 15.8174C14.6905 15.4564 14.5131 15.1541 14.2985 14.9399L1 1.5" stroke="#00F0FF" stroke-width="2"/></svg>'
-                ],
-                onInitialized: function() {
-                    $('.ch-block-slider').show();
-                }
-            });
-
-            $('.index-carousel').hide();
-            $('.index-carousel').owlCarousel({
-                margin: 20,
-                loop: false,
-                dots: true,
-                nav: true,
-                autoWidth:true,
-                navText: [
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="33" viewBox="0 0 16 33" fill="none"><path d="M15 32L1.70148 18.5601C1.4869 18.3459 1.30952 18.0436 1.1866 17.6826C1.06368 17.3216 0.999397 16.9142 1.00001 16.5C0.999397 16.0858 1.06368 15.6784 1.1866 15.3174C1.30952 14.9564 1.4869 14.6541 1.70148 14.4399L15 1" stroke="#00F0FF"/></svg>',
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="33" viewBox="0 0 16 33" fill="none"><path d="M1 32L14.2985 18.5601C14.5131 18.3459 14.6905 18.0436 14.8134 17.6826C14.9363 17.3216 15.0006 16.9142 15 16.5C15.0006 16.0858 14.9363 15.6784 14.8134 15.3174C14.6905 14.9564 14.5131 14.6541 14.2985 14.4399L1 1" stroke="#00F0FF"/></svg>'
-                ],
-                onInitialized: function() {
-                    $('.index-carousel').show();
-                }
-            });
-
-
-            //donators-slider
-            $('.donators-slider').hide();
-            $('.donators-slider').owlCarousel({
-                loop: true,
-                nav: true,
-                dots: false,
-                center: true,
-                margin: 20,
-                stagePadding: 10,
-                navText: [
-                    '<svg viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg"><circle r="21.5" transform="matrix(-1 0 0 1 21.5 21.5)"/><path d="M24 15L18 21.5L24 28" stroke-width="2"/></svg>',
-                    '<svg viewBox="0 0 43 43" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="21.5" cy="21.5" r="21.5" /><path d="M19 15L25 21.5L19 28" stroke-width="2"/></svg>'],
-                items: 1,
-                responsive: {
-                    0: {
-                        margin: 4,
-                    },
-                    480: {
-                        margin: 20,
-                    },
-                },
-                onInitialized: function() {
-                    $('.donators-slider').show();
-                }
-            });
-
-        });
-
-		if ($(window).width() >= 900) {
-			$('.topslider').slick({
-				arrows: false,
-				slidesToShow: 1,
-				infinite: true,
-				autoplay: true,
-				autoplaySpeed: 5000,
-			})
-		}
-
-		$('.finish-slider__track').slick({
-			arrows: false,
-			slidesToShow: 3,
-			infinite: false,
-
-			prevArrow: $('.finish-slider__prev'),
-			nextArrow: $('.finish-slider__next'),
-
-			responsive: [
-				{
-					breakpoint: 980,
-					settings: {
-						slidesToShow: 2,
-					}
-				},
-				{
-					breakpoint: 650,
-					settings: {
-						slidesToShow: 1,
-					}
-				},
-			]
-		});
-
-		$('.finish-slider__prev').click(() => {
-			$('.finish-slider__track').slick('slickPrev')
-		});
-		$('.finish-slider__next').click(() => {
-			$('.finish-slider__track').slick('slickNext')
-		});
-
-        $( document ).ready(function() {
-            function resize_window() {
-                $(window).trigger('resize');
-                setTimeout(function() {
-                    resize_window();
-                }, 3000);
-            }
-            setTimeout(function() {
-                resize_window();
-            }, 3000);
-        });
-
-    </script>
-    <script src="/dist/js/swiper.min.js"></script>
-    <script src="/js/libs/fancybox/jquery.fancybox.min.js"></script>
-    <script src="/dist/js/actions-top.js"></script>
-{{--    @include('dashboard.stories.stories_scripts')--}}
+@include('stories.modal')
 @endsection
