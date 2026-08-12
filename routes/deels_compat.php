@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\DeelsCampaignCompatibilityController;
+use App\Http\Controllers\Api\DeelsCommunicationCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
@@ -104,4 +105,16 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
     Route::get('messages/dialogs/{id}', [DeelsCompatibilityController::class, 'thread'])
         ->whereNumber('id')
         ->name('deels.compat.messages.thread');
+    Route::post('messages/dialogs/{id}/messages', [DeelsCommunicationCompatibilityController::class, 'sendMessage'])
+        ->whereNumber('id')
+        ->middleware(['suspicious.restricted', 'action.limit.message'])
+        ->name('deels.compat.messages.send');
+
+    Route::get('notifications', [DeelsCommunicationCompatibilityController::class, 'notifications'])
+        ->name('deels.compat.notifications.index');
+    Route::post('notifications/{id}/read', [DeelsCommunicationCompatibilityController::class, 'readNotification'])
+        ->whereNumber('id')
+        ->name('deels.compat.notifications.read');
+    Route::post('notifications/read-all', [DeelsCommunicationCompatibilityController::class, 'readAllNotifications'])
+        ->name('deels.compat.notifications.read-all');
 });
