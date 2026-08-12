@@ -20,8 +20,7 @@ class ContestListService
     public function __construct(
         private readonly ContestAccountInfoCache $accountInfo,
         private readonly ContestVisibilityService $visibility
-    )
-    {
+    ) {
     }
 
     public function challenges(Request $request): LengthAwarePaginator
@@ -34,6 +33,16 @@ class ContestListService
 
     public function contests(Request $request): LengthAwarePaginator
     {
+        $content = (string) $request->input('content', 'all');
+
+        if ($content === 'challenges') {
+            return $this->challenges($request);
+        }
+
+        if ($content === 'battles') {
+            return $this->battles($request);
+        }
+
         $challengeQuery = $this->baseQuery(Challenge::query(), 'challenges');
         $this->applyFilters($challengeQuery, $request, 'challenge_id');
 
