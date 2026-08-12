@@ -24,15 +24,6 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/app.min.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-compat.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-create.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-social.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-account.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-account-structure.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-detail.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-messenger.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-wallet-auth.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-register-campaigns.css')}}"/>
-    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-campaigns-auth.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-home-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-header-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-catalog-source.css')}}"/>
