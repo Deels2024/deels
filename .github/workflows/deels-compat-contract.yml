@@ -1,0 +1,101 @@
+name: Deels compatibility API contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/DeelsCompatibilityController.php'
+      - 'app/Providers/RouteServiceProvider.php'
+      - 'routes/deels_compat.php'
+      - '.github/workflows/deels-compat-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Laravel
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: PHP syntax
+        run: |
+          php -l app/Http/Controllers/Api/DeelsCompatibilityController.php
+          php -l app/Providers/RouteServiceProvider.php
+          php -l routes/deels_compat.php
+
+      - name: Verify stage-one source contracts
+        run: |
+          grep -q "api(\"stats\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\"feed\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\"stories\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\`stories/\${encode(id)}\`)" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\`challenges/\${encode(id)}\`)" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\"wallet\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          grep -q "api(\"messages/dialogs\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Laravel route bootstrap
+        run: php artisan route:list --path=api | tee /tmp/api-routes.txt
+
+      - name: Verify stage-one compatibility routes
+        run: |
+          set -euo pipefail
+          for route in \
+            'api/stats' \
+            'api/feed' \
+            'api/stories' \
+            'api/stories/{id}' \
+            'api/challenges/{id}' \
+            'api/wallet' \
+            'api/messages/dialogs' \
+            'api/messages/dialogs/{id}'; do
+            grep -Fq "$route" /tmp/api-routes.txt || { echo "Missing compatibility route: $route"; exit 1; }
+          done
+
+      - name: Verify compatibility route names
+        run: |
+          set -euo pipefail
+          for name in \
+            deels.compat.stats \
+            deels.compat.feed \
+            deels.compat.stories.index \
+            deels.compat.stories.show \
+            deels.compat.challenges.show \
+            deels.compat.wallet \
+            deels.compat.messages.dialogs \
+            deels.compat.messages.thread; do
+            grep -Fq "$name" /tmp/api-routes.txt || { echo "Missing compatibility route name: $name"; exit 1; }
+          done
