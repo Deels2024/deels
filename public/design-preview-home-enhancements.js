@@ -4,7 +4,7 @@
   ready(function(){
     var home=document.getElementById('screen-home');
     if(!home||home.querySelector('.preview-home-enhancements'))return;
-    home.classList.add('deels-source-home','light_theme','light_there');
+    home.classList.add('deels-source-home','deels-v2-enabled','light_theme','light_there');
 
     var hero=home.querySelector('.hero-preview');
     var firstWrap=home.querySelector('.screen-wrap');
@@ -41,5 +41,10 @@
       '<article class="source-economy-item"><b>💜</b><strong>Копилки</strong><p>Сбор поддержки на мечты, проекты и инициативы.</p></article>'+
     '</div></div>';
     home.appendChild(economy);
+
+    var footer=document.createElement('footer');
+    footer.className='footer preview-home-enhancements';
+    footer.innerHTML='<div class="container footer__menu"><a href="#home" class="footer__logo"><span style="font-size:28px;font-weight:900;color:#6b2bc1">DEELS</span></a><div class="footer__list"><ul><li><a href="#home">Главная</a></li><li><a href="#challenges">Челленджи</a></li><li><a href="#feed">Истории</a></li><li><a href="#campaign">Копилки</a></li><li><a href="#profile">Профиль</a></li><li><a href="#wallet">Кошелёк</a></li></ul></div><div class="footer__icons"><a href="#" aria-label="Telegram">TG</a><a href="#" aria-label="VK">VK</a></div></div><div class="container deels-footer-directory"><div class="deels-footer-col"><strong>Смотреть</strong><a href="#feed">Лента и истории</a><a href="#challenges">Челленджи</a><a href="#campaign">Копилки</a></div><div class="deels-footer-col"><strong>Создавать</strong><a href="#create">Создать челлендж</a><a href="#create">Создать сторис</a><a href="#campaign">Создать копилку</a></div><div class="deels-footer-col"><strong>Поддержка</strong><a href="#">Контакты</a><a href="#">Правила и оферты</a><a href="#">Конфиденциальность</a></div><div class="deels-footer-col"><strong>Deels</strong><a href="#home">О платформе</a><a href="#">Telegram</a><a href="#">VK</a></div></div><div class="container footer__items"><div class="footer__item"><span>⌖</span><a href="#">Санкт-Петербург, пр. Ветеранов 166, лит. А</a></div><div class="footer__item"><span>☎</span><a href="#">+7 (812) 507-98-08</a></div><div class="footer__item"><span>✉</span><a href="#">info@deels.ru</a></div></div><div class="container footer__href"><a href="#">Политика конфиденциальности</a><p>Реклама на Deels размещается по закону (erid)</p></div><div class="container footer__items gap-3"><a href="#" class="button button-soft">Google Play</a><a href="#" class="button button-soft">App Store</a></div>';
+    home.appendChild(footer);
   });
 })();
