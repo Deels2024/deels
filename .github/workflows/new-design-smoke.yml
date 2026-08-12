@@ -9,9 +9,6 @@ on:
       - resources/views/**
       - public/dist/css/deelsweb-*.css
       - public/dist/js/deels-v2.js
-      - composer.json
-      - composer.lock
-      - routes/web.php
       - .github/workflows/new-design-smoke.yml
   workflow_dispatch:
 
@@ -114,27 +111,34 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cp .env.example .env
+          : > .env
           {
+            echo 'APP_NAME=Deels'
             echo 'APP_ENV=testing'
             echo 'APP_DEBUG=true'
             echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
             echo 'DB_CONNECTION=sqlite'
             echo 'DB_DATABASE=:memory:'
             echo 'CACHE_DRIVER=array'
             echo 'SESSION_DRIVER=array'
             echo 'QUEUE_CONNECTION=sync'
             echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
           } >> .env
-          mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 
       - name: Laravel route bootstrap
-        run: php artisan route:list --no-ansi > /tmp/routes.txt
+        run: php artisan route:list --columns=method,uri,name > /tmp/routes.txt
 
       - name: Verify runtime routes
         shell: bash
         run: |
           set -euo pipefail
-          grep -q 'challenges' /tmp/routes.txt
-          grep -q 'stories' /tmp/routes.txt
-          grep -q 'campaign' /tmp/routes.txt
+          grep -q 'home' /tmp/routes.txt
+          grep -q 'challenges.catalog' /tmp/routes.txt
+          grep -q 'challenge_page' /tmp/routes.txt
+          grep -q 'battle_page' /tmp/routes.txt
+          grep -q 'campaign_single' /tmp/routes.txt
+          grep -q 'stories.catalog' /tmp/routes.txt
+          grep -q 'stories.create' /tmp/routes.txt
