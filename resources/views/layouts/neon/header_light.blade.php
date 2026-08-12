@@ -15,24 +15,16 @@
     @if(request()->cookie('web_app'))
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
     @endif
-    <link
-            rel="shortcut icon"
-            href="/dist/images/icons/favicon.ico"
-            type="image/x-icon"
-    />
-
+    <link rel="shortcut icon" href="/dist/images/icons/favicon.ico" type="image/x-icon"/>
     @if(isset($_GET) && !empty($_GET))
         <link rel="canonical" href="{{request()->url()}}">
     @endif
-
-
     <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicons/favicon-16x16.png">
     <link rel="manifest" href="/images/favicons/site.webmanifest">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
-
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href=" {{ext_asset('/dist/css/owl.carousel.min.css')}}"/>
     <link rel="stylesheet" href=" {{ext_asset('/dist/css/owl.theme.default.min.css')}}"/>
@@ -46,7 +38,7 @@
     <link rel="stylesheet" href=" {{ext_asset('/dist/css/main.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-wallet-auth.css')}}"/>
-
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2-campaigns-auth.css')}}"/>
 
     @yield('page-css')
 
