@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use App\Http\Controllers\Api\DeelsSettingsCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
+use App\Http\Controllers\Api\DeelsUtilityCompatibilityController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,10 @@ Route::post('auth/login', [DeelsCompatibilityController::class, 'login'])
 Route::post('auth/register', [DeelsCompatibilityController::class, 'register'])
     ->middleware('throttle:registrations')
     ->name('deels.compat.auth.register');
+Route::post('auth/forgot-password', [DeelsUtilityCompatibilityController::class, 'forgotPassword'])
+    ->name('deels.compat.auth.forgot-password');
+Route::post('auth/reset-password', [DeelsUtilityCompatibilityController::class, 'resetPassword'])
+    ->name('deels.compat.auth.reset-password');
 
 Route::get('stats', [DeelsCompatibilityController::class, 'stats'])
     ->name('deels.compat.stats');
@@ -45,9 +50,16 @@ Route::get('campaigns/{id}', [DeelsCampaignCompatibilityController::class, 'show
     ->where('id', '[A-Za-z0-9_-]+')
     ->name('deels.compat.campaigns.show');
 
+Route::get('search', [DeelsUtilityCompatibilityController::class, 'search'])
+    ->name('deels.compat.search');
+Route::post('contacts', [DeelsUtilityCompatibilityController::class, 'contact'])
+    ->name('deels.compat.contacts.store');
+
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
     Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
         ->name('deels.compat.auth.logout');
+    Route::get('user', [DeelsUtilityCompatibilityController::class, 'me'])
+        ->name('deels.compat.auth.me');
 
     Route::post('challenges', [DeelsContentCompatibilityController::class, 'createChallenge'])
         ->name('deels.compat.challenges.store');
@@ -98,6 +110,9 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
         ->where('type', 'stories|story|challenges|challenge-responses')
         ->whereNumber('id')
         ->name('deels.compat.social.share');
+
+    Route::post('media', [DeelsUtilityCompatibilityController::class, 'media'])
+        ->name('deels.compat.media.store');
 
     Route::get('wallet', [DeelsCompatibilityController::class, 'wallet'])
         ->name('deels.compat.wallet');
