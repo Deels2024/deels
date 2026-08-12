@@ -5,12 +5,12 @@ on:
     branches:
       - codex/new-design-migration
     paths:
-      - public/design-preview.html
-      - public/dist/css/deelsweb-*.css
-      - public/dist/css/deels-v2*.css
-      - public/dist/js/deels-*.js
-      - resources/views/**
-      - .github/workflows/design-preview-pages.yml
+      - 'public/design-preview.html'
+      - 'public/dist/css/deelsweb-*.css'
+      - 'public/dist/css/deels-v2*.css'
+      - 'public/dist/js/deels-*.js'
+      - 'resources/views/**'
+      - '.github/workflows/design-preview-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -77,4 +77,6 @@ jobs:
 
       - name: Preview ready
         if: success()
-        run: echo "Interactive Deels preview deployed: ${{ steps.deployment.outputs.page_url }}"
+        run: |
+          echo "Interactive Deels preview deployed"
+          echo "${{ steps.deployment.outputs.page_url }}"
