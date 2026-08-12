@@ -11,11 +11,12 @@ use App\Models\Story;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\WithdrawalRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DeelsCompatibilityController extends Controller
 {
-    public function stats()
+    public function stats(): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -38,17 +39,34 @@ class DeelsCompatibilityController extends Controller
         return app(ApiController::class)->get_stories($request);
     }
 
-    public function challenge(Request $request, $id)
+    public function challenge(Request $request, $id): JsonResponse
     {
-        return app(ChallengeController::class)->get($request, $id);
+        $data = app(ChallengeController::class)->get($request, $id, true, false);
+        if ($data instanceof JsonResponse) {
+            return $data;
+        }
+
+        $data['id'] = $data['challenge_id'] ?? $id;
+        $data['prize_amount'] = $data['reward_amount'] ?? 0;
+        $data['media_url'] = $data['video_preview'] ?? $data['path'] ?? null;
+
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
-    public function story(Request $request, $id)
+    public function story(Request $request, $id): JsonResponse
     {
-        return app(StoryController::class)->get($request, $id);
+        $data = app(StoryController::class)->get($request, $id, true, false);
+        if ($data instanceof JsonResponse) {
+            return $data;
+        }
+
+        $data['id'] = $data['story_id'] ?? $id;
+        $data['media_url'] = $data['video_preview'] ?? $data['path'] ?? null;
+
+        return response()->json(['success' => true, 'data' => $data]);
     }
 
-    public function wallet(Request $request)
+    public function wallet(Request $request): JsonResponse
     {
         $user = $request->user();
         $wallet = $user->getWallet('default');
@@ -91,15 +109,66 @@ class DeelsCompatibilityController extends Controller
         ]);
     }
 
-    public function dialogs(Request $request)
+    public function dialogs(Request $request): JsonResponse
     {
-        return app(MessagesController::class)->get_list($request);
+        $legacy = app(MessagesController::class)->get_list($request);
+        $payload = $legacy->getData(true);
+
+        if (empty($payload['success'])) {
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'total' => 0,
+            ]);
+        }
+
+        $rows = collect($payload['data'] ?? [])->map(function (array $row): array {
+            $row['time'] = $row['time'] ?? $row['date'] ?? '';
+            return $row;
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => $rows,
+            'total' => $rows->count(),
+        ]);
     }
 
-    public function thread(Request $request, $id)
+    public function thread(Request $request, $id): JsonResponse
     {
         $request->merge(['thread_id' => $id]);
+        $legacy = app(MessagesController::class)->show($request);
+        $payload = $legacy->getData(true);
 
-        return app(MessagesController::class)->show($request);
+        if (empty($payload['success'])) {
+            return response()->json($payload, $legacy->getStatusCode());
+        }
+
+        $rows = collect($payload['data'] ?? [])
+            ->flatMap(function ($messages): array {
+                return is_array($messages) ? $messages : [];
+            })
+            ->map(function (array $message): array {
+                return [
+                    'id' => $message['id'] ?? md5(($message['created_at'] ?? '') . '|' . ($message['message'] ?? '')),
+                    'text' => $message['message'] ?? '',
+                    'message' => $message['message'] ?? '',
+                    'created_at' => $message['created_at'] ?? '',
+                    'is_mine' => (bool) ($message['my_message'] ?? false),
+                    'outgoing' => (bool) ($message['my_message'] ?? false),
+                    'user' => $message['user'] ?? null,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => $rows,
+            'total' => $rows->count(),
+            'current_page' => $payload['current_page'] ?? 1,
+            'total_pages' => $payload['total_pages'] ?? 1,
+            'thread_id' => $payload['thread_id'] ?? $id,
+            'is_blocked' => $payload['is_blocked'] ?? false,
+        ]);
     }
 }
