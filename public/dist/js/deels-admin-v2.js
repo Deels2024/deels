@@ -73,5 +73,34 @@
     });
   }
 
-  ready(ensureAdminHub);
+  function ensureAdminDataStates() {
+    var main = document.querySelector('.admin-main');
+    if (!main || main.dataset.statesEnhanced === '1') return;
+    main.dataset.statesEnhanced = '1';
+
+    var filterForm = main.querySelector('form.form--admin, form.d-flex.mb-4');
+    if (filterForm && !main.querySelector('.deels-admin-filter-note')) {
+      var note = document.createElement('div');
+      note.className = 'deels-admin-filter-note';
+      note.textContent = 'Список обновляется по выбранным фильтрам. Все действия выполняются через существующую систему прав Deels.';
+      filterForm.parentNode.insertBefore(note, filterForm);
+    }
+
+    Array.prototype.forEach.call(main.querySelectorAll('.admin-table table, table.admin-table, .followers-block table'), function (table) {
+      var tbody = table.querySelector('tbody');
+      if (!tbody || tbody.querySelector('tr')) return;
+      var wrap = table.closest('.admin-table, .followers-block') || table.parentNode;
+      if (!wrap || wrap.querySelector('.deels-admin-empty')) return;
+      table.style.display = 'none';
+      var empty = document.createElement('div');
+      empty.className = 'deels-admin-empty';
+      empty.innerHTML = '<strong>Нет данных</strong><span>По текущим фильтрам записей не найдено.</span>';
+      wrap.appendChild(empty);
+    });
+  }
+
+  ready(function () {
+    ensureAdminHub();
+    ensureAdminDataStates();
+  });
 })();
