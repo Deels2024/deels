@@ -29,6 +29,10 @@
     @endif
 <!-- main style.css -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    @if(request()->is('dashboard/my_campaigns/edit_campaign/*/rewards') || request()->is('dashboard/my_campaigns/edit_campaign/*/updates') || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs'))
+        <link rel="stylesheet" href="{{ asset('dist/css/deelsweb-campaign-manage-source.css') }}">
+        <script>document.documentElement.classList.add('deels-campaign-manage-loading');</script>
+    @endif
     @yield('page-css')
 
     @if(get_option('additional_css'))
@@ -43,7 +47,7 @@
         ]) !!};
     </script>
 </head>
-<body>
+<body @if(request()->is('dashboard/my_campaigns/edit_campaign/*/rewards') || request()->is('dashboard/my_campaigns/edit_campaign/*/updates') || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs')) class="deels-campaign-manage" @endif>
 
 
 @include('layouts.main_menu')
