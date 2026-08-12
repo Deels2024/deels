@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DeelsCampaignCompatibilityController;
 use App\Http\Controllers\Api\DeelsCommunicationCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
+use App\Http\Controllers\Api\DeelsEngagementCompatibilityController;
 use App\Http\Controllers\Api\DeelsSettingsCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
 use App\Http\Controllers\Api\DeelsUtilityCompatibilityController;
@@ -43,6 +44,8 @@ Route::get('stories/{id}', [DeelsCompatibilityController::class, 'story'])
 Route::get('challenges/{id}', [DeelsCompatibilityController::class, 'challenge'])
     ->whereNumber('id')
     ->name('deels.compat.challenges.show');
+Route::get('battles', [DeelsEngagementCompatibilityController::class, 'battles'])
+    ->name('deels.compat.battles.index');
 
 Route::get('campaigns', [DeelsCampaignCompatibilityController::class, 'index'])
     ->name('deels.compat.campaigns.index');
@@ -67,6 +70,18 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
     Route::post('challenges/{id}/responses', [DeelsContentCompatibilityController::class, 'joinChallenge'])
         ->whereNumber('id')
         ->name('deels.compat.challenges.responses.store');
+    Route::post('challenges/{id}/save', [DeelsEngagementCompatibilityController::class, 'saveChallenge'])
+        ->whereNumber('id')
+        ->name('deels.compat.challenges.save');
+    Route::post('challenge-responses/{id}/vote', [DeelsEngagementCompatibilityController::class, 'voteChallengeResponse'])
+        ->whereNumber('id')
+        ->middleware(['suspicious.restricted', 'action.limit.like'])
+        ->name('deels.compat.challenge-responses.vote');
+    Route::post('battles/{id}/vote', [DeelsEngagementCompatibilityController::class, 'voteBattle'])
+        ->whereNumber('id')
+        ->middleware(['suspicious.restricted', 'action.limit.like'])
+        ->name('deels.compat.battles.vote');
+
     Route::post('stories', [DeelsContentCompatibilityController::class, 'createStory'])
         ->name('deels.compat.stories.store');
     Route::post('campaigns', [DeelsCampaignCompatibilityController::class, 'store'])
