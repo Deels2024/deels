@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deels-v2.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-auth-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-auth-functions-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-qa-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-auth-functions-v2.js')}}"></script>
 
     @yield('page-css')
