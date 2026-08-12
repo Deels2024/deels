@@ -1,0 +1,76 @@
+name: Deels communication API contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/DeelsCommunicationCompatibilityController.php'
+      - 'routes/deels_compat.php'
+      - '.github/workflows/deels-communication-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+      - name: PHP syntax
+        run: |
+          php -l app/Http/Controllers/Api/DeelsCommunicationCompatibilityController.php
+          php -l routes/deels_compat.php
+      - name: Verify source contracts
+        run: |
+          src=$(mktemp)
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$src"
+          grep -q 'api(`messages/dialogs/${encode(id)}/messages`)' "$src"
+          grep -q 'list: api("notifications")' "$src"
+          grep -q 'api(`notifications/${encode(id)}/read`)' "$src"
+          grep -q 'readAll: api("notifications/read-all")' "$src"
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Prepare Laravel
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+      - name: Verify routes
+        run: |
+          php artisan route:list --path=api --json > /tmp/routes.json
+          for name in \
+            deels.compat.messages.send \
+            deels.compat.notifications.index \
+            deels.compat.notifications.read \
+            deels.compat.notifications.read-all; do
+            grep -Fq '"name":"'"$name"'"' /tmp/routes.json || { echo "Missing $name"; exit 1; }
+          done
+          grep -Fq '"uri":"api/messages/dialogs/{id}/messages","method":"POST"' /tmp/routes.json
+          grep -Fq '"uri":"api/notifications","method":"GET|HEAD"' /tmp/routes.json
+          grep -Fq '"uri":"api/notifications/{id}/read","method":"POST"' /tmp/routes.json
+          grep -Fq '"uri":"api/notifications/read-all","method":"POST"' /tmp/routes.json
+      - name: Verify notification runtime matching
+        run: |
+          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/notifications/read-all", "POST"))->getName();' | tee /tmp/read-all.txt
+          grep -Fq 'deels.compat.notifications.read-all' /tmp/read-all.txt
