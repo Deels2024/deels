@@ -65,6 +65,13 @@ Route::post('contacts', [DeelsUtilityCompatibilityController::class, 'contact'])
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
     Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
         ->name('deels.compat.auth.logout');
+    Route::post('auth/verify-email/{token}', [DeelsCompatibilityController::class, 'verifyEmail'])
+        ->where('token', '\\d{6}')
+        ->middleware('throttle:10,1')
+        ->name('deels.compat.auth.verify-email');
+    Route::post('auth/email/verification-notification', [DeelsCompatibilityController::class, 'resendEmailVerification'])
+        ->middleware('throttle:5,1')
+        ->name('deels.compat.auth.resend-verification');
 
     Route::post('challenges', [DeelsContentCompatibilityController::class, 'createChallenge'])
         ->name('deels.compat.challenges.store');
