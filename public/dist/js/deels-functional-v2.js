@@ -125,7 +125,7 @@
     prompt.className = 'deels-guest-contest-prompt';
     var next = encodeURIComponent(window.location.pathname + window.location.search);
     prompt.innerHTML = '' +
-      '<div><strong>Хотите участвовать?</strong><span>Войдите — после этого Deels покажет доступное действие для этого челленджа или баттла.</span></div>' +
+      '<div><strong>Войти, чтобы увидеть доступные действия</strong><span>После входа Deels покажет, можно ли участвовать, принять вызов или выполнить другое доступное действие.</span></div>' +
       '<a href="/login?next=' + next + '">Войти</a>';
     actions.insertBefore(prompt, actions.firstChild);
   }
