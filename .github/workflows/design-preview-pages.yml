@@ -6,6 +6,10 @@ on:
       - codex/new-design-migration
     paths:
       - public/design-preview.html
+      - public/dist/css/deelsweb-*.css
+      - public/dist/css/deels-v2*.css
+      - public/dist/js/deels-*.js
+      - resources/views/**
       - .github/workflows/design-preview-pages.yml
   workflow_dispatch:
 
@@ -37,14 +41,25 @@ jobs:
           ref: main
           path: deelsweb
 
-      - name: Prepare source-faithful preview
+      - name: Prepare interactive source-faithful preview
         run: |
+          set -euo pipefail
           mkdir -p _preview/source
           cp laravel/public/design-preview.html _preview/index.html
           cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
           cp deelsweb/app/styles.css _preview/source/styles.css
           cp deelsweb/app/pages.css _preview/source/pages.css
+          cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
           touch _preview/.nojekyll
+
+      - name: Verify preview screens
+        run: |
+          set -euo pipefail
+          for id in home feed challenges battles profile wallet messages create campaign admin; do
+            grep -q "id=\"screen-$id\"" _preview/index.html
+          done
+          grep -q 'deelsweb-qa-source.css' _preview/index.html
+          grep -q 'INTERACTIVE PREVIEW' _preview/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -62,4 +77,4 @@ jobs:
 
       - name: Preview ready
         if: success()
-        run: echo "Source-faithful Deelsweb preview deployed"
+        run: echo "Interactive Deels preview deployed: ${{ steps.deployment.outputs.page_url }}"
