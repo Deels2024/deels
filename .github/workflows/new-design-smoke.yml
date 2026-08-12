@@ -9,6 +9,9 @@ on:
       - resources/views/**
       - public/dist/css/deelsweb-*.css
       - public/dist/js/deels-v2.js
+      - composer.json
+      - composer.lock
+      - routes/web.php
       - .github/workflows/new-design-smoke.yml
   workflow_dispatch:
 
@@ -27,6 +30,10 @@ jobs:
         with:
           php-version: '8.1'
           coverage: none
+          tools: composer:v2
+
+      - name: Composer manifest
+        run: composer validate --no-check-publish
 
       - name: PHP syntax
         run: php -l app/Services/Contests/ContestListService.php
@@ -99,3 +106,35 @@ jobs:
           grep -q "может стать" resources/views/home.blade.php
           grep -q "source-phone-frame" resources/views/home.blade.php
           grep -q "source-campaign-grid" resources/views/home.blade.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .env.example .env
+          {
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+          } >> .env
+          mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
+
+      - name: Laravel route bootstrap
+        run: php artisan route:list --no-ansi > /tmp/routes.txt
+
+      - name: Verify runtime routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'challenges' /tmp/routes.txt
+          grep -q 'stories' /tmp/routes.txt
+          grep -q 'campaign' /tmp/routes.txt
