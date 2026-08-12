@@ -59,12 +59,7 @@ jobs:
       - name: Verify settings routes
         run: |
           php artisan route:list --path=api --json > /tmp/routes.json
-          for spec in \
-            'deels.compat.settings.preferences|api/settings/preferences|PATCH' \
-            'deels.compat.settings.password|api/settings/password|PUT' \
-            'deels.compat.settings.sessions|api/settings/sessions|GET|HEAD' \
-            'deels.compat.settings.sessions.close-others|api/settings/sessions/close-others|POST'; do
-            name=${spec%%|*}; rest=${spec#*|}; uri=${rest%%|*}; method=${rest#*|}
-            grep -Fq '"name":"'"$name"'"' /tmp/routes.json || { echo "Missing $name"; exit 1; }
-            grep -Fq '"uri":"'"$uri"'"' /tmp/routes.json || { echo "Missing $uri"; exit 1; }
-          done
+          jq -e '.[] | select(.name=="deels.compat.settings.preferences" and .uri=="api/settings/preferences" and (.method|contains("PATCH")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.settings.password" and .uri=="api/settings/password" and (.method|contains("PUT")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.settings.sessions" and .uri=="api/settings/sessions" and (.method|contains("GET")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.settings.sessions.close-others" and .uri=="api/settings/sessions/close-others" and (.method|contains("POST")))' /tmp/routes.json
