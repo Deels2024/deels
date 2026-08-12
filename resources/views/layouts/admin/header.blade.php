@@ -29,9 +29,16 @@
     @endif
 <!-- main style.css -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
-    @if(request()->is('dashboard/my_campaigns/edit_campaign/*/rewards') || request()->is('dashboard/my_campaigns/edit_campaign/*/updates') || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs'))
+    @php
+        $deelsCampaignManage = request()->is('dashboard/my_campaigns/edit_campaign/*/rewards')
+            || request()->is('dashboard/my_campaigns/edit_campaign/*/rewards/update/*')
+            || request()->is('dashboard/my_campaigns/edit_campaign/*/updates')
+            || request()->is('dashboard/my_campaigns/edit_campaign/*/updates/update/*')
+            || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs')
+            || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs/update/*');
+    @endphp
+    @if($deelsCampaignManage)
         <link rel="stylesheet" href="{{ asset('dist/css/deelsweb-campaign-manage-source.css') }}">
-        <script>document.documentElement.classList.add('deels-campaign-manage-loading');</script>
     @endif
     @yield('page-css')
 
@@ -47,7 +54,7 @@
         ]) !!};
     </script>
 </head>
-<body @if(request()->is('dashboard/my_campaigns/edit_campaign/*/rewards') || request()->is('dashboard/my_campaigns/edit_campaign/*/updates') || request()->is('dashboard/my_campaigns/edit_campaign/*/faqs')) class="deels-campaign-manage" @endif>
+<body @if($deelsCampaignManage) class="deels-campaign-manage" @endif>
 
 
 @include('layouts.main_menu')
