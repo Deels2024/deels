@@ -1,10 +1,132 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Deels v2 — screen preview</title><link rel="stylesheet" href="/dist/css/deels-v2.css"><style>body{margin:0;background:#fbf9fc}.pv-top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);border-bottom:1px solid #ebe4f1;backdrop-filter:blur(16px)}.pv-head{height:72px;display:flex;align-items:center;gap:18px}.pv-brand{font-weight:950;letter-spacing:.08em;margin-right:10px}.pv-tabs{display:flex;gap:7px;overflow:auto;padding:6px 0}.pv-tab{white-space:nowrap;border:1px solid #ebe4f1;border-radius:999px;padding:9px 13px;background:#fff;color:#62566a;font-weight:800;cursor:pointer}.pv-tab.active{background:#6b2bc1;color:#fff;border-color:#6b2bc1}.pv-screen{display:none;padding:50px 0 80px}.pv-screen.active{display:block}.pv-grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pv-card{padding:24px;border:1px solid #ebe4f1;border-radius:24px;background:#fff;box-shadow:0 12px 34px rgba(63,28,87,.08)}.pv-title{margin:8px 0 12px;font-size:clamp(38px,5vw,64px);line-height:.98;letter-spacing:-.055em}.pv-muted{color:#73677d}.pv-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.pv-btn{min-height:48px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;border-radius:15px;background:linear-gradient(135deg,#6b2bc1,#8d3bd5);color:#fff;font-weight:850}.pv-btn.soft{color:#4b1788;background:#f5eff9}.pv-media{min-height:390px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(145deg,#562090,#ef579d);color:#fff;font-size:92px;box-shadow:0 30px 70px rgba(67,23,95,.2)}.pv-statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.pv-stat{padding:18px;border-radius:18px;background:#f8f4fa}.pv-stat b{font-size:26px}.pv-wallet{padding:28px;border-radius:28px;background:linear-gradient(145deg,#24102f,#5b218f 58%,#a13991);color:#fff}.pv-wallet strong{font-size:44px}.pv-list{display:grid;gap:10px}.pv-row{padding:14px 16px;border:1px solid #ebe4f1;border-radius:16px;background:#fff;display:flex;justify-content:space-between;gap:14px}.pv-chat{display:grid;grid-template-columns:300px 1fr;min-height:520px;border:1px solid #ebe4f1;border-radius:26px;overflow:hidden;background:#fff}.pv-threads{background:#fbf9fc;border-right:1px solid #ebe4f1}.pv-thread{padding:16px;border-bottom:1px solid #ebe4f1}.pv-thread.active{background:#f5eff9}.pv-dialog{display:flex;flex-direction:column}.pv-messages{padding:24px;display:grid;align-content:end;gap:10px;flex:1}.pv-msg{max-width:75%;padding:12px 15px;border-radius:16px 16px 16px 5px;background:#f2edf6}.pv-msg.me{margin-left:auto;border-radius:16px 16px 5px 16px;background:#6b2bc1;color:#fff}.pv-form{padding:14px;border-top:1px solid #ebe4f1;display:flex;gap:10px}.pv-input{width:100%;min-height:50px;border:1px solid #ebe4f1;border-radius:14px;padding:0 14px;background:#fff}.pv-progress{height:10px;border-radius:99px;background:#eee7f2;overflow:hidden}.pv-progress i{display:block;height:100%;width:78%;background:linear-gradient(90deg,#25bad0,#6b2bc1,#ec4f9c)}.pv-auth{max-width:900px;margin:auto;display:grid;grid-template-columns:.85fr 1.15fr;gap:0;border:1px solid #ebe4f1;border-radius:30px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(63,28,87,.1)}.pv-authart{min-height:580px;display:grid;place-items:center;background:linear-gradient(145deg,#25102f,#4b1788 62%,#8a338d);font-size:100px}.pv-authform{padding:42px}.pv-authform input{width:100%;min-height:52px;margin:6px 0;padding:0 14px;border:1px solid #ebe4f1;border-radius:14px}.pv-check{padding:10px 0;color:#62566a;font-size:13px}.pv-story{max-width:420px;margin:auto;padding:10px;border-radius:36px;background:#17101e;box-shadow:0 35px 80px rgba(45,13,67,.28)}.pv-storyframe{height:680px;border-radius:29px;position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(160deg,#7032c8,#ef579d);font-size:110px}.pv-storycap{position:absolute;left:20px;right:65px;bottom:22px;color:#fff}.pv-rail{position:absolute;right:18px;bottom:90px;display:grid;gap:18px;color:#fff;font-size:25px}.pv-storycap strong{display:block;font-size:21px}.pv-campaign-img{height:280px;border-radius:20px;background:linear-gradient(145deg,#8d4cd4,#ff7b9f);display:grid;place-items:center;font-size:82px;color:#fff}@media(max-width:800px){.pv-head{height:auto;display:block;padding:10px 0}.pv-grid2,.pv-auth{grid-template-columns:1fr}.pv-chat{grid-template-columns:1fr}.pv-threads{max-height:220px;border-right:0;border-bottom:1px solid #ebe4f1}.pv-statrow{grid-template-columns:1fr}.pv-authart{min-height:180px}.pv-storyframe{height:620px}}</style></head><body><header class="pv-top"><div class="container pv-head"><div class="pv-brand">DEELS</div><div class="pv-tabs"><button class="pv-tab active" data-pv="home">Главная</button><button class="pv-tab" data-pv="challenge">Челлендж</button><button class="pv-tab" data-pv="story">Сторис</button><button class="pv-tab" data-pv="profile">Профиль</button><button class="pv-tab" data-pv="wallet">Кошелёк</button><button class="pv-tab" data-pv="messages">Сообщения</button><button class="pv-tab" data-pv="campaign">Копилка</button><button class="pv-tab" data-pv="register">Регистрация</button></div></div></header><main>
-<section class="pv-screen active" data-screen="home"><div class="container pv-grid2"><div><div class="deels-v2-eyebrow">Новый Deels</div><h1 class="pv-title">Создавай. Участвуй. <em style="color:#6b2bc1;font-style:normal">Побеждай.</em></h1><p class="deels-v2-lead">Челленджи, баттлы, вертикальная лента, копилки и общение — с сохранением существующего Laravel-бэкенда.</p><div class="pv-btns"><span class="pv-btn">Создать челлендж</span><span class="pv-btn soft">Смотреть ленту</span></div><div class="pv-statrow"><div class="pv-stat"><b>12.4K</b><div class="pv-muted">создателей</div></div><div class="pv-stat"><b>180K</b><div class="pv-muted">ответов</div></div><div class="pv-stat"><b>8.7M</b><div class="pv-muted">голосов</div></div></div></div><div class="pv-media">🔥</div></div></section>
-<section class="pv-screen" data-screen="challenge"><div class="container pv-grid2"><div class="pv-media">🕺</div><div class="pv-card"><div class="deels-v2-eyebrow">Челлендж</div><h1 style="font-size:44px;margin:8px 0">Повтори летний движ</h1><p class="pv-muted">Сними свой ответ, участвуй в голосовании и поборись за приз.</p><div class="pv-list"><div class="pv-row"><span>Приз</span><b>50 000 ₽</b></div><div class="pv-row"><span>Участники</span><b>1 248</b></div><div class="pv-row"><span>Осталось</span><b>3 дня</b></div><div class="pv-row"><span>Организатор</span><b>@deels.team</b></div></div><div class="pv-btns"><span class="pv-btn">Участвовать</span><span class="pv-btn soft">Пригласить</span><span class="pv-btn soft">Поделиться</span></div></div></div></section>
-<section class="pv-screen" data-screen="story"><div class="container"><div class="pv-story"><div class="pv-storyframe">✨<div class="pv-storycap"><small>@alina.move</small><strong>Мой ответ на челлендж</strong><small>Повтори летний движ</small></div><div class="pv-rail"><span>♡</span><span>◉</span><span>↗</span></div></div></div></div></section>
-<section class="pv-screen" data-screen="profile"><div class="container"><div class="pv-card"><div style="display:flex;align-items:center;gap:18px"><div style="width:92px;height:92px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:28px;font-weight:900;background:linear-gradient(145deg,#ec4f9c,#6b2bc1)">СС</div><div><h1 style="margin:0">Сергей Серебряков</h1><div class="pv-muted">@sergey.deels · Санкт-Петербург</div></div></div><div class="pv-statrow"><div class="pv-stat"><b>6</b><div class="pv-muted">публикаций</div></div><div class="pv-stat"><b>126K</b><div class="pv-muted">голосов</div></div><div class="pv-stat"><b>4</b><div class="pv-muted">победы</div></div></div></div><div class="pv-grid2" style="margin-top:20px"><div class="pv-card"><h2>Реферальная программа</h2><p class="pv-muted">Ваше место среди донатеров: 12</p><div class="pv-progress"><i style="width:64%"></i></div><p><b>0.75%</b> от донатов приглашённых</p></div><div class="pv-card"><h2>Мои активности</h2><div class="pv-list"><div class="pv-row"><span>Челленджи</span><b>8</b></div><div class="pv-row"><span>Баттлы</span><b>3</b></div><div class="pv-row"><span>Сторис</span><b>21</b></div></div></div></div></div></section>
-<section class="pv-screen" data-screen="wallet"><div class="container pv-grid2"><div><div class="pv-wallet"><div>Мои дилсы</div><strong>184 500</strong><div style="opacity:.72">1 ₽ = 100 дилсов</div><hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:22px 0"><div>Мои средства</div><strong>18 450 ₽</strong><div class="pv-btns"><span class="pv-btn" style="background:#fff;color:#4b1788">Пополнить</span><span class="pv-btn" style="background:rgba(255,255,255,.12)">Вывести</span></div></div></div><div class="pv-card"><h2>История</h2><div class="pv-list"><div class="pv-row"><span>Приз за челлендж</span><b style="color:#278a50">+5 000 ₽</b></div><div class="pv-row"><span>Вывод средств</span><b>−12 000 ₽</b></div><div class="pv-row"><span>Поддержка копилки</span><b>−1 000 ₽</b></div><div class="pv-row"><span>Бонус Deels</span><b style="color:#278a50">+450 ₽</b></div></div></div></div></section>
-<section class="pv-screen" data-screen="messages"><div class="container"><div class="pv-chat"><div class="pv-threads"><div class="pv-thread active"><b>Алина Морозова</b><div class="pv-muted">Спасибо за поддержку!</div></div><div class="pv-thread"><b>Deels Team</b><div class="pv-muted">Ваш ролик вышел в топ</div></div><div class="pv-thread"><b>Миша К.</b><div class="pv-muted">Снимем совместный баттл?</div></div></div><div class="pv-dialog"><div class="pv-messages"><div class="pv-msg">Привет! Видел твой новый челлендж.</div><div class="pv-msg me">Спасибо! Хочу собрать сильный финал 🔥</div><div class="pv-msg">Давай снимем совместный ответ?</div></div><div class="pv-form"><input class="pv-input" placeholder="Сообщение"><span class="pv-btn">Отправить</span></div></div></div></div></section>
-<section class="pv-screen" data-screen="campaign"><div class="container pv-grid2"><div class="pv-campaign-img">💜</div><div class="pv-card"><div class="deels-v2-eyebrow">Копилка</div><h1 style="font-size:42px;margin:8px 0">Поможем Маше снова танцевать</h1><p class="pv-muted">Поддержи цель любой суммой или поделись с друзьями.</p><div class="pv-progress"><i></i></div><div style="display:flex;justify-content:space-between;margin-top:10px"><b>1 564 300 ₽</b><span class="pv-muted">из 2 000 000 ₽</span></div><div class="pv-btns"><span class="pv-btn">Поддержать</span><span class="pv-btn soft">Поделиться</span></div></div></div></section>
-<section class="pv-screen" data-screen="register"><div class="container"><div class="pv-auth"><div class="pv-authart">🚀</div><div class="pv-authform"><div class="deels-v2-eyebrow">Добро пожаловать</div><h1 style="font-size:42px;margin:8px 0 18px">Регистрация</h1><input placeholder="Никнейм"><input placeholder="E-mail"><input placeholder="Код подтверждения e-mail"><input placeholder="Телефон"><input type="password" placeholder="Пароль"><div class="pv-check">☑ Принимаю пользовательское соглашение и правила обработки данных</div><div class="pv-check">☑ Принимаю правила контента и платежей</div><span class="pv-btn" style="width:100%;box-sizing:border-box">Создать аккаунт</span></div></div></div></section>
-</main><script>document.querySelectorAll('.pv-tab').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.pv-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.pv-screen').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('[data-screen="'+b.dataset.pv+'"]').classList.add('active');window.scrollTo({top:0,behavior:'smooth'})})})</script></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deels — source-faithful preview</title>
+  <link rel="stylesheet" href="./source/deels-main.css">
+  <link rel="stylesheet" href="./source/styles.css">
+  <link rel="stylesheet" href="./source/pages.css">
+  <style>
+    :root{--font-geist-sans:"Segoe UI",Arial,Helvetica,sans-serif}
+    .preview-note{position:fixed;z-index:100;right:16px;bottom:16px;padding:9px 12px;border:1px solid var(--deels-line);border-radius:12px;background:rgba(255,255,255,.9);box-shadow:var(--deels-shadow-soft);color:var(--deels-muted);font-size:11px;backdrop-filter:blur(12px)}
+    @media(max-width:700px){.preview-note{display:none}}
+  </style>
+</head>
+<body>
+<div class="deels-app light_theme light_there">
+  <a class="skip-link" href="#main-content">Перейти к содержанию</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <button type="button" class="icon-button mobile-menu-button" aria-label="Открыть меню"><span class="icon">≡</span></button>
+      <a href="#" class="brand" aria-label="Deels — главная"><span class="brand-mark">D</span><span class="brand-word">DEELS</span></a>
+      <nav class="desktop-nav" aria-label="Основная навигация">
+        <a href="#feed">Лента</a><a href="#challenges">Челленджи</a><a href="#battles">Баттлы</a><a href="#stories">Истории</a><a href="#campaigns">Копилки</a>
+      </nav>
+      <div class="header-actions">
+        <a href="#search" class="icon-button"><span class="icon">⌕</span></a>
+        <a href="#notifications" class="icon-button desktop-only"><span class="icon">◌</span><span class="notification-dot"></span></a>
+        <a href="#create" class="button button-primary button-small"><span class="icon">+</span> Создать</a>
+        <a href="#profile" class="avatar avatar-small desktop-only">СС</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="main-content">
+    <main>
+      <section class="hero theme-gradient">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow"><span class="icon">✦</span> Здесь начинается движение</span>
+            <h1>Твоя идея<br>может стать <em>движением</em></h1>
+            <p>Создавай челленджи, снимай ответы, участвуй в баттлах и поддерживай истории, которые хочется разделить.</p>
+            <div class="hero-actions">
+              <a href="#create" class="button button-primary">Создать челлендж <span class="icon">→</span></a>
+              <a href="#feed" class="button button-glass"><span class="icon">▶</span> Смотреть ленту</a>
+            </div>
+            <div class="hero-proof">
+              <div class="avatar-stack"><span>АК</span><span>МС</span><span>ОЛ</span><span>+12,4K</span></div>
+              <p><strong>12,4K+</strong><br>уже создают в Deels</p>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="floating-chip chip-prize"><span>🏆</span><strong>50 000 ₽</strong><small>призовой фонд</small></div>
+            <div class="floating-chip chip-trend"><span>↗</span><strong>В тренде</strong><small>180K ответов</small></div>
+            <div class="phone-frame">
+              <div class="phone-top"><a href="#" class="brand"><span class="brand-mark">D</span><span class="brand-word">DEELS</span></a><span class="icon">◌</span></div>
+              <div class="phone-video poster-violet">
+                <span class="phone-live">DEELS • LIVE</span><span class="poster-emoji">🕺</span>
+                <div class="phone-side"><span><span class="icon">♡</span><small>8,2K</small></span><span><span class="icon">◯</span><small>462</small></span><span><span class="icon">↗</span><small>92</small></span></div>
+                <div class="phone-caption"><small>@mila.sun</small><strong>Повтори летний движ</strong><span>#танцы #deels</span></div>
+              </div>
+              <div class="phone-nav"><span>⌂</span><span>⌕</span><b>+</b><span>◌</span><span>●</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="challenges">
+        <div class="container">
+          <div class="section-head"><div><span class="eyebrow"><span class="icon">✦</span> Горячее сейчас</span><h2>Челленджи, о которых говорят</h2><p>Выбирай идею, снимай свой ответ и забирай внимание аудитории.</p></div><a href="#" class="text-link">Смотреть все <span class="icon">→</span></a></div>
+          <div class="horizontal-cards">
+            <article class="video-card"><div class="poster poster-violet"><a href="#" class="poster-link"></a><div class="poster-top"><span class="poster-tag">Танцы</span><button class="round-action">♡</button></div><span class="poster-emoji">🕺</span><div class="poster-caption"><span>@deels.team</span><strong>Повтори летний движ</strong></div><span class="play-button">▶</span></div><div class="card-meta"><div><strong>50 000 ₽</strong><span>призовой фонд</span></div><div><strong>1,2K</strong><span>участников</span></div></div></article>
+            <article class="video-card"><div class="poster poster-coral"><a href="#" class="poster-link"></a><div class="poster-top"><span class="poster-tag">Добро</span><button class="round-action">♡</button></div><span class="poster-emoji">🤍</span><div class="poster-caption"><span>@mila.sun</span><strong>Цепочка добрых дел</strong></div><span class="play-button">▶</span></div><div class="card-meta"><div><strong>25 000 ₽</strong><span>призовой фонд</span></div><div><strong>846</strong><span>участников</span></div></div></article>
+            <article class="video-card"><div class="poster poster-blue"><a href="#" class="poster-link"></a><div class="poster-top"><span class="poster-tag">Творчество</span><button class="round-action">♡</button></div><span class="poster-emoji">🏙️</span><div class="poster-caption"><span>@urban.day</span><strong>Мой город за 15 секунд</strong></div><span class="play-button">▶</span></div><div class="card-meta"><div><strong>30 000 ₽</strong><span>призовой фонд</span></div><div><strong>734</strong><span>участника</span></div></div></article>
+            <article class="video-card"><div class="poster poster-pink"><a href="#" class="poster-link"></a><div class="poster-top"><span class="poster-tag">Музыка</span><button class="round-action">♡</button></div><span class="poster-emoji">🎤</span><div class="poster-caption"><span>@voiceclub</span><strong>Твой голос — твоя сила</strong></div><span class="play-button">▶</span></div><div class="card-meta"><div><strong>15 000 ₽</strong><span>призовой фонд</span></div><div><strong>590</strong><span>участников</span></div></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-dark theme-dark-card">
+        <div class="container">
+          <div class="section-head"><div><span class="eyebrow"><span class="icon">✦</span> Простая механика</span><h2>От идеи до победы — три шага</h2><p>Никаких сложных правил. Только ты, камера и желание попробовать.</p></div></div>
+          <div class="steps-grid">
+            <article><span>01</span><div class="step-icon">✦</div><h3>Найди свой вызов</h3><p>Выбери челлендж, который тебя цепляет.</p></article>
+            <article><span>02</span><div class="step-icon">▶</div><h3>Сними ответ</h3><p>Покажи свой вариант в коротком вертикальном видео.</p></article>
+            <article><span>03</span><div class="step-icon">🏆</div><h3>Собери голоса</h3><p>Делись, получай поддержку и выходи в топ.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="stories">
+        <div class="container split-feature">
+          <div><div class="section-head"><div><span class="eyebrow"><span class="icon">✦</span> Истории Deels</span><h2>Не просто видео. Настоящие истории</h2><p>Люди рассказывают о шагах, которые изменили их жизнь. Иногда достаточно одного честного ролика, чтобы вдохновить тысячи.</p></div></div><a href="#" class="button button-dark">Смотреть истории <span class="icon">→</span></a></div>
+          <div class="stories-stack">
+            <a href="#" class="story-card poster-pink"><div class="story-icon">✨</div><div><span>2 мин • @Алина М.</span><h3>Танец, который вернул уверенность</h3><span class="story-more">Смотреть историю <span class="icon">→</span></span></div></a>
+            <a href="#" class="story-card poster-blue"><div class="story-icon">🎭</div><div><span>4 мин • @Илья С.</span><h3>Как я впервые вышел на сцену</h3><span class="story-more">Смотреть историю <span class="icon">→</span></span></div></a>
+            <a href="#" class="story-card poster-orange"><div class="story-icon">🛹</div><div><span>3 мин • @Саша К.</span><h3>Новый город и 100 новых друзей</h3><span class="story-more">Смотреть историю <span class="icon">→</span></span></div></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-tint" id="campaigns">
+        <div class="container">
+          <div class="section-head"><div><span class="eyebrow"><span class="icon">✦</span> Делись добром</span><h2>Копилки, которые меняют жизнь</h2><p>Поддерживай проверенные сборы и следи за результатом вместе с сообществом.</p></div><a href="#" class="text-link">Смотреть все <span class="icon">→</span></a></div>
+          <div class="campaign-grid">
+            <article class="campaign-card"><a href="#" class="campaign-cover poster-violet"><span>💜</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Поможем Маше снова танцевать</h3><div class="progress-line"><span style="width:78%"></span></div><div class="progress-meta"><strong>1 564 300 ₽</strong><span>из 2 000 000 ₽</span></div><a href="#" class="button button-soft">Поддержать</a></div></article>
+            <article class="campaign-card"><a href="#" class="campaign-cover poster-coral"><span>🎨</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Творческий двор для подростков</h3><div class="progress-line"><span style="width:64%"></span></div><div class="progress-meta"><strong>641 200 ₽</strong><span>из 1 000 000 ₽</span></div><a href="#" class="button button-soft">Поддержать</a></div></article>
+            <article class="campaign-card"><a href="#" class="campaign-cover poster-blue"><span>🐾</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Тёплый дом для 40 хвостов</h3><div class="progress-line"><span style="width:91%"></span></div><div class="progress-meta"><strong>819 000 ₽</strong><span>из 900 000 ₽</span></div><a href="#" class="button button-soft">Поддержать</a></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section"><div class="container cta-card theme-dark-card"><div><span class="eyebrow"><span class="icon">✦</span> Твой ход</span><h2>Готов создать то,<br>что подхватят другие?</h2><p>Начни с первого челленджа. Это займёт меньше пяти минут.</p></div><a href="#create" class="button button-white">Создать в Deels <span class="icon">→</span></a></div></section>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div><a href="#" class="brand"><span class="brand-mark">D</span><span class="brand-word">DEELS</span></a><p>Новая развлекательная соцсеть, где идеи превращаются в движение.</p><div class="socials"><span>VK</span><span>TG</span><span>YT</span></div></div>
+      <div><h4>Смотреть</h4><a href="#feed">Лента</a><a href="#challenges">Челленджи</a><a href="#stories">Истории</a><a href="#campaigns">Копилки</a></div>
+      <div><h4>Deels</h4><a href="#">О проекте</a><a href="#">Контакты</a><a href="#">Документы</a><a href="#">Карта экранов</a></div>
+      <div><h4>Будь в движении</h4><p>Скачивай приложение и участвуй первым.</p><div class="store-buttons"><a href="https://apps.apple.com/app/id6480409656">App Store</a></div></div>
+    </div>
+    <div class="container footer-bottom"><span>© 2026 Deels</span><span>Сделано для настоящих идей</span></div>
+  </footer>
+  <nav class="mobile-bottom-nav"><a class="active" href="#"><span class="icon">⌂</span><span>Главная</span></a><a href="#search"><span class="icon">⌕</span><span>Поиск</span></a><a class="create-nav" href="#create"><span class="icon">+</span><span>Создать</span></a><a href="#notifications"><span class="icon">◌</span><span>События</span></a><a href="#profile"><span class="icon">●</span><span>Профиль</span></a></nav>
+  <aside class="cookie-consent"><div><strong>Cookie — только под вашим контролем</strong><p>Обязательные cookie нужны для входа и безопасности. Аналитика включится только после согласия. <a href="#">Подробнее</a></p></div><div><button class="button button-soft button-small" onclick="this.closest('.cookie-consent').remove()">Только необходимые</button><button class="button button-primary button-small" onclick="this.closest('.cookie-consent').remove()">Разрешить аналитику</button></div></aside>
+  <div class="preview-note">Preview повторяет структуру и CSS из Deels2024/deelsweb</div>
+</div>
+</body>
+</html>
