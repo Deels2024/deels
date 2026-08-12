@@ -8,10 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\SearchController;
 use App\Mail\ContactUs;
+use App\Models\Challenge;
 use App\Services\ApiAccountInfoService;
 use App\Services\Contests\ContestListService;
+use App\Services\Contests\ContestVisibilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
@@ -106,13 +109,38 @@ class DeelsUtilityCompatibilityController extends Controller
             ]);
         }
 
-        $request->merge(['q' => $query, 'search' => $query]);
+        $request->merge(['q' => $query]);
         $request->headers->set('Accept', 'application/json');
 
         $legacy = app(SearchController::class)->search($request);
         $payload = $legacy instanceof JsonResponse ? $legacy->getData(true) : [];
 
-        $challengePage = app(ContestListService::class)->challenges($request);
+        $challengeQuery = Challenge::query()
+            ->where('challenges.active', 1)
+            ->where('challenges.declined', 0)
+            ->whereNull('challenges.blocked_at');
+
+        app(ContestVisibilityService::class)->applyToContests(
+            $challengeQuery,
+            'challenges',
+            Auth::user() ?? auth()->user()
+        );
+
+        $challengeQuery->where(function ($builder) use ($query): void {
+            $builder
+                ->where('title', 'like', '%' . $query . '%')
+                ->orWhere('description', 'like', '%' . $query . '%')
+                ->orWhereHas('user', function ($userQuery) use ($query): void {
+                    $userQuery
+                        ->where('username', 'like', '%' . $query . '%')
+                        ->orWhere('name', 'like', '%' . $query . '%');
+                });
+        });
+
+        $challengePage = $challengeQuery
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->paginate(20);
         $challengePayload = app(ContestListService::class)->formatPaginator($challengePage);
 
         return response()->json([
