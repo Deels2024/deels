@@ -6,7 +6,12 @@
     var previewTop=document.querySelector('.preview-top');
     if(!home||!previewTop)return;
 
-    /* One shared source-faithful Deels header for every preview route. */
+    /* One physical Deels app shell for every preview route. */
+    document.querySelectorAll('.screen').forEach(function(screen){
+      screen.classList.add('deels-app','light_theme','light_there');
+    });
+
+    /* One shared source-faithful Deels header outside all route screens. */
     previewTop.className='site-header';
     previewTop.innerHTML=''+
       '<div class="container header-inner">'+
@@ -28,7 +33,6 @@
     if(home.dataset.sourceHome!=='1'){
       home.dataset.sourceHome='1';
       home.innerHTML=''+
-        '<div class="deels-app light_theme light_there">'+
           '<main>'+ 
             '<section class="hero theme-gradient"><div class="container hero-grid">'+
               '<div class="hero-copy"><span class="eyebrow">✦ Здесь начинается движение</span><h1>Твоя идея<br>может стать <em>движением</em></h1><p>Создавай челленджи, снимай ответы, участвуй в баттлах и поддерживай истории, которые хочется разделить.</p><div class="hero-actions"><a href="#create" class="button button-primary">Создать челлендж →</a><a href="#feed" class="button button-glass">▶ Смотреть ленту</a></div><div class="hero-proof"><div class="avatar-stack"><span>АК</span><span>МС</span><span>ОЛ</span><span>+12,4K</span></div><p><strong>12,4K+</strong><br>уже создают в Deels</p></div></div>'+ 
@@ -45,8 +49,7 @@
             '<section class="section section-tint"><div class="container"><div class="section-head"><div><span class="eyebrow">✦ Делись добром</span><h2>Копилки, которые меняют жизнь</h2><p>Поддерживай проверенные сборы и следи за результатом вместе с сообществом.</p></div><a href="#campaign" class="text-link">Смотреть все →</a></div><div class="campaign-grid"><article class="campaign-card"><a href="#campaign" class="campaign-cover poster-violet"><span>💜</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Поможем Маше снова танцевать</h3><div class="progress-line"><span style="width:78%"></span></div><div class="progress-meta"><strong>1 564 300 ₽</strong><span>из 2 000 000 ₽</span></div><a href="#campaign" class="button button-soft">Поддержать</a></div></article><article class="campaign-card"><a href="#campaign" class="campaign-cover poster-coral"><span>🎨</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Творческий двор для подростков</h3><div class="progress-line"><span style="width:64%"></span></div><div class="progress-meta"><strong>641 200 ₽</strong><span>из 1 000 000 ₽</span></div><a href="#campaign" class="button button-soft">Поддержать</a></div></article><article class="campaign-card"><a href="#campaign" class="campaign-cover poster-blue"><span>🐾</span><span class="poster-tag">Проверенная копилка</span></a><div class="campaign-body"><h3>Тёплый дом для 40 хвостов</h3><div class="progress-line"><span style="width:91%"></span></div><div class="progress-meta"><strong>819 000 ₽</strong><span>из 900 000 ₽</span></div><a href="#campaign" class="button button-soft">Поддержать</a></div></article></div></div></section>'+ 
             '<section class="section"><div class="container cta-card theme-dark-card"><div><span class="eyebrow">✦ Твой ход</span><h2>Готов создать то,<br>что подхватят другие?</h2><p>Начни с первого челленджа. Это займёт меньше пяти минут.</p></div><a href="#create" class="button button-white">Создать в Deels →</a></div></section>'+ 
           '</main>'+ 
-          '<footer class="site-footer"><div class="container footer-grid"><div><a href="#home" class="brand"><span class="brand-mark">D</span><span class="brand-word">DEELS</span></a><p>Новая развлекательная соцсеть, где идеи превращаются в движение.</p><div class="socials"><span>VK</span><span>TG</span><span>YT</span></div></div><div><h4>Смотреть</h4><a href="#feed">Лента</a><a href="#challenges">Челленджи</a><a href="#feed">Истории</a><a href="#campaign">Копилки</a></div><div><h4>Deels</h4><a href="#home">О проекте</a><a href="#home">Контакты</a><a href="#home">Документы</a></div><div><h4>Будь в движении</h4><p>Скачивай приложение и участвуй первым.</p><div class="store-buttons"><span>App Store</span></div></div></div><div class="container footer-bottom"><span>© 2026 Deels</span><span>Сделано для настоящих идей</span></div></footer>'+ 
-        '</div>';
+          '<footer class="site-footer"><div class="container footer-grid"><div><a href="#home" class="brand"><span class="brand-mark">D</span><span class="brand-word">DEELS</span></a><p>Новая развлекательная соцсеть, где идеи превращаются в движение.</p><div class="socials"><span>VK</span><span>TG</span><span>YT</span></div></div><div><h4>Смотреть</h4><a href="#feed">Лента</a><a href="#challenges">Челленджи</a><a href="#feed">Истории</a><a href="#campaign">Копилки</a></div><div><h4>Deels</h4><a href="#home">О проекте</a><a href="#home">Контакты</a><a href="#home">Документы</a></div><div><h4>Будь в движении</h4><p>Скачивай приложение и участвуй первым.</p><div class="store-buttons"><span>App Store</span></div></div></div><div class="container footer-bottom"><span>© 2026 Deels</span><span>Сделано для настоящих идей</span></div></footer>';
     }
 
     /* Keep active item in the one shared header in sync with hash routing. */
