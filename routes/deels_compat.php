@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('auth/login', [DeelsCompatibilityController::class, 'login'])
+    ->name('deels.compat.auth.login');
+Route::post('auth/register', [DeelsCompatibilityController::class, 'register'])
+    ->middleware('throttle:registrations')
+    ->name('deels.compat.auth.register');
+
 Route::get('stats', [DeelsCompatibilityController::class, 'stats'])
     ->name('deels.compat.stats');
 Route::get('feed', [DeelsCompatibilityController::class, 'feed'])
@@ -29,6 +35,8 @@ Route::get('challenges/{id}', [DeelsCompatibilityController::class, 'challenge']
     ->name('deels.compat.challenges.show');
 
 Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
+    Route::post('auth/logout', [DeelsCompatibilityController::class, 'logout'])
+        ->name('deels.compat.auth.logout');
     Route::get('wallet', [DeelsCompatibilityController::class, 'wallet'])
         ->name('deels.compat.wallet');
     Route::get('messages/dialogs', [DeelsCompatibilityController::class, 'dialogs'])
