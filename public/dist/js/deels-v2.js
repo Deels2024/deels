@@ -107,6 +107,57 @@
     else account.insertBefore(section, account.firstChild);
   }
 
+  function campaignPublicPath() {
+    var match = window.location.pathname.match(/^\/campaign\/([^/]+)\/?$/);
+    return match ? match[1] : null;
+  }
+
+  function ensureCampaignPublicTools() {
+    var slug = campaignPublicPath();
+    if (!slug || document.querySelector('.deels-campaign-tools')) return;
+    var anchor = document.querySelector('.main-content__switch, .main-content__info, .campaign-detail-grid, .campaign-detail');
+    if (!anchor) return;
+    var nav = document.createElement('nav');
+    nav.className = 'deels-campaign-tools';
+    nav.setAttribute('aria-label', 'Разделы копилки');
+    nav.innerHTML = '' +
+      '<a class="active" href="/campaign/' + slug + '">О сборе</a>' +
+      '<a href="/campaign/backers/' + slug + '">Донатеры</a>' +
+      '<a href="/campaign/updates/' + slug + '">Обновления</a>' +
+      '<a href="/campaign/faqs/' + slug + '">FAQ</a>';
+    anchor.parentNode.insertBefore(nav, anchor);
+  }
+
+  function campaignEditId() {
+    var match = window.location.pathname.match(/^\/dashboard\/my_campaigns\/edit_campaign\/(\d+)/);
+    return match ? match[1] : null;
+  }
+
+  function ensureCampaignManagementTools() {
+    var id = campaignEditId();
+    if (!id || document.querySelector('.deels-campaign-manage')) return;
+    var account = document.querySelector('.account-main, .account__content .account-main');
+    if (!account) return;
+    var base = '/dashboard/my_campaigns/edit_campaign/' + id;
+    var path = window.location.pathname;
+    var tabs = [
+      ['Основное', base],
+      ['Награды', base + '/rewards'],
+      ['Обновления', base + '/updates'],
+      ['FAQ', base + '/faqs']
+    ];
+    var nav = document.createElement('nav');
+    nav.className = 'deels-campaign-manage';
+    nav.setAttribute('aria-label', 'Управление копилкой');
+    nav.innerHTML = '<div><span>Управление копилкой</span><strong>Все функции старого кабинета</strong></div>' + tabs.map(function (item) {
+      var active = path === item[1] || (item[1] !== base && path.indexOf(item[1]) === 0);
+      return '<a class="' + (active ? 'active' : '') + '" href="' + item[1] + '">' + item[0] + '</a>';
+    }).join('');
+    var head = account.querySelector('.account-main__head');
+    if (head && head.nextSibling) head.parentNode.insertBefore(nav, head.nextSibling);
+    else account.insertBefore(nav, account.firstChild);
+  }
+
   function upgradeCatalogCards() {
     var selectors = ['.challenge-item', '.story-item', '.finish-item', '.bank__item', '.campaign-card', '.challenge-card', '.copystories-item', '.tops-story'];
     document.querySelectorAll(selectors.join(',')).forEach(function (card) { card.classList.add('deels-v2-live-card'); });
@@ -114,7 +165,7 @@
 
   function upgradeHeadings() {
     document.querySelectorAll('h1, h2').forEach(function (heading) {
-      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview, .deels-functional-hub')) heading.classList.add('deels-v2-heading');
+      if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview, .deels-functional-hub, .deels-campaign-manage')) heading.classList.add('deels-v2-heading');
     });
   }
 
@@ -213,6 +264,8 @@
       enhanceStoryPopup();
       updateStoryProgress(document.getElementById('story-popup'));
       ensureFunctionalHub();
+      ensureCampaignPublicTools();
+      ensureCampaignManagementTools();
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
@@ -222,6 +275,8 @@
     upgradeHeader();
     labelPage();
     ensureFunctionalHub();
+    ensureCampaignPublicTools();
+    ensureCampaignManagementTools();
     upgradeCatalogCards();
     upgradeHeadings();
     enhanceStoryPopup();
