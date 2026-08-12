@@ -35,15 +35,20 @@ jobs:
           php -l app/Providers/RouteServiceProvider.php
           php -l routes/deels_compat.php
 
-      - name: Verify stage-one source contracts
+      - name: Verify source contracts
         run: |
-          grep -q "api(\"stats\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\"feed\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\"stories\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\`stories/\${encode(id)}\`)" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\`challenges/\${encode(id)}\`)" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\"wallet\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
-          grep -q "api(\"messages/dialogs\")" <(curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts)
+          src=$(mktemp)
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$src"
+          grep -q 'login: api("auth/login")' "$src"
+          grep -q 'register: api("auth/register")' "$src"
+          grep -q 'logout: api("auth/logout")' "$src"
+          grep -q 'api("stats")' "$src"
+          grep -q 'api("feed")' "$src"
+          grep -q 'api("stories")' "$src"
+          grep -q 'api(`stories/${encode(id)}`)' "$src"
+          grep -q 'api(`challenges/${encode(id)}`)' "$src"
+          grep -q 'api("wallet")' "$src"
+          grep -q 'api("messages/dialogs")' "$src"
 
       - name: Install Laravel dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
@@ -70,10 +75,13 @@ jobs:
       - name: Laravel route bootstrap
         run: php artisan route:list --path=api | tee /tmp/api-routes.txt
 
-      - name: Verify stage-one compatibility routes
+      - name: Verify compatibility routes
         run: |
           set -euo pipefail
           for route in \
+            'api/auth/login' \
+            'api/auth/register' \
+            'api/auth/logout' \
             'api/stats' \
             'api/feed' \
             'api/stories' \
@@ -89,6 +97,9 @@ jobs:
         run: |
           set -euo pipefail
           for name in \
+            deels.compat.auth.login \
+            deels.compat.auth.register \
+            deels.compat.auth.logout \
             deels.compat.stats \
             deels.compat.feed \
             deels.compat.stories.index \
