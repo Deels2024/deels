@@ -4,6 +4,8 @@
   ready(function(){
     var home=document.getElementById('screen-home');
     if(!home||home.querySelector('.preview-home-enhancements'))return;
+    home.classList.add('deels-source-home','light_theme','light_there');
+
     var hero=home.querySelector('.hero-preview');
     var firstWrap=home.querySelector('.screen-wrap');
     if(!hero||!firstWrap)return;
