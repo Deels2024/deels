@@ -59,17 +59,10 @@ jobs:
       - name: Verify routes
         run: |
           php artisan route:list --path=api --json > /tmp/routes.json
-          for name in \
-            deels.compat.messages.send \
-            deels.compat.notifications.index \
-            deels.compat.notifications.read \
-            deels.compat.notifications.read-all; do
-            grep -Fq '"name":"'"$name"'"' /tmp/routes.json || { echo "Missing $name"; exit 1; }
-          done
-          grep -Fq '"uri":"api/messages/dialogs/{id}/messages","method":"POST"' /tmp/routes.json
-          grep -Fq '"uri":"api/notifications","method":"GET|HEAD"' /tmp/routes.json
-          grep -Fq '"uri":"api/notifications/{id}/read","method":"POST"' /tmp/routes.json
-          grep -Fq '"uri":"api/notifications/read-all","method":"POST"' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.messages.send" and .uri=="api/messages/dialogs/{id}/messages" and (.method|contains("POST")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.notifications.index" and .uri=="api/notifications" and (.method|contains("GET")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.notifications.read" and .uri=="api/notifications/{id}/read" and (.method|contains("POST")))' /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.notifications.read-all" and .uri=="api/notifications/read-all" and (.method|contains("POST")))' /tmp/routes.json
       - name: Verify notification runtime matching
         run: |
           php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/notifications/read-all", "POST"))->getName();' | tee /tmp/read-all.txt
