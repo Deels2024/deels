@@ -51,6 +51,7 @@ jobs:
             public/dist/css/deelsweb-detail-source.css \
             public/dist/css/deelsweb-feed-source.css \
             public/dist/css/deelsweb-campaign-detail-source.css \
+            public/dist/css/deelsweb-campaign-manage-source.css \
             public/dist/css/deelsweb-dashboard-source.css \
             public/dist/css/deelsweb-create-source.css \
             public/dist/css/deelsweb-auth-source.css \
@@ -79,6 +80,10 @@ jobs:
             resources/views/stories_index.blade.php \
             resources/views/stories/story_item.blade.php \
             resources/views/campaign_single_new.blade.php \
+            resources/views/admin/campaign_rewards.blade.php \
+            resources/views/admin/campaign_updates.blade.php \
+            resources/views/admin/campaign_faqs.blade.php \
+            resources/views/profile/profile.blade.php \
             resources/views/admin/profile_edit.blade.php \
             resources/views/dashboard/wallet/wallet_index.blade.php \
             resources/views/auth/login.blade.php \
@@ -169,6 +174,17 @@ jobs:
           grep -q 'deels-contest-state-chip' public/dist/js/deels-functional-v2.js
           grep -q 'Войти, чтобы увидеть доступные действия' public/dist/js/deels-functional-v2.js
 
+      - name: Verify campaign management states
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'deels-campaign-manage' resources/views/layouts/admin/header.blade.php
+          grep -q 'deels-campaign-empty-state' public/dist/js/deels-functional-v2.js
+          grep -q 'deels-campaign-empty-state' public/dist/css/deelsweb-campaign-manage-source.css
+          grep -q 'delete_reward' resources/views/admin/campaign_rewards.blade.php
+          grep -q 'delete_update' resources/views/admin/campaign_updates.blade.php
+          grep -q 'delete_faq' resources/views/admin/campaign_faqs.blade.php
+
       - name: Verify profile and messaging functions
         shell: bash
         run: |
@@ -177,6 +193,11 @@ jobs:
           grep -q 'profile-dignity' public/dist/css/deelsweb-profile-functions-source.css
           grep -q 'profile-donate' public/dist/css/deelsweb-profile-functions-source.css
           grep -q 'profile-statistics' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'follow_button' resources/views/profile/profile.blade.php
+          grep -q 'chat_btn' resources/views/profile/profile.blade.php
+          grep -q 'profile_block_top' public/dist/css/deelsweb-profile-functions-source.css
+          grep -q 'deels-chat-network-state' public/dist/js/deels-functional-v2.js
+          grep -q 'deels-chat-empty' public/dist/js/deels-functional-v2.js
           grep -q 'header-chat__btn--notifications' public/dist/css/deelsweb-messages-functions-source.css
           grep -q 'abuse_modal' public/dist/css/deelsweb-messages-functions-source.css
           grep -q 'chat-form' public/dist/css/deelsweb-messages-functions-source.css
@@ -272,3 +293,4 @@ jobs:
           grep -q 'dashboard/my_campaigns/edit_campaign/{id}/rewards' /tmp/routes.txt
           grep -q 'dashboard/my_campaigns/edit_campaign/{id}/updates' /tmp/routes.txt
           grep -q 'dashboard/my_campaigns/edit_campaign/{id}/faqs' /tmp/routes.txt
+          grep -q 'dashboard/profile/{id}' /tmp/routes.txt
