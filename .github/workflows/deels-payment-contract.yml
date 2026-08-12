@@ -1,0 +1,83 @@
+name: Deels payment API contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php'
+      - 'routes/deels_compat.php'
+      - '.github/workflows/deels-payment-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: PHP syntax
+        run: |
+          php -l app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          php -l routes/deels_compat.php
+
+      - name: Verify deelsweb donation contract
+        run: |
+          endpoints=$(mktemp)
+          services=$(mktemp)
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/endpoints.ts > "$endpoints"
+          curl -fsSL https://raw.githubusercontent.com/Deels2024/deelsweb/main/app/lib/api/services.ts > "$services"
+          grep -Fq 'api(`campaigns/${encode(id)}/donations`)' "$endpoints"
+          grep -Fq 'body: { amount, anonymous }' "$services"
+
+      - name: Verify payment safety source
+        run: |
+          grep -Fq "'NotificationURL' => route('deels.compat.campaigns.donations.callback')" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq "($anonymous ? '_anon' : '')" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq "hash_equals(hash('sha256', $source), $received)" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq "session()->put('cart.contributor_name_display', $displayName)" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq 'CampaignsController::class)->confirmPayment' app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare Laravel
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+            echo 'TINKOFF_TERMINAL_KEY=test-terminal'
+            echo 'TINKOFF_SECRET_KEY=test-secret'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Verify payment routes
+        run: |
+          php artisan route:list --path=api --json > /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.compat.campaigns.donations.store" and .uri=="api/campaigns/{id}/donations" and .method=="POST")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.compat.campaigns.donations.callback" and .uri=="api/campaign-donations/tinkoff/callback" and .method=="POST")' /tmp/routes.json >/dev/null
+
+      - name: Verify donation runtime matcher
+        run: |
+          php artisan tinker --execute='echo app("router")->getRoutes()->match(\Illuminate\Http\Request::create("/api/campaigns/123/donations", "POST"))->getName();' | tee /tmp/donation-match.txt
+          grep -Fq 'deels.compat.campaigns.donations.store' /tmp/donation-match.txt
