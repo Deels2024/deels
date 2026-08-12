@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DeelsCommunicationCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use App\Http\Controllers\Api\DeelsEngagementCompatibilityController;
+use App\Http\Controllers\Api\DeelsOAuthCompatibilityController;
 use App\Http\Controllers\Api\DeelsPaymentCompatibilityController;
 use App\Http\Controllers\Api\DeelsSettingsCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
@@ -32,6 +33,12 @@ Route::post('auth/forgot-password', [DeelsUtilityCompatibilityController::class,
     ->name('deels.compat.auth.forgot-password');
 Route::post('auth/reset-password', [DeelsUtilityCompatibilityController::class, 'resetPassword'])
     ->name('deels.compat.auth.reset-password');
+Route::get('auth/oauth/vk/redirect', [DeelsOAuthCompatibilityController::class, 'redirectToVk'])
+    ->middleware(['web', 'throttle:20,1'])
+    ->name('deels.compat.auth.oauth.vk.redirect');
+Route::get('auth/oauth/vk/callback', [DeelsOAuthCompatibilityController::class, 'callback'])
+    ->middleware(['web', 'throttle:30,1'])
+    ->name('deels.compat.auth.oauth.vk.callback');
 
 Route::get('stats', [DeelsCompatibilityController::class, 'stats'])
     ->name('deels.compat.stats');
