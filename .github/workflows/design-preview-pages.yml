@@ -6,7 +6,6 @@ on:
       - codex/new-design-migration
     paths:
       - public/design-preview.html
-      - public/dist/css/deels-v2*.css
       - .github/workflows/design-preview-pages.yml
   workflow_dispatch:
 
@@ -26,14 +25,25 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout preview branch
+      - name: Checkout Laravel preview branch
         uses: actions/checkout@v4
+        with:
+          path: laravel
 
-      - name: Prepare static preview
+      - name: Checkout original Deelsweb design
+        uses: actions/checkout@v4
+        with:
+          repository: Deels2024/deelsweb
+          ref: main
+          path: deelsweb
+
+      - name: Prepare source-faithful preview
         run: |
-          mkdir -p _preview/dist/css
-          cp public/design-preview.html _preview/index.html
-          cp public/dist/css/deels-v2*.css _preview/dist/css/
+          mkdir -p _preview/source
+          cp laravel/public/design-preview.html _preview/index.html
+          cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
+          cp deelsweb/app/styles.css _preview/source/styles.css
+          cp deelsweb/app/pages.css _preview/source/pages.css
           touch _preview/.nojekyll
 
       - name: Configure Pages
@@ -52,4 +62,4 @@ jobs:
 
       - name: Preview ready
         if: success()
-        run: echo "Deels preview deployed"
+        run: echo "Source-faithful Deelsweb preview deployed"
