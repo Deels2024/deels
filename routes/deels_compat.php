@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DeelsCommunicationCompatibilityController;
 use App\Http\Controllers\Api\DeelsCompatibilityController;
 use App\Http\Controllers\Api\DeelsContentCompatibilityController;
 use App\Http\Controllers\Api\DeelsEngagementCompatibilityController;
+use App\Http\Controllers\Api\DeelsPaymentCompatibilityController;
 use App\Http\Controllers\Api\DeelsSettingsCompatibilityController;
 use App\Http\Controllers\Api\DeelsSocialCompatibilityController;
 use App\Http\Controllers\Api\DeelsUtilityCompatibilityController;
@@ -52,6 +53,9 @@ Route::get('campaigns', [DeelsCampaignCompatibilityController::class, 'index'])
 Route::get('campaigns/{id}', [DeelsCampaignCompatibilityController::class, 'show'])
     ->where('id', '[A-Za-z0-9_-]+')
     ->name('deels.compat.campaigns.show');
+Route::post('campaign-donations/tinkoff/callback', [DeelsPaymentCompatibilityController::class, 'callback'])
+    ->middleware(\Illuminate\Session\Middleware\StartSession::class)
+    ->name('deels.compat.campaigns.donations.callback');
 
 Route::get('search', [DeelsUtilityCompatibilityController::class, 'search'])
     ->name('deels.compat.search');
@@ -86,6 +90,9 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
         ->name('deels.compat.stories.store');
     Route::post('campaigns', [DeelsCampaignCompatibilityController::class, 'store'])
         ->name('deels.compat.campaigns.store');
+    Route::post('campaigns/{id}/donations', [DeelsPaymentCompatibilityController::class, 'donate'])
+        ->where('id', '[A-Za-z0-9_-]+')
+        ->name('deels.compat.campaigns.donations.store');
 
     Route::get('profile', [DeelsSocialCompatibilityController::class, 'profile'])
         ->name('deels.compat.profile.show');
