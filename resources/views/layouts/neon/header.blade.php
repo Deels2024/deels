@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-dashboard-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-create-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-functional-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-contest-actions-source.css')}}"/>
     <script defer src="{{ext_asset('/dist/js/deels-v2.js')}}"></script>
     @yield('page-css')
     <script>
