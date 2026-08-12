@@ -1,0 +1,111 @@
+/* Final unified Deels design-system layer. Keeps business logic intact and normalizes visual language. */
+:root{
+  --deels-ui-bg:#faf8fc;
+  --deels-ui-surface:#ffffff;
+  --deels-ui-surface-soft:#f6f1f9;
+  --deels-ui-ink:#231a2d;
+  --deels-ui-muted:#756b80;
+  --deels-ui-line:#e9e1ef;
+  --deels-ui-purple:#6b2bc1;
+  --deels-ui-purple-2:#813be2;
+  --deels-ui-pink:#ff4fc8;
+  --deels-ui-cyan:#34d7e9;
+  --deels-ui-success:#26ad70;
+  --deels-ui-danger:#c3475b;
+  --deels-ui-radius-sm:12px;
+  --deels-ui-radius-md:16px;
+  --deels-ui-radius-lg:22px;
+  --deels-ui-radius-xl:30px;
+  --deels-ui-shadow:0 12px 38px rgba(68,26,107,.07);
+  --deels-ui-shadow-hover:0 18px 46px rgba(68,26,107,.11);
+  --deels-ui-section:88px;
+  --deels-ui-container:1180px;
+}
+
+.deels-v2-enabled,.deels-source-home,.deels-source-auth{color:var(--deels-ui-ink)}
+.deels-v2-enabled :where(.container),.deels-source-home .container{width:min(var(--deels-ui-container),calc(100% - 48px));margin-inline:auto}
+
+/* Type scale */
+.deels-v2-enabled :where(h1,h2,h3,h4),.deels-source-home :where(h1,h2,h3,h4){color:var(--deels-ui-ink);text-wrap:balance}
+.deels-v2-enabled :where(p,.text-muted,.muted),.deels-source-home p{overflow-wrap:anywhere}
+
+/* Shared card language */
+.deels-v2-enabled :where(.content-card,.account-main,.profile-card,.wallet-card,.campaign-card,.admin-card,.admin-main .card,.challenge-card,.battle-card),
+.deels-source-home :where(.source-video-card,.source-campaign-card,.source-live-stats-card,.source-ecosystem-card,.source-economy-item){
+  border-color:var(--deels-ui-line)!important;
+  border-radius:var(--deels-ui-radius-lg)!important;
+  box-shadow:var(--deels-ui-shadow)!important;
+}
+
+.deels-v2-enabled :where(.content-card,.profile-card,.wallet-card,.admin-card),
+.deels-source-home :where(.source-ecosystem-card,.source-economy-item){background:var(--deels-ui-surface)!important}
+
+/* Shared buttons */
+.deels-v2-enabled :where(.btn,.button,button[type="submit"]),.deels-source-home .button{
+  border-radius:var(--deels-ui-radius-md)!important;
+  font-weight:800!important;
+}
+.deels-v2-enabled :where(.btn_fill,.btn-primary,.button-primary),.deels-source-home .button-primary{
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--deels-ui-purple),var(--deels-ui-purple-2) 58%,#9b57f5)!important;
+  box-shadow:0 12px 28px rgba(107,43,193,.22)!important;
+}
+
+/* Inputs */
+.deels-v2-enabled :where(input,select,textarea),.deels-source-auth :where(input,select,textarea){
+  border-color:#ddd2e8!important;
+  border-radius:var(--deels-ui-radius-md)!important;
+  background:#fff!important;
+  color:var(--deels-ui-ink)!important;
+}
+
+/* Header + footer use same glass/line language */
+.deels-v2-enabled .header{
+  border-bottom:1px solid rgba(233,225,239,.9)!important;
+  background:rgba(255,255,255,.92)!important;
+  box-shadow:0 1px 0 rgba(68,26,107,.02)!important;
+}
+.deels-v2-enabled .footer{border-top:1px solid var(--deels-ui-line)!important}
+
+/* Home rhythm */
+.deels-source-home .source-section{padding:var(--deels-ui-section) 0!important}
+.deels-source-home .source-section-head{margin-bottom:36px!important}
+.deels-source-home .source-section-head h2{max-width:720px!important}
+.deels-source-home .source-section-head p{max-width:620px!important}
+.deels-source-home .source-ecosystem{padding:28px 0 76px!important}
+.deels-source-home .source-live-stats{padding-bottom:88px!important}
+.deels-source-home .source-economy{padding:88px 0!important}
+.deels-source-home .source-cta-card{border-radius:var(--deels-ui-radius-xl)!important}
+
+/* Dashboard/profile/wallet/admin spacing */
+.deels-v2-enabled :where(.account-main,.content-card,.profile-card,.wallet-card,.admin-main){min-width:0}
+.deels-v2-enabled :where(.account-main__title,.page-title,.admin-main h1){letter-spacing:-.025em!important}
+.deels-v2-enabled :where(.account-main,.content-card,.profile-card,.wallet-card){background-color:var(--deels-ui-surface)}
+
+/* Tables and pills */
+.deels-v2-enabled :where(table,.admin-table table,.profile-table table){border-radius:var(--deels-ui-radius-md)!important;overflow:hidden}
+.deels-v2-enabled :where(.tabs a,.tabs button,.admin-toolbar button,.filter-pill,.status-chip){border-radius:999px!important}
+
+/* Hover restraint */
+@media (hover:hover){
+  .deels-v2-enabled :where(.content-card,.profile-card,.wallet-card,.admin-card),
+  .deels-source-home :where(.source-ecosystem-card,.source-economy-item){transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .deels-source-home .source-ecosystem-card:hover{box-shadow:var(--deels-ui-shadow-hover)!important}
+}
+
+/* Mobile unified rhythm */
+@media(max-width:760px){
+  :root{--deels-ui-section:64px}
+  .deels-v2-enabled :where(.container),.deels-source-home .container{width:min(100% - 28px,var(--deels-ui-container))!important}
+  .deels-source-home .source-section-head{margin-bottom:26px!important}
+  .deels-source-home .source-section-head h2{font-size:clamp(30px,9vw,42px)!important;line-height:1.02!important}
+  .deels-source-home .source-section-head p{font-size:15px!important;line-height:1.6!important}
+  .deels-source-home .source-ecosystem{padding:20px 0 54px!important}
+  .deels-source-home .source-economy{padding:64px 0!important}
+  .deels-v2-enabled :where(.content-card,.profile-card,.wallet-card,.admin-card){border-radius:20px!important}
+}
+
+@media(max-width:420px){
+  .deels-v2-enabled :where(.container),.deels-source-home .container{width:calc(100% - 24px)!important}
+  .deels-source-home .source-section{padding:56px 0!important}
+}
