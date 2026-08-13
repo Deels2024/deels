@@ -8,3 +8,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('battles/{id}', [DeelsBattleCompatibilityController::class, 'show'])
     ->whereNumber('id')
     ->name('deels.compat.battles.show');
+
+Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void {
+    Route::post('battles', [DeelsBattleCompatibilityController::class, 'store'])
+        ->name('deels.compat.battles.store');
+    Route::put('battles/{id}', [DeelsBattleCompatibilityController::class, 'update'])
+        ->whereNumber('id')
+        ->name('deels.compat.battles.update');
+});
