@@ -15,4 +15,7 @@ Route::middleware(['auth:sanctum', 'update.user.data'])->group(function (): void
     Route::put('battles/{id}', [DeelsBattleCompatibilityController::class, 'update'])
         ->whereNumber('id')
         ->name('deels.compat.battles.update');
+    Route::post('battles/{id}/response', [DeelsBattleCompatibilityController::class, 'response'])
+        ->whereNumber('id')
+        ->name('deels.compat.battles.response');
 });
