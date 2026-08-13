@@ -72,6 +72,7 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/deels_compat.php'));
     }
 
+    /** Canonical battle routes used by the new Deels facade. */
     protected function mapDeelsBattleCompatibilityRoutes(): void
     {
         Route::prefix('api')
