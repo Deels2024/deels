@@ -9,6 +9,7 @@ on:
       - 'app/Http/Requests/Deels*.php'
       - 'app/Providers/RouteServiceProvider.php'
       - 'routes/deels_compat.php'
+      - 'routes/deels_battle_compat.php'
       - 'resources/views/**'
       - 'public/design-preview*.js'
       - 'public/dist/css/deelsweb-*.css'
@@ -40,6 +41,7 @@ jobs:
           find app/Http/Controllers/Api -maxdepth 1 -name 'Deels*CompatibilityController.php' -print0 | xargs -0 -n1 php -l
           find app/Http/Requests -maxdepth 1 -name 'Deels*.php' -print0 | xargs -0 -r -n1 php -l
           php -l routes/deels_compat.php
+          php -l routes/deels_battle_compat.php
           php -l app/Providers/RouteServiceProvider.php
 
       - name: Install Laravel dependencies
@@ -94,6 +96,10 @@ jobs:
             deels.compat.challenges.save
             deels.compat.challenge-responses.vote
             deels.compat.battles.index
+            deels.compat.battles.show
+            deels.compat.battles.store
+            deels.compat.battles.update
+            deels.compat.battles.response
             deels.compat.battles.vote
             deels.compat.campaigns.index
             deels.compat.campaigns.show
@@ -146,6 +152,10 @@ jobs:
           check_match '/api/profile' 'GET' 'deels.compat.profile.show'
           check_match '/api/campaigns' 'GET' 'deels.compat.campaigns.index'
           check_match '/api/battles' 'GET' 'deels.compat.battles.index'
+          check_match '/api/battles/123' 'GET' 'deels.compat.battles.show'
+          check_match '/api/battles' 'POST' 'deels.compat.battles.store'
+          check_match '/api/battles/123' 'PUT' 'deels.compat.battles.update'
+          check_match '/api/battles/123/response' 'POST' 'deels.compat.battles.response'
           check_match '/api/search?q=test' 'GET' 'deels.compat.search'
           check_match '/api/campaigns/123/donations' 'POST' 'deels.compat.campaigns.donations.store'
           check_match '/api/auth/verify-email/123456' 'POST' 'deels.compat.auth.verify-email'
