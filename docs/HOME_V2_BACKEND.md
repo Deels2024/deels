@@ -28,8 +28,19 @@ The existing `/` route and `home.blade.php` remain the default. They now use
 `HomePageDataService`, the same data source as the v1 endpoint. This preserves
 SEO and avoids a second set of homepage queries.
 
-When `resources/views/home-v2.blade.php` has been added and verified, enable it
-with:
+The production-ready facade is isolated in:
+
+- `resources/views/home-v2.blade.php`;
+- `public/dist/css/home-v2.css`;
+- `public/dist/js/home-v2.js`.
+
+It uses the same server-rendered collections as the current homepage, keeps the
+existing story modal and routes, and adds touch-friendly horizontal rails. The
+"funded campaigns" and completed-campaign congratulations blocks are intentionally
+not rendered in v2. Recently funded and new campaigns remain as vertical `9:16`
+cards.
+
+After deploying and verifying the files, enable the facade with:
 
 ```dotenv
 HOME_DESIGN_V2=true
@@ -37,6 +48,14 @@ HOME_DESIGN_V2=true
 
 If the v2 template is absent, the controller safely falls back to the existing
 `home.blade.php` even when the flag is enabled.
+
+After changing the flag, rebuild the Laravel caches:
+
+```shell
+php artisan optimize:clear
+php artisan config:cache
+php artisan view:cache
+```
 
 ## Cache and rollback
 
