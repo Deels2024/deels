@@ -11,6 +11,7 @@ on:
       - 'public/design-preview-feed-ux.js'
       - 'public/design-preview-feed-compact.js'
       - 'public/design-preview-challenges.js'
+      - 'public/design-preview-media-fill.js'
       - 'public/home-media/**'
       - 'public/dist/css/deelsweb-*.css'
       - 'public/dist/css/deels-v2*.css'
@@ -57,30 +58,28 @@ jobs:
           cp laravel/public/design-preview-feed-ux.js _preview/source/design-preview-feed-ux.js
           cp laravel/public/design-preview-feed-compact.js _preview/source/design-preview-feed-compact.js
           cp laravel/public/design-preview-challenges.js _preview/source/design-preview-challenges.js
+          cp laravel/public/design-preview-media-fill.js _preview/source/design-preview-media-fill.js
           cp laravel/public/home-media/*.webp _preview/source/home-media/
           cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
           cp deelsweb/app/styles.css _preview/source/styles.css
           cp deelsweb/app/pages.css _preview/source/pages.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
-          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n</body>#' _preview/index.html
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _preview/index.html
           touch _preview/.nojekyll
 
-      - name: Verify preview screens and single-source home assets
+      - name: Verify preview screens and media assets
         run: |
           set -euo pipefail
           for id in home feed challenges battles profile wallet messages create campaign admin; do
             grep -q "id=\"screen-$id\"" _preview/index.html
           done
-          grep -q 'deelsweb-qa-source.css' _preview/index.html
-          grep -q 'design-preview-home-enhancements.js' _preview/index.html
-          grep -q 'design-preview-polish.js' _preview/index.html
-          grep -q 'design-preview-feed-ux.js' _preview/index.html
-          grep -q 'design-preview-feed-compact.js' _preview/index.html
-          grep -q 'design-preview-challenges.js' _preview/index.html
+          for script in design-preview-home-enhancements.js design-preview-polish.js design-preview-feed-ux.js design-preview-feed-compact.js design-preview-challenges.js design-preview-media-fill.js; do
+            grep -q "$script" _preview/index.html
+          done
           if grep -q 'design-preview-home-live.js' _preview/index.html; then exit 1; fi
           if grep -q 'design-preview-home-live-fix.js' _preview/index.html; then exit 1; fi
           grep -q 'INTERACTIVE PREVIEW' _preview/index.html
-          for asset in hero-rooftop.webp video-creator.webp video-boy.webp video-friends.webp video-dance.webp; do
+          for asset in hero-rooftop.webp video-creator.webp video-boy.webp video-friends.webp video-dance.webp story-dance-v2.webp story-stage-v2.webp; do
             test -s "_preview/source/home-media/$asset"
           done
           if grep -q 'deelsweb-home-enhancements.css' _preview/index.html; then exit 1; fi
@@ -103,5 +102,5 @@ jobs:
       - name: Preview ready
         if: success()
         run: |
-          echo "Source Deelsweb preview deployed"
+          echo "Media-filled Deels preview deployed"
           echo "${{ steps.deployment.outputs.page_url }}"
