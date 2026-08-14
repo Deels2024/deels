@@ -280,7 +280,9 @@ class Challenge extends Model
 
     public function getViewsCountAttribute()
     {
-        $count = $this->views()->count();
+        $count = array_key_exists('views_count', $this->attributes)
+            ? (int) $this->attributes['views_count']
+            : $this->views()->count();
 
         if ($count >= 1000) {
             $count = ($count / 1000) . 'K';
@@ -290,7 +292,9 @@ class Challenge extends Model
 
     public function getCommentsCountAttribute()
     {
-        $count = $this->comments()->count();
+        $count = array_key_exists('comments_count', $this->attributes)
+            ? (int) $this->attributes['comments_count']
+            : $this->comments()->count();
 
         if ($count >= 1000) {
             $count = round(($count / 1000), 2) . 'K';
@@ -301,7 +305,9 @@ class Challenge extends Model
 
     public function getLikesCountAttribute()
     {
-        $count = $this->likes()->count();
+        $count = array_key_exists('likes_count', $this->attributes)
+            ? (int) $this->attributes['likes_count']
+            : $this->likes()->count();
 
         if ($count >= 1000) {
             $count = round(($count / 1000), 2) . 'K';

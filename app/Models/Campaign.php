@@ -193,6 +193,14 @@ class Campaign extends Model
         return $this->hasMany(Story::class, 'campaign_id', 'id');
     }
 
+    public function latestActiveStory(): HasOne
+    {
+        return $this->hasOne(Story::class, 'campaign_id', 'id')
+            ->withoutGlobalScopes()
+            ->active()
+            ->latestOfMany();
+    }
+
     /** @return false|float|int */
     public function days_left()
     {

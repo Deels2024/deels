@@ -15,8 +15,7 @@
                         <div class="info-item__text">всего спонсоров</div>
                     </div>
                     <div class="info__item">
-                        <div class="info-item__num">{!! number_format(round($fundRaised+569600), 0, ',', ',') !!}<span class="ruble-sign">₽</span></div>
-                        {{--                        <div class="info-item__num">569600<span class="ruble-sign">₽</span></div>--}}
+                        <div class="info-item__num">{!! number_format(round($fundRaised), 0, ',', ',') !!}<span class="ruble-sign">₽</span></div>
                         <div class="info-item__text">привлеченные средства</div>
                     </div>
                     <div class="info__item">

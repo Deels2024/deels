@@ -4,26 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Jobs\FinishChallenge;
 use App\Mail\ContactUs;
-use App\Models\Campaign;
-use App\Models\Challenge;
-use App\Models\Comment;
-use App\Models\Payment;
-use App\Models\Story;
-use App\Models\User;
-use App\Repositories\CampaignRepository;
-use Carbon\Carbon;
+use App\Services\Home\HomePageDataService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class HomeController extends Controller
@@ -31,242 +20,17 @@ class HomeController extends Controller
     /**
      * Show the application dashboard.
      */
-    public function index(CampaignRepository $campaignRepository)
+    public function index(HomePageDataService $homePageData)
     {
-
-        $title = 'Deels платформа для творчества и продвижения контента - Заработок онлайн на сторис и челленджах';
-        $description = 'Deels.ru  |  Платформа для творчества и продвижения контента | Заработок на сторис  | Участие в челленджах  |  Растущие сообщество талантливых создателей и энтузиастов';
-        $user = Auth::user();
-
-        if($user) {
-
-        } else {
-//            return view(
-//                'auth.login',
-//                compact(
-//                    'title',
-//                    'description',
-//
-//                )
-//            );
-        }
-
-//        $completedCampaigns = $campaignRepository->randomFullyDonatedCampaigns(4);
-        $completedCampaigns = Cache::remember('home.hero.completed_campaigns', now()->addMinutes(30), static function () {
-            return Campaign::whereIn('slug', [
-                'kreslo-gamak',
-                'bilet-na-koncert-mukki',
-                'na-kraski-dlia-novoi-kartiny',
-                'na-obucenie-tatu-mastera',
-                'donat-v-frostborn',
-                'buket-romasek',
-                'dorado',
-                'obucenie-52',
-            ])->get();
-        });
-        $today = Carbon::now()->format('Y-m-d');
-        $week = Carbon::now()->subDays(7)->format('Y-m-d');
-        $last_week = Carbon::now()->subDays(14)->format('Y-m-d');
-        $storiesBlocks = Cache::remember('home.blocks.stories', now()->addMinutes(5), function () use ($week, $last_week, $today) {
-            $newStories = Story::with('comments', 'likes')
-                ->where('active', true)
-                ->where('declined', false)
-                ->where('created_at', '>=', $week . ' 00:00:00')
-                ->where('created_at', '<=', $today . ' 23:59:59')
-                ->orderBy('created_at', 'DESC')
-                ->take(10)
-                ->get();
-
-            if (count($newStories) == 0) {
-                $newStories = Story::with('comments', 'likes')
-                    ->where('active', true)
-                    ->where('declined', false)
-                    ->where('created_at', '>=', $last_week . ' 00:00:00')
-                    ->where('created_at', '<=', $today . ' 23:59:59')
-                    ->orderBy('created_at', 'DESC')
-                    ->take(10)
-                    ->get();
-            }
-
-            $donateStories = Story::with('comments', 'likes')
-                ->where('active', true)
-                ->where('declined', false)
-                ->where('amount', '>', 0)
-                ->where('paid', true)
-                ->inRandomOrder()
-                ->take(10)
-                ->get();
-
-            $topStories = Story::with('comments', 'likes')
-                ->where('active', true)
-                ->where('declined', false)
-                ->where('created_at', '>=', $today . ' 00:00:00')
-                ->where('created_at', '<=', $today . ' 23:59:59')
-                ->withCount('comments', 'likes')
-                ->orderBy('comments_count', 'desc')
-                ->orderBy('likes_count', 'desc')
-                ->orderBy('created_at', 'DESC')
-                ->take(10)
-                ->get();
-
-            if (count($topStories) < 6) {
-                $topStories = Story::with('comments', 'likes')
-                    ->where('active', true)
-                    ->where('declined', false)
-                    ->where('created_at', '>=', $week . ' 00:00:00')
-                    ->where('created_at', '<=', $today . ' 23:59:59')
-                    ->withCount('comments', 'likes')
-                    ->havingRaw('comments_count > 0 OR likes_count > 0')
-                    ->orderBy('comments_count', 'desc')
-                    ->orderBy('likes_count', 'desc')
-                    ->orderBy('created_at', 'DESC')
-                    ->take(10)
-                    ->get();
-            }
-            if (count($topStories) < 6) {
-                $topStories = Story::with('comments', 'likes')
-                    ->where('active', true)
-                    ->where('declined', false)
-                    ->where('created_at', '>=', $last_week . ' 00:00:00')
-                    ->where('created_at', '<=', $today . ' 23:59:59')
-                    ->withCount('comments', 'likes')
-                    ->havingRaw('comments_count > 0 OR likes_count > 0')
-                    ->orderBy('comments_count', 'desc')
-                    ->orderBy('likes_count', 'desc')
-                    ->orderBy('created_at', 'DESC')
-                    ->take(10)
-                    ->get();
-            }
-            if (count($topStories) < 6) {
-                $topStories = Story::with('comments', 'likes')
-                    ->where('active', true)
-                    ->where('declined', false)
-                    ->withCount('comments', 'likes')
-                    ->havingRaw('comments_count > 0 OR likes_count > 0')
-                    ->orderBy('comments_count', 'desc')
-                    ->orderBy('likes_count', 'desc')
-                    ->orderBy('created_at', 'DESC')
-                    ->take(10)
-                    ->get();
-            }
-
-            return compact('newStories', 'donateStories', 'topStories');
-        });
-        $viewer = Auth::user() ?? auth()->user();
-        $visibility = app(\App\Services\Contests\ContestVisibilityService::class);
-        $visibleStories = static function ($stories) use ($viewer, $visibility) {
-            return $stories->filter(static function (Story $story) use ($viewer, $visibility): bool {
-                $contest = $story->challenge_id
-                    ? $story->challenge
-                    : ($story->battle_id ? $story->battle : null);
-
-                return !$contest || $visibility->canView($contest, $viewer);
-            })->values();
-        };
-        $newStories = $visibleStories($storiesBlocks['newStories']);
-        $donateStories = $visibleStories($storiesBlocks['donateStories']);
-        $topStories = $visibleStories($storiesBlocks['topStories']);
-
-        $topChallenges = Cache::remember(
-            'home.blocks.top_challenges:' . ($viewer?->id ?? 'guest'),
-            now()->addMinutes(5),
-            static function () use ($viewer) {
-            $query = Challenge::where('challenges.active', 1)
-                ->where('challenges.declined', 0)
-                ->whereNull('challenges.blocked_at')
-                ->whereNull('finished_at');
-            app(\App\Services\Contests\ContestVisibilityService::class)
-                ->applyToContests($query, 'challenges', $viewer);
-
-            return $query
-                ->withCount('comments')
-                ->withCount('likes')
-                ->withCount('views')
-                ->inRandomOrder()
-                ->orderBy('views_count', 'DESC')
-                ->orderBy('likes_count', 'DESC')
-                ->orderBy('comments_count', 'DESC')
-                ->take(10)
-                ->get();
-        });
-
-        $stats = Cache::remember('home.blocks.stats', now()->addMinutes(5), static function () {
-            $campaignsCount = Campaign::active()->count();
-            $usersCount = User::count();
-            $fundRaised = Payment::whereStatus('success')->sum('amount');
-            $fundedCampaignsCount = Campaign::join('payments', 'campaign_id', 'campaigns.id')
-                ->where('payments.status', 'success')
-                ->count();
-
-            $storiesCount = Story::active()->count();
-            $storiesDonatedCount = DB::table('transactions')->where('meta', 'like', '%{"get":"story"%')->sum('amount');
-            $storiesCommentsCount = Comment::whereNotNull('story_id')->where('approved', true)->count();
-            $storiesViewsCount = \App\Models\View::count();
-
-            return compact(
-                'campaignsCount',
-                'usersCount',
-                'fundRaised',
-                'fundedCampaignsCount',
-                'storiesCount',
-                'storiesDonatedCount',
-                'storiesCommentsCount',
-                'storiesViewsCount'
-            );
-        });
-        extract($stats, EXTR_OVERWRITE);
-
-        $fundedCampaigns = $campaignRepository->fundedCampaigns(8);
-        $newCampaigns = $campaignRepository->newCampaigns(8, $fundedCampaigns->pluck('id'));
-        $latestFundedCampaigns = $campaignRepository->latestFundedCampaigns(8);
+        $data = $homePageData->get(auth()->user());
 
         if (request()->wantsJson()) {
-            return response()->json([
-                'title' => $title,
-                'description' => $description,
-                'newCampaigns' => $newCampaigns,
-                'fundedCampaigns' => $fundedCampaigns,
-                'campaignsCount' => $campaignsCount,
-                'usersCount' => $usersCount,
-                'fundRaised' => $fundRaised,
-                'latestFundedCampaigns' => $latestFundedCampaigns,
-                'fundedCampaignsCount' => $fundedCampaignsCount,
-                'completedCampaigns' => $completedCampaigns,
-                'storiesCount' => $storiesCount,
-                'storiesDonatedCount' => $storiesDonatedCount,
-                'storiesCommentsCount' => $storiesCommentsCount,
-                'storiesViewsCount' => $storiesViewsCount,
-                'topDonaters' => [],
-                'topReferrals' => [],
-                'topWinners' => [],
-                'doneCampaigns' => [],
-                'topChallenges' => $topChallenges,
-            ]);
-        } else {
-            return view(
-                'home',
-                compact(
-                    'title',
-                    'description',
-                    'completedCampaigns',
-                    'newStories',
-                    'fundedCampaigns',
-                    'newCampaigns',
-                    'latestFundedCampaigns',
-                    'donateStories',
-                    'topStories',
-                    'campaignsCount',
-                    'usersCount',
-                    'fundRaised',
-                    'fundedCampaignsCount',
-                    'storiesCount',
-                    'storiesDonatedCount',
-                    'storiesCommentsCount',
-                    'storiesViewsCount',
-                    'topChallenges',
-                )
-            );
+            return response()->json($homePageData->legacyJson($data));
         }
+
+        $view = config('homepage.use_v2') && view()->exists('home-v2') ? 'home-v2' : 'home';
+
+        return view($view, $data);
     }
 
     public function contactUs()

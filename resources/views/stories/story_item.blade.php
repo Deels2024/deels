@@ -1,13 +1,13 @@
 @if(isset($story->id))
 
     @php
-        $is_viewed = false;
-        if(Auth::user()) {
-            $view = \App\Models\View::where('user_id', Auth::user()->id)->where('story_id', $story->id)->first();
-            if($view) {
-                $is_viewed = true;
-            }
+        $is_viewed = $story->getAttribute('is_viewed');
+        if($is_viewed === null && Auth::user()) {
+            $is_viewed = \App\Models\View::where('user_id', Auth::user()->id)
+                ->where('story_id', $story->id)
+                ->exists();
         }
+        $is_viewed = (bool) $is_viewed;
     @endphp
     @if(isset($challenge))
         <a href="#story-popup" class="challenge-card show_story {{$story->paid && !$is_viewed ? 'story_paid story__content_closed' : ''}}" data-route="{{route('stories.preview', ['id' => $story->id, 'user_id' => Auth::user()->id ?? null])}}" data-story="{{$story->id}}" data-type="{{$story->type}}" data-paid="{{$story->paid}}" data-amount="{{$story->amount}}">

@@ -223,6 +223,7 @@ Route::group(['prefix' => 'challenges'], function (): void {
     Route::get('/show/{id}', ['as' => 'challenge_page', 'uses' => 'Api\ChallengeController@show']);
 });
 Route::group(['prefix' => 'battles'], function (): void {
+    Route::get('/', ['as' => 'battles.catalog', 'uses' => 'Api\BattleController@get_battles']);
     Route::get('/show/{id}', ['as' => 'battle_page', 'uses' => 'Api\BattleController@show']);
 });
 
