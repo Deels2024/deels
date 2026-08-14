@@ -8,6 +8,7 @@ on:
       - 'public/design-preview.html'
       - 'public/design-preview-home-enhancements.js'
       - 'public/design-preview-home-live.js'
+      - 'public/design-preview-home-live-fix.js'
       - 'public/design-preview-polish.js'
       - 'public/design-preview-feed-ux.js'
       - 'public/design-preview-feed-compact.js'
@@ -55,6 +56,7 @@ jobs:
           cp laravel/public/design-preview.html _preview/index.html
           cp laravel/public/design-preview-home-enhancements.js _preview/source/design-preview-home-enhancements.js
           cp laravel/public/design-preview-home-live.js _preview/source/design-preview-home-live.js
+          cp laravel/public/design-preview-home-live-fix.js _preview/source/design-preview-home-live-fix.js
           cp laravel/public/design-preview-polish.js _preview/source/design-preview-polish.js
           cp laravel/public/design-preview-feed-ux.js _preview/source/design-preview-feed-ux.js
           cp laravel/public/design-preview-feed-compact.js _preview/source/design-preview-feed-compact.js
@@ -64,7 +66,7 @@ jobs:
           cp deelsweb/app/styles.css _preview/source/styles.css
           cp deelsweb/app/pages.css _preview/source/pages.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
-          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-home-live.js"></script>\n</body>#' _preview/index.html
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-home-live.js"></script>\n<script src="./source/design-preview-home-live-fix.js"></script>\n</body>#' _preview/index.html
           touch _preview/.nojekyll
 
       - name: Verify preview screens and live home assets
@@ -76,6 +78,7 @@ jobs:
           grep -q 'deelsweb-qa-source.css' _preview/index.html
           grep -q 'design-preview-home-enhancements.js' _preview/index.html
           grep -q 'design-preview-home-live.js' _preview/index.html
+          grep -q 'design-preview-home-live-fix.js' _preview/index.html
           grep -q 'design-preview-polish.js' _preview/index.html
           grep -q 'design-preview-feed-ux.js' _preview/index.html
           grep -q 'design-preview-feed-compact.js' _preview/index.html
