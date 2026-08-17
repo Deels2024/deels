@@ -40,6 +40,19 @@ existing story modal and routes, and adds touch-friendly horizontal rails. The
 not rendered in v2. Recently funded and new campaigns remain as vertical `9:16`
 cards.
 
+## Administrator preview
+
+After the branch has been deployed, a full administrator can open:
+
+```text
+/home-v2-preview
+```
+
+The route requires authentication and checks `User::is_admin()` separately, so
+campaign and comment moderators cannot open it. It always renders Home v2 even
+when `HOME_DESIGN_V2=false`, adds `noindex,nofollow,noarchive`, and does not
+change the homepage seen by other users.
+
 After deploying and verifying the files, enable the facade with:
 
 ```dotenv

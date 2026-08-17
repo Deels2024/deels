@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index');
+Route::get('/home-v2-preview', 'HomeController@previewV2')
+    ->middleware('auth')
+    ->name('home.v2.preview');
 Route::get('/testSocket', 'Api\SendSocketController@testSocket')->name('testSocket');
 //Route::get('clear', 'HomeController@clearCache')->name('clear_cache');
 Route::get('banned', 'HomeController@banned')->name('banned');

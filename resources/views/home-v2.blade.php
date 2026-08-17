@@ -11,7 +11,7 @@
     <meta property="og:site_name" content="DEELS">
     <meta property="og:image" content="{{ url('/images/promo/banner1.png') }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="robots" content="{{ !empty($homeV2Preview) ? 'noindex,nofollow,noarchive' : 'index,follow,max-image-preview:large' }}">
     <link rel="canonical" href="{{ route('home') }}">
     <script type="application/ld+json">
         {!! json_encode([
@@ -49,6 +49,14 @@
 @section('content')
 <main class="home-v2" data-home-v2 data-bank-url="{{ route('coins_bank') }}">
     <div class="home-v2__ambient" aria-hidden="true"></div>
+
+    @if(!empty($homeV2Preview))
+        <div class="hv2-preview" role="status">
+            <strong>Предпросмотр Home v2</strong>
+            <span>Эту версию видит только администратор. Публичная главная не переключена.</span>
+            <a href="{{ route('home') }}">Вернуться на текущую главную</a>
+        </div>
+    @endif
 
     <section class="hv2-shell hv2-hero hv2-panel" aria-labelledby="home-v2-title">
         <div class="hv2-hero__copy">

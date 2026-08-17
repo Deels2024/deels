@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Mail\ContactUs;
 use App\Services\Home\HomePageDataService;
 use Exception;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,22 @@ class HomeController extends Controller
         $view = config('homepage.use_v2') && view()->exists('home-v2') ? 'home-v2' : 'home';
 
         return view($view, $data);
+    }
+
+    /**
+     * Render Home v2 for a full administrator without changing the public flag.
+     */
+    public function previewV2(Request $request, HomePageDataService $homePageData): View
+    {
+        $user = $request->user();
+
+        abort_unless($user && $user->is_admin(), 403);
+        abort_unless(view()->exists('home-v2'), 404);
+
+        $data = $homePageData->get($user);
+        $data['homeV2Preview'] = true;
+
+        return view('home-v2', $data);
     }
 
     public function contactUs()
