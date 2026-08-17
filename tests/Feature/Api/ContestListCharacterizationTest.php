@@ -192,4 +192,34 @@ class ContestListCharacterizationTest extends TestCase
             ->assertJsonPath('data.0.title', 'Visible author challenge');
     }
 
+    public function test_rewarded_filter_returns_only_challenges_with_a_prize(): void
+    {
+        $owner = $this->createCharacterizationUserWithWallets(['name' => 'Owner', 'email' => 'owner@example.test']);
+        Challenge::create([
+            'user_id' => $owner->id,
+            'title' => 'Rewarded challenge',
+            'active' => true,
+            'declined' => false,
+            'finished' => false,
+            'reward_amount' => 5000,
+        ]);
+        Challenge::create([
+            'user_id' => $owner->id,
+            'title' => 'Free challenge',
+            'active' => true,
+            'declined' => false,
+            'finished' => false,
+            'reward_amount' => null,
+        ]);
+
+        $response = $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/challenges?type=rewarded');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Rewarded challenge');
+    }
+
 }

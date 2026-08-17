@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::get('/home', 'HomeController@index');
+Route::get('/home-v2-preview', 'HomeController@previewV2')
+    ->middleware('auth')
+    ->name('home.v2.preview');
 Route::get('/testSocket', 'Api\SendSocketController@testSocket')->name('testSocket');
 //Route::get('clear', 'HomeController@clearCache')->name('clear_cache');
 Route::get('banned', 'HomeController@banned')->name('banned');
@@ -223,6 +226,7 @@ Route::group(['prefix' => 'challenges'], function (): void {
     Route::get('/show/{id}', ['as' => 'challenge_page', 'uses' => 'Api\ChallengeController@show']);
 });
 Route::group(['prefix' => 'battles'], function (): void {
+    Route::get('/', ['as' => 'battles.catalog', 'uses' => 'Api\BattleController@get_battles']);
     Route::get('/show/{id}', ['as' => 'battle_page', 'uses' => 'Api\BattleController@show']);
 });
 

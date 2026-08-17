@@ -105,21 +105,6 @@
                     <small style="display: block; text-align: center; position: relative; top: -30px">Виртуальная внутренняя единица платформы</small>
                     <div class="d-flex">
                         <div class="bcounter-wrap">
-                            @php
-                                $deels_bank_user = \App\Models\User::where('email', 'moderdeels@mail.ru')->first();
-                                $transactions_total = \Bavix\Wallet\Models\Transaction::where('meta', 'like', '%"get":"coins","old_connected"%')->sum('amount');
-                                if($deels_bank_user) {
-                                    $deels_wallet_balance = intval($deels_bank_user->wallet_balance ?? 0);
-//                                    $bank = intval($deels_wallet_balance-intval($transactions_total));
-                                    $bank = $deels_wallet_balance;
-                                    if($bank < 0) {
-                                        $bank = 0;
-                                    }
-                                } else {
-                                    $bank = intval(10000000-$transactions_total);
-                                }
-
-                            @endphp
                                <div class="numCounter" data-value="{{$bank}}"><div>
                                        <b data-value="0"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="0"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="1"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="2"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="3"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="4" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="5" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div><div><b data-value="6" class="blur"><span>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br></span></b></div></div>
                            </div>
