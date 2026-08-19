@@ -1,0 +1,37 @@
+name: Deploy kopiberi
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kopiberi-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Configure deployment key
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' '[212.8.229.87]:2422 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDLPVrxoyYAQKszVvGkkyYm4G12nqv0f1EsziRYGjqp+cKFxVfMYo/AEX6sM9A2Ar5fRm/5TwP/mtnsDYWuLYPg=' > ~/.ssh/known_hosts
+
+      - name: Deploy codex/new-design-migration
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -p "$SSH_PORT" -o IdentitiesOnly=yes "$SSH_USER@$SSH_HOST"
+
