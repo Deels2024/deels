@@ -58,9 +58,11 @@ jobs:
           cp laravel/public/dist/css/deelsweb-final-polish.css _site/source/deelsweb-final-polish.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _site/source/deelsweb-qa-source.css
 
+          sed -i 's#<title>#<meta name="robots" content="noindex,nofollow,noarchive">\n<meta name="googlebot" content="noindex,nofollow,noarchive">\n<title>#' _site/index.html
           sed -i 's#<link rel="stylesheet" href="./source/deels-main.css">#<link rel="stylesheet" href="./source/font/stylesheet.css">\n<link rel="stylesheet" href="./source/deels-main.css">#' _site/index.html
           sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _site/index.html
 
+          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
           printf '{"sha":"%s","branch":"%s","run_id":"%s"}\n' "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_RUN_ID" > _site/build-info.json
           touch _site/.nojekyll
 
@@ -104,6 +106,8 @@ jobs:
             test -s "_site/source/home-media/$asset"
           done
 
+          grep -q 'name="robots" content="noindex,nofollow,noarchive"' _site/index.html
+          grep -q '^Disallow: /$' _site/robots.txt
           test -s _site/build-info.json
 
           if grep -q 'design-preview-home-live.js' _site/index.html; then exit 1; fi
