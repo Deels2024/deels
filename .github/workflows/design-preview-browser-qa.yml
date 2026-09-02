@@ -1,0 +1,106 @@
+name: Deels responsive browser QA
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'public/design-preview.html'
+      - 'public/design-preview*.js'
+      - 'public/home-media/**'
+      - 'public/dist/css/deelsweb-*.css'
+      - 'public/dist/css/font/**'
+      - 'tests/design-preview-browser-smoke.mjs'
+      - '.github/workflows/design-preview-browser-qa.yml'
+      - '.github/workflows/design-preview-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Deels branch
+        uses: actions/checkout@v4
+        with:
+          path: laravel
+
+      - name: Checkout Deelsweb source styles
+        uses: actions/checkout@v4
+        with:
+          repository: Deels2024/deelsweb
+          ref: main
+          path: deelsweb
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+
+      - name: Build exact static preview
+        run: |
+          set -euo pipefail
+          mkdir -p _site/source/home-media _site/source/font
+
+          cp laravel/public/design-preview.html _site/index.html
+          cp laravel/public/design-preview-home-enhancements.js _site/source/design-preview-home-enhancements.js
+          cp laravel/public/design-preview-polish.js _site/source/design-preview-polish.js
+          cp laravel/public/design-preview-feed-ux.js _site/source/design-preview-feed-ux.js
+          cp laravel/public/design-preview-feed-compact.js _site/source/design-preview-feed-compact.js
+          cp laravel/public/design-preview-challenges.js _site/source/design-preview-challenges.js
+          cp laravel/public/design-preview-media-fill.js _site/source/design-preview-media-fill.js
+          cp laravel/public/home-media/*.webp _site/source/home-media/
+
+          cp laravel/public/dist/css/font/stylesheet.css _site/source/font/stylesheet.css
+          cp laravel/public/dist/css/font/*.woff2 _site/source/font/
+          cp deelsweb/app/themes/deels-main.css _site/source/deels-main.css
+          cp deelsweb/app/styles.css _site/source/styles.css
+          cp deelsweb/app/pages.css _site/source/pages.css
+          cp laravel/public/dist/css/deelsweb-final-polish.css _site/source/deelsweb-final-polish.css
+          cp laravel/public/dist/css/deelsweb-qa-source.css _site/source/deelsweb-qa-source.css
+
+          sed -i 's#<link rel="stylesheet" href="./source/deels-main.css">#<link rel="stylesheet" href="./source/font/stylesheet.css">\n<link rel="stylesheet" href="./source/deels-main.css">#' _site/index.html
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _site/index.html
+          touch _site/.nojekyll
+
+      - name: Install Playwright Chromium
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/deels-browser-qa
+          cp laravel/tests/design-preview-browser-smoke.mjs /tmp/deels-browser-qa/qa.mjs
+          cd /tmp/deels-browser-qa
+          npm init -y >/dev/null 2>&1
+          npm install --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local static server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory _site >/tmp/deels-preview-server.log 2>&1 &
+          echo $! >/tmp/deels-preview-server.pid
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/deels-preview-server.log
+          exit 1
+
+      - name: Run responsive browser audit
+        env:
+          QA_BASE_URL: http://127.0.0.1:4173
+          QA_OUTPUT_DIR: ${{ github.workspace }}/qa-output
+        run: |
+          cd /tmp/deels-browser-qa
+          node qa.mjs
+
+      - name: Upload responsive QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-browser-qa
+          path: qa-output
+          if-no-files-found: warn
+          retention-days: 7
