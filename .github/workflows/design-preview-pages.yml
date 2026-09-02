@@ -53,6 +53,7 @@ jobs:
           cp deelsweb/app/themes/deels-main.css _site/source/deels-main.css
           cp deelsweb/app/styles.css _site/source/styles.css
           cp deelsweb/app/pages.css _site/source/pages.css
+          cp laravel/public/dist/css/deelsweb-final-polish.css _site/source/deelsweb-final-polish.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _site/source/deelsweb-qa-source.css
 
           sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _site/index.html
@@ -78,6 +79,11 @@ jobs:
             test -s "_site/source/$script"
             grep -q "$script" _site/index.html
           done
+
+          for style in deels-main.css styles.css pages.css deelsweb-final-polish.css deelsweb-qa-source.css; do
+            test -s "_site/source/$style"
+          done
+          grep -q "deelsweb-final-polish.css" _site/source/deelsweb-qa-source.css
 
           for asset in \
             hero-rooftop.webp \
