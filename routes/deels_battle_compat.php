@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\DeelsBattleCompatibilityController;
 use Illuminate\Support\Facades\Route;
 
+/* Canonical battle detail/create/update/response contract consumed by Deels2024/deelsweb. */
 Route::get('battles/{id}', [DeelsBattleCompatibilityController::class, 'show'])
     ->whereNumber('id')
     ->name('deels.compat.battles.show');
