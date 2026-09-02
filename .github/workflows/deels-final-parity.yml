@@ -94,5 +94,6 @@ jobs:
           grep -q "deelsweb-final-polish.css" public/dist/css/deelsweb-qa-source.css
           grep -q -- "--deels-ui-font" public/dist/css/deelsweb-final-polish.css
           grep -q "aspect-ratio: 9 / 16" public/dist/css/deelsweb-final-polish.css
-          if grep -q 'design-preview-home-live.js' .github/workflows/design-preview-pages.yml; then exit 1; fi
-          if grep -q 'design-preview-home-live-fix.js' .github/workflows/design-preview-pages.yml; then exit 1; fi
+          test ! -e public/design-preview-home-live.js
+          test ! -e public/design-preview-home-live-fix.js
+          test ! -e public/design-preview-battles-ux.js
