@@ -85,7 +85,6 @@
             </div>
         </section>
 
-        @if($homeChallenges->count())
         <section class="source-section">
             <div class="container">
                 <div class="source-section-head">
@@ -96,41 +95,44 @@
                     </div>
                     <a href="{{ route('challenges.catalog') }}" class="source-text-link">Смотреть все →</a>
                 </div>
-                <div class="source-horizontal-cards">
-                    @foreach($homeChallenges as $challenge)
-                        @php
-                            $participants = $challenge->stories()->active()->count();
-                            $reward = (int)($challenge->reward_amount ?? 0);
-                        @endphp
-                        <article class="source-video-card">
-                            <a href="{{ route('challenge_page', $challenge->id) }}" class="source-poster">
-                                @if($challenge->type === 'video' && $challenge->video_preview)
-                                    <video src="{{ $challenge->video_preview }}" poster="{{ $challenge->thumbnail }}" muted loop autoplay playsinline></video>
-                                @elseif($challenge->thumbnail || $challenge->path)
-                                    <img src="{{ $challenge->thumbnail ?: $challenge->path }}" alt="{{ $challenge->title }}">
-                                @else
-                                    <span class="source-poster-placeholder"></span><span class="source-poster-emoji-card">✦</span>
-                                @endif
-                                <div class="source-poster-top">
-                                    <span class="source-poster-tag">Челлендж</span>
-                                    <span class="source-round-action">♡</span>
+                @if($homeChallenges->count())
+                    <div class="source-horizontal-cards">
+                        @foreach($homeChallenges as $challenge)
+                            @php
+                                $participants = $challenge->stories()->active()->count();
+                                $reward = (int)($challenge->reward_amount ?? 0);
+                            @endphp
+                            <article class="source-video-card">
+                                <a href="{{ route('deels.public.challenges.show', $challenge->id) }}" class="source-poster">
+                                    @if($challenge->type === 'video' && $challenge->video_preview)
+                                        <video src="{{ $challenge->video_preview }}" poster="{{ $challenge->thumbnail }}" muted loop autoplay playsinline></video>
+                                    @elseif($challenge->thumbnail || $challenge->path)
+                                        <img src="{{ $challenge->thumbnail ?: $challenge->path }}" alt="{{ $challenge->title }}">
+                                    @else
+                                        <span class="source-poster-placeholder"></span><span class="source-poster-emoji-card">✦</span>
+                                    @endif
+                                    <div class="source-poster-top">
+                                        <span class="source-poster-tag">Челлендж</span>
+                                        <span class="source-round-action">♡</span>
+                                    </div>
+                                    <div class="source-poster-caption">
+                                        <span>{{ $challenge->user ? '@'.$challenge->user->username : '@deels' }}</span>
+                                        <strong>{{ $challenge->title }}</strong>
+                                    </div>
+                                    <span class="source-play-button">▶</span>
+                                </a>
+                                <div class="source-card-meta">
+                                    <div><strong>{{ $reward > 0 ? number_format($reward, 0, ',', ' ').' ₽' : 'Без приза' }}</strong><span>призовой фонд</span></div>
+                                    <div><strong>{{ number_format($participants, 0, ',', ' ') }}</strong><span>участников</span></div>
                                 </div>
-                                <div class="source-poster-caption">
-                                    <span>{{ $challenge->user ? '@'.$challenge->user->username : '@deels' }}</span>
-                                    <strong>{{ $challenge->title }}</strong>
-                                </div>
-                                <span class="source-play-button">▶</span>
-                            </a>
-                            <div class="source-card-meta">
-                                <div><strong>{{ $reward > 0 ? number_format($reward, 0, ',', ' ').' ₽' : 'Без приза' }}</strong><span>призовой фонд</span></div>
-                                <div><strong>{{ number_format($participants, 0, ',', ' ') }}</strong><span>участников</span></div>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-results" role="status"><div><h2>Новые челленджи уже готовятся</h2><p>Загляни чуть позже или создай свой — он сразу появится в каталоге после публикации.</p></div></div>
+                @endif
             </div>
         </section>
-        @endif
 
         <section class="source-section theme-dark-card">
             <div class="container">
@@ -149,7 +151,6 @@
             </div>
         </section>
 
-        @if($homeStories->count())
         <section class="source-section">
             <div class="container source-split-feature">
                 <div>
@@ -166,7 +167,7 @@
                     <a href="{{ route('stories.catalog') }}" class="button button-dark">Смотреть истории →</a>
                 </div>
                 <div class="source-stories-stack">
-                    @foreach($homeStories as $story)
+                    @forelse($homeStories as $story)
                         @php
                             $isViewed = false;
                             if(Auth::check()) {
@@ -175,7 +176,7 @@
                             $lockedStory = $story->paid && !$isViewed;
                             $previewClass = 'source-story-media '.($story->paid && $story->type !== 'video' && !$isViewed ? 'blurred_preview' : '');
                         @endphp
-                        <a href="#story-popup" class="source-story-card show_story {{ $lockedStory ? 'story_paid story__content_closed' : '' }}" data-route="{{ route('stories.preview', ['id' => $story->id, 'user_id' => Auth::id()]) }}" data-story="{{ $story->id }}" data-type="{{ $story->type }}" data-paid="{{ $story->paid }}" data-amount="{{ $story->amount }}" aria-label="Смотреть историю {{ $story->title ?: 'участника Deels' }}">
+                        <a href="{{ route('deels.public.stories.show', $story->id) }}" class="source-story-card show_story {{ $lockedStory ? 'story_paid story__content_closed' : '' }}" data-route="{{ route('stories.preview', ['id' => $story->id, 'user_id' => Auth::id()]) }}" data-story="{{ $story->id }}" data-type="{{ $story->type }}" data-paid="{{ $story->paid }}" data-amount="{{ $story->amount }}" aria-label="Смотреть историю {{ $story->title ?: 'участника Deels' }}">
                             @include('stories.parts.preview', [
                                 'story' => $story,
                                 'class' => $previewClass,
@@ -187,13 +188,13 @@
                                 <span class="source-story-more">{{ $lockedStory ? 'Открыть историю →' : 'Смотреть историю →' }}</span>
                             </div>
                         </a>
-                    @endforeach
+                    @empty
+                        <div class="empty-results" role="status"><div><h2>Истории появятся здесь</h2><p>Сейчас нет доступных публикаций. Каталог обновится автоматически, когда появятся новые истории.</p></div></div>
+                    @endforelse
                 </div>
             </div>
         </section>
-        @endif
 
-        @if($homeCampaigns->count())
         <section class="source-section source-section-tint">
             <div class="container">
                 <div class="source-section-head">
@@ -202,32 +203,35 @@
                         <h2>Копилки, которые меняют жизнь</h2>
                         <p>Поддерживай проверенные сборы и следи за результатом вместе с сообществом.</p>
                     </div>
-                    <a href="{{ route('browse_campaign') }}" class="source-text-link">Смотреть все →</a>
+                    <a href="{{ route('deels.public.campaigns.index') }}" class="source-text-link">Смотреть все →</a>
                 </div>
-                <div class="source-campaign-grid">
-                    @foreach($homeCampaigns as $campaign)
-                        @php $raised = min(100, max(0, (int)$campaign->percent_raised())); @endphp
-                        <article class="source-campaign-card">
-                            <a href="{{ route('campaign_single', $campaign->slug) }}" class="source-campaign-cover">
-                                @if($campaign->feature_img_url())
-                                    <img src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt="{{ $campaign->title }}">
-                                @else
-                                    <span>💜</span>
-                                @endif
-                                <span class="source-poster-tag">Проверенная копилка</span>
-                            </a>
-                            <div class="source-campaign-body">
-                                <h3>{{ $campaign->title }}</h3>
-                                <div class="source-progress-line"><span style="width:{{ $raised }}%"></span></div>
-                                <div class="source-progress-meta"><strong>{{ get_amount($campaign->success_payments->sum('amount')) }}</strong><span>из {{ get_amount($campaign->goal) }}</span></div>
-                                <a href="{{ route('campaign_single', $campaign->slug) }}" class="button button-soft">Поддержать</a>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
+                @if($homeCampaigns->count())
+                    <div class="source-campaign-grid">
+                        @foreach($homeCampaigns as $campaign)
+                            @php $raised = min(100, max(0, (int)$campaign->percent_raised())); @endphp
+                            <article class="source-campaign-card">
+                                <a href="{{ route('deels.public.campaigns.show', $campaign->slug) }}" class="source-campaign-cover">
+                                    @if($campaign->feature_img_url())
+                                        <img src="{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}" alt="{{ $campaign->title }}">
+                                    @else
+                                        <span>💜</span>
+                                    @endif
+                                    <span class="source-poster-tag">Проверенная копилка</span>
+                                </a>
+                                <div class="source-campaign-body">
+                                    <h3>{{ $campaign->title }}</h3>
+                                    <div class="source-progress-line"><span style="width:{{ $raised }}%"></span></div>
+                                    <div class="source-progress-meta"><strong>{{ get_amount($campaign->success_payments->sum('amount')) }}</strong><span>из {{ get_amount($campaign->goal) }}</span></div>
+                                    <a href="{{ route('deels.public.campaigns.show', $campaign->slug) }}" class="button button-soft">Поддержать</a>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-results" role="status"><div><h2>Новых копилок пока нет</h2><p>Проверенные сборы появятся здесь сразу после публикации.</p></div></div>
+                @endif
             </div>
         </section>
-        @endif
 
         <section class="source-section">
             <div class="container source-cta-card theme-dark-card">
