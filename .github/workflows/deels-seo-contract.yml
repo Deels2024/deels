@@ -1,0 +1,119 @@
+name: Deels SEO contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - routes/deels_public.php
+      - app/Http/Controllers/DeelsPublicController.php
+      - app/Providers/RouteServiceProvider.php
+      - resources/views/meta.blade.php
+      - resources/views/sitemap.blade.php
+      - public/robots.txt
+      - public/design-preview.html
+      - .github/workflows/design-preview-pages.yml
+      - .github/workflows/deels-seo-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: PHP syntax
+        run: |
+          set -euo pipefail
+          php -l routes/deels_public.php
+          php -l app/Http/Controllers/DeelsPublicController.php
+          php -l app/Providers/RouteServiceProvider.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=https://deels.ru'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Export web routes
+        run: php artisan route:list --json > /tmp/routes.json
+
+      - name: Verify clean public URLs
+        run: |
+          set -euo pipefail
+          jq -e '.[] | select(.name=="deels.public.sitemap" and .uri=="sitemap.xml" and .method=="GET|HEAD")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.challenges.show" and .uri=="challenges/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.index" and .uri=="battles")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.show" and .uri=="battles/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.stories.show" and .uri=="stories/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.index" and .uri=="campaigns")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.show" and .uri=="campaigns/{slug}")' /tmp/routes.json >/dev/null
+
+      - name: Verify legacy URLs remain available
+        run: |
+          set -euo pipefail
+          jq -e '.[] | select(.name=="challenge_page" and .uri=="challenges/show/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="battle_page" and .uri=="battles/show/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="campaign_single" and .uri=="campaign/{slug}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="stories.catalog" and .uri=="stories")' /tmp/routes.json >/dev/null
+
+      - name: Verify SEO metadata contract
+        run: |
+          set -euo pipefail
+          meta=resources/views/meta.blade.php
+          grep -Fq 'rel="canonical"' "$meta"
+          grep -Fq 'name="robots"' "$meta"
+          grep -Fq 'og:title' "$meta"
+          grep -Fq 'og:description' "$meta"
+          grep -Fq 'og:image' "$meta"
+          grep -Fq 'twitter:card' "$meta"
+          grep -Fq "'@type' => 'WebSite'" "$meta"
+          grep -Fq "'@type' => 'VideoObject'" "$meta"
+          grep -Fq "deels.public.challenges.show" "$meta"
+          grep -Fq "deels.public.battles.show" "$meta"
+          grep -Fq "deels.public.stories.show" "$meta"
+          grep -Fq "deels.public.campaigns.show" "$meta"
+
+      - name: Verify sitemap and robots
+        run: |
+          set -euo pipefail
+          grep -Fq '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' resources/views/sitemap.blade.php
+          grep -Fq "route('deels.public.challenges.show'" app/Http/Controllers/DeelsPublicController.php
+          grep -Fq "route('deels.public.battles.show'" app/Http/Controllers/DeelsPublicController.php
+          grep -Fq "route('deels.public.stories.show'" app/Http/Controllers/DeelsPublicController.php
+          grep -Fq "route('deels.public.campaigns.show'" app/Http/Controllers/DeelsPublicController.php
+          grep -Fq 'Sitemap: https://deels.ru/sitemap.xml' public/robots.txt
+
+      - name: Verify preview cannot compete with production SEO
+        run: |
+          set -euo pipefail
+          grep -Fq 'noindex,nofollow,noarchive' .github/workflows/design-preview-pages.yml
+          grep -Fq "printf 'User-agent: *\\nDisallow: /\\n' > _site/robots.txt" .github/workflows/design-preview-pages.yml
