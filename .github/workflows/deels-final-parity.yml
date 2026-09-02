@@ -1,0 +1,98 @@
+name: Deels final design parity
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - routes/**
+      - app/Http/Controllers/Api/Deels*CompatibilityController.php
+      - resources/views/**
+      - public/dist/css/deels*.css
+      - public/design-preview*.js
+      - .github/workflows/deels-final-parity.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: PHP syntax
+        run: |
+          set -euo pipefail
+          php -l routes/api.php
+          php -l routes/deels_compat.php
+          php -l routes/deels_battle_compat.php
+          for file in app/Http/Controllers/Api/Deels*CompatibilityController.php; do
+            php -l "$file"
+          done
+
+      - name: Verify original Laravel capabilities still exist
+        run: |
+          set -euo pipefail
+          grep -q "Route::get('/', \['as' => 'challenges.list'" routes/api.php
+          grep -q "Route::get('/', \['as' => 'battles.list'" routes/api.php
+          grep -q "Route::get('transactions'" routes/api.php
+          grep -q "Route::post('deposit'" routes/api.php
+          grep -q "Route::post('withdraw'" routes/api.php
+          grep -q "stories.preview" routes/api.php
+          grep -q "messages.send_message" routes/api.php
+
+      - name: Verify new-design REST compatibility surface
+        run: |
+          set -euo pipefail
+          for pattern in \
+            "auth/login" \
+            "auth/register" \
+            "stats" \
+            "feed" \
+            "stories/{id}" \
+            "challenges/{id}" \
+            "battles" \
+            "campaigns/{id}" \
+            "profile" \
+            "messages/dialogs" \
+            "notifications" \
+            "settings/preferences"; do
+            grep -q "$pattern" routes/deels_compat.php || { echo "Missing compatibility route: $pattern"; exit 1; }
+          done
+          for pattern in \
+            "battles/{id}" \
+            "Route::post('battles'" \
+            "Route::put('battles/{id}'" \
+            "battles/{id}/response"; do
+            grep -q "$pattern" routes/deels_battle_compat.php || { echo "Missing battle compatibility route: $pattern"; exit 1; }
+          done
+
+      - name: Verify real data is wired into new home
+        run: |
+          set -euo pipefail
+          grep -q '\$topChallenges' resources/views/home.blade.php
+          grep -q '\$topStories' resources/views/home.blade.php
+          grep -q '\$fundedCampaigns' resources/views/home.blade.php
+          grep -q "route('challenges.create')" resources/views/home.blade.php
+          grep -q "route('stories.catalog')" resources/views/home.blade.php
+          grep -q "route('browse_campaign')" resources/views/home.blade.php
+          grep -q "@include('stories.modal')" resources/views/home.blade.php
+
+      - name: Verify final design system
+        run: |
+          set -euo pipefail
+          test -s public/dist/css/deelsweb-final-polish.css
+          grep -q "deelsweb-final-polish.css" public/dist/css/deelsweb-qa-source.css
+          grep -q -- "--deels-ui-font" public/dist/css/deelsweb-final-polish.css
+          grep -q "aspect-ratio: 9 / 16" public/dist/css/deelsweb-final-polish.css
+          if grep -q 'design-preview-home-live.js' .github/workflows/design-preview-pages.yml; then exit 1; fi
+          if grep -q 'design-preview-home-live-fix.js' .github/workflows/design-preview-pages.yml; then exit 1; fi
