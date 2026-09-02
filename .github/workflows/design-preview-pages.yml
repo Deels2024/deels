@@ -39,7 +39,7 @@ jobs:
       - name: Build static GitHub Pages site
         run: |
           set -euo pipefail
-          mkdir -p _site/source/home-media
+          mkdir -p _site/source/home-media _site/source/font
 
           cp laravel/public/design-preview.html _site/index.html
           cp laravel/public/design-preview-home-enhancements.js _site/source/design-preview-home-enhancements.js
@@ -50,12 +50,15 @@ jobs:
           cp laravel/public/design-preview-media-fill.js _site/source/design-preview-media-fill.js
           cp laravel/public/home-media/*.webp _site/source/home-media/
 
+          cp laravel/public/dist/css/font/stylesheet.css _site/source/font/stylesheet.css
+          cp laravel/public/dist/css/font/*.woff2 _site/source/font/
           cp deelsweb/app/themes/deels-main.css _site/source/deels-main.css
           cp deelsweb/app/styles.css _site/source/styles.css
           cp deelsweb/app/pages.css _site/source/pages.css
           cp laravel/public/dist/css/deelsweb-final-polish.css _site/source/deelsweb-final-polish.css
           cp laravel/public/dist/css/deelsweb-qa-source.css _site/source/deelsweb-qa-source.css
 
+          sed -i 's#<link rel="stylesheet" href="./source/deels-main.css">#<link rel="stylesheet" href="./source/font/stylesheet.css">\n<link rel="stylesheet" href="./source/deels-main.css">#' _site/index.html
           sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _site/index.html
 
           printf '{"sha":"%s","branch":"%s","run_id":"%s"}\n' "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_RUN_ID" > _site/build-info.json
@@ -84,6 +87,11 @@ jobs:
             test -s "_site/source/$style"
           done
           grep -q "deelsweb-final-polish.css" _site/source/deelsweb-qa-source.css
+          test -s _site/source/font/stylesheet.css
+          for font in Gilroy-Regular.woff2 Gilroy-Medium.woff2 Gilroy-Semibold.woff2 Gilroy-Bold.woff2 Gilroy-Black.woff2; do
+            test -s "_site/source/font/$font"
+          done
+          grep -q './source/font/stylesheet.css' _site/index.html
 
           for asset in \
             hero-rooftop.webp \
