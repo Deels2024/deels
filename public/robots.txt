@@ -1,10 +1,13 @@
 User-agent: *
-Disallow: *?*user=
-Disallow: *?*
+Allow: /
 Disallow: /search
 Disallow: /login
-Allow: /*.js
-Allow: /*.css
+Disallow: /register
+Disallow: /password/
+Disallow: /dashboard/
+Disallow: /checkout
+Disallow: /admin/
+Disallow: /*?*
 
-Clean-param: utm_source&utm_medium&utm_campaign
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term
 Sitemap: https://deels.ru/sitemap.xml
