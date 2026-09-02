@@ -1,0 +1,152 @@
+name: Deels public SEO contract
+
+on:
+  push:
+    branches:
+      - codex/new-design-migration
+    paths:
+      - 'app/Http/Controllers/DeelsPublicController.php'
+      - 'app/Providers/RouteServiceProvider.php'
+      - 'routes/deels_public.php'
+      - 'resources/views/meta.blade.php'
+      - 'resources/views/home.blade.php'
+      - 'resources/views/challenges_index.blade.php'
+      - 'resources/views/stories/page_public.blade.php'
+      - 'resources/views/errors/**'
+      - '.github/workflows/deels-seo-public-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-seo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Laravel facade
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: Syntax checks
+        run: |
+          set -euo pipefail
+          php -l app/Http/Controllers/DeelsPublicController.php
+          php -l app/Providers/RouteServiceProvider.php
+          php -l routes/deels_public.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=https://deels.ru'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Verify canonical public routes
+        run: |
+          set -euo pipefail
+          php artisan route:list --json > /tmp/routes.json
+          jq -e '.[] | select(.name=="deels.public.challenges.show" and .uri=="challenges/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.index" and .uri=="battles")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.show" and .uri=="battles/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.stories.show" and .uri=="stories/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.index" and .uri=="campaigns")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.show" and .uri=="campaigns/{slug}")' /tmp/routes.json >/dev/null
+
+      - name: Verify legacy routes remain available
+        run: |
+          set -euo pipefail
+          php artisan route:list --json > /tmp/routes.json
+          jq -e '.[] | select(.name=="challenge_page" and .uri=="challenges/show/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="battle_page" and .uri=="battles/show/{id}")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="stories.catalog" and .uri=="stories")' /tmp/routes.json >/dev/null
+          jq -e '.[] | select(.name=="campaign_single" and .uri=="campaign/{slug}")' /tmp/routes.json >/dev/null
+
+      - name: Verify runtime route matching
+        run: |
+          set -euo pipefail
+          check_match() {
+            local uri="$1" expected="$2"
+            php artisan tinker --execute="echo app('router')->getRoutes()->match(\\Illuminate\\Http\\Request::create('$uri', 'GET'))->getName();" > /tmp/match.txt
+            grep -Fq "$expected" /tmp/match.txt || { cat /tmp/match.txt; exit 1; }
+          }
+          check_match '/challenges/123' 'deels.public.challenges.show'
+          check_match '/battles' 'deels.public.battles.index'
+          check_match '/battles/123' 'deels.public.battles.show'
+          check_match '/stories/123' 'deels.public.stories.show'
+          check_match '/campaigns/example-campaign' 'deels.public.campaigns.show'
+
+      - name: Verify SEO markup and internal links
+        run: |
+          set -euo pipefail
+          grep -Fq 'rel="canonical"' resources/views/meta.blade.php
+          grep -Fq 'og:title' resources/views/meta.blade.php
+          grep -Fq 'twitter:card' resources/views/meta.blade.php
+          grep -Fq 'application/ld+json' resources/views/meta.blade.php
+          grep -Fq "route('deels.public.challenges.show'" resources/views/home.blade.php
+          grep -Fq "route('deels.public.stories.show'" resources/views/home.blade.php
+          grep -Fq "route('deels.public.campaigns.show'" resources/views/home.blade.php
+          grep -Fq "deels.public.battles.index" resources/views/challenges_index.blade.php
+          test -s resources/views/errors/404.blade.php
+          test -s resources/views/errors/419.blade.php
+          test -s resources/views/errors/429.blade.php
+          test -s resources/views/errors/500.blade.php
+
+  frontend-seo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Deelsweb
+        uses: actions/checkout@v4
+        with:
+          repository: Deels2024/deelsweb
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify public SEO routes
+        run: |
+          set -euo pipefail
+          grep -Fq '/^\\/battles\\/[^/]+$/' 'app/[...slug]/page.tsx'
+          grep -Fq '"challenges" | "battles" | "stories" | "campaigns"' app/lib/seo.ts
+          grep -Fq '"battles"' app/sitemap.ts
+          test -s app/loading.tsx
+          test -s app/error.tsx
+          test -s app/not-found.tsx
+          test -s app/states.css
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests
+        run: node --test tests/*.test.mjs
