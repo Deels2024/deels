@@ -8,6 +8,9 @@ use App\Http\Controllers\CampaignsController;
 use App\Http\Controllers\DeelsPublicController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('sitemap.xml', [DeelsPublicController::class, 'sitemap'])
+    ->name('deels.public.sitemap');
+
 Route::get('challenges/{id}', [ChallengeController::class, 'show'])
     ->whereNumber('id')
     ->name('deels.public.challenges.show');
