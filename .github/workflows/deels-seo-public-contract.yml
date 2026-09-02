@@ -134,7 +134,7 @@ jobs:
       - name: Verify public SEO routes
         run: |
           set -euo pipefail
-          grep -Fq '/^\\/battles\\/[^/]+$/' 'app/[...slug]/page.tsx'
+          grep -Fq 'battles\/[^/]+$' 'app/[...slug]/page.tsx'
           grep -Fq '"challenges" | "battles" | "stories" | "campaigns"' app/lib/seo.ts
           grep -Fq '"battles"' app/sitemap.ts
           test -s app/loading.tsx
