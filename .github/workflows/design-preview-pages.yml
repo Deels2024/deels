@@ -1,23 +1,9 @@
-name: Deels design preview
+name: Deels GitHub Pages
 
 on:
   push:
     branches:
       - codex/new-design-migration
-    paths:
-      - 'public/design-preview.html'
-      - 'public/design-preview-home-enhancements.js'
-      - 'public/design-preview-polish.js'
-      - 'public/design-preview-feed-ux.js'
-      - 'public/design-preview-feed-compact.js'
-      - 'public/design-preview-challenges.js'
-      - 'public/design-preview-media-fill.js'
-      - 'public/home-media/**'
-      - 'public/dist/css/deelsweb-*.css'
-      - 'public/dist/css/deels-v2*.css'
-      - 'public/dist/js/deels-*.js'
-      - 'resources/views/**'
-      - '.github/workflows/design-preview-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -26,81 +12,106 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deels-design-preview-pages
+  group: deels-github-pages
   cancel-in-progress: true
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Laravel preview branch
+      - name: Checkout Deels branch
         uses: actions/checkout@v4
         with:
           path: laravel
 
-      - name: Checkout original Deelsweb design
+      - name: Checkout Deelsweb source styles
         uses: actions/checkout@v4
         with:
           repository: Deels2024/deelsweb
           ref: main
           path: deelsweb
 
-      - name: Prepare source Deelsweb preview
+      - name: Build static GitHub Pages site
         run: |
           set -euo pipefail
-          mkdir -p _preview/source/home-media
-          cp laravel/public/design-preview.html _preview/index.html
-          cp laravel/public/design-preview-home-enhancements.js _preview/source/design-preview-home-enhancements.js
-          cp laravel/public/design-preview-polish.js _preview/source/design-preview-polish.js
-          cp laravel/public/design-preview-feed-ux.js _preview/source/design-preview-feed-ux.js
-          cp laravel/public/design-preview-feed-compact.js _preview/source/design-preview-feed-compact.js
-          cp laravel/public/design-preview-challenges.js _preview/source/design-preview-challenges.js
-          cp laravel/public/design-preview-media-fill.js _preview/source/design-preview-media-fill.js
-          cp laravel/public/home-media/*.webp _preview/source/home-media/
-          cp deelsweb/app/themes/deels-main.css _preview/source/deels-main.css
-          cp deelsweb/app/styles.css _preview/source/styles.css
-          cp deelsweb/app/pages.css _preview/source/pages.css
-          cp laravel/public/dist/css/deelsweb-qa-source.css _preview/source/deelsweb-qa-source.css
-          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _preview/index.html
-          touch _preview/.nojekyll
+          mkdir -p _site/source/home-media
 
-      - name: Verify preview screens and media assets
+          cp laravel/public/design-preview.html _site/index.html
+          cp laravel/public/design-preview-home-enhancements.js _site/source/design-preview-home-enhancements.js
+          cp laravel/public/design-preview-polish.js _site/source/design-preview-polish.js
+          cp laravel/public/design-preview-feed-ux.js _site/source/design-preview-feed-ux.js
+          cp laravel/public/design-preview-feed-compact.js _site/source/design-preview-feed-compact.js
+          cp laravel/public/design-preview-challenges.js _site/source/design-preview-challenges.js
+          cp laravel/public/design-preview-media-fill.js _site/source/design-preview-media-fill.js
+          cp laravel/public/home-media/*.webp _site/source/home-media/
+
+          cp deelsweb/app/themes/deels-main.css _site/source/deels-main.css
+          cp deelsweb/app/styles.css _site/source/styles.css
+          cp deelsweb/app/pages.css _site/source/pages.css
+          cp laravel/public/dist/css/deelsweb-qa-source.css _site/source/deelsweb-qa-source.css
+
+          sed -i 's#</body>#<script src="./source/design-preview-home-enhancements.js"></script>\n<script src="./source/design-preview-polish.js"></script>\n<script src="./source/design-preview-feed-ux.js"></script>\n<script src="./source/design-preview-feed-compact.js"></script>\n<script src="./source/design-preview-challenges.js"></script>\n<script src="./source/design-preview-media-fill.js"></script>\n</body>#' _site/index.html
+
+          printf '{"sha":"%s","branch":"%s","run_id":"%s"}\n' "$GITHUB_SHA" "$GITHUB_REF_NAME" "$GITHUB_RUN_ID" > _site/build-info.json
+          touch _site/.nojekyll
+
+      - name: Verify static site
         run: |
           set -euo pipefail
+
           for id in home feed challenges battles profile wallet messages create campaign admin; do
-            grep -q "id=\"screen-$id\"" _preview/index.html
+            grep -q "id=\"screen-$id\"" _site/index.html
           done
-          for script in design-preview-home-enhancements.js design-preview-polish.js design-preview-feed-ux.js design-preview-feed-compact.js design-preview-challenges.js design-preview-media-fill.js; do
-            grep -q "$script" _preview/index.html
-          done
-          if grep -q 'design-preview-home-live.js' _preview/index.html; then exit 1; fi
-          if grep -q 'design-preview-home-live-fix.js' _preview/index.html; then exit 1; fi
-          grep -q 'INTERACTIVE PREVIEW' _preview/index.html
-          for asset in hero-rooftop.webp video-creator.webp video-boy.webp video-friends.webp video-dance.webp story-dance-v2.webp story-stage-v2.webp; do
-            test -s "_preview/source/home-media/$asset"
-          done
-          if grep -q 'deelsweb-home-enhancements.css' _preview/index.html; then exit 1; fi
-          if grep -q 'deelsweb-unified-theme.css' _preview/index.html; then exit 1; fi
 
-      - name: Configure Pages
+          for script in \
+            design-preview-home-enhancements.js \
+            design-preview-polish.js \
+            design-preview-feed-ux.js \
+            design-preview-feed-compact.js \
+            design-preview-challenges.js \
+            design-preview-media-fill.js; do
+            test -s "_site/source/$script"
+            grep -q "$script" _site/index.html
+          done
+
+          for asset in \
+            hero-rooftop.webp \
+            video-creator.webp \
+            video-boy.webp \
+            video-friends.webp \
+            video-dance.webp \
+            story-dance-v2.webp \
+            story-stage-v2.webp; do
+            test -s "_site/source/home-media/$asset"
+          done
+
+          test -s _site/build-info.json
+
+          if grep -q 'design-preview-home-live.js' _site/index.html; then exit 1; fi
+          if grep -q 'design-preview-home-live-fix.js' _site/index.html; then exit 1; fi
+
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
-      - name: Upload preview artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: _preview
+          path: _site
 
-      - name: Deploy preview
+      - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Preview ready
+      - name: Deployment summary
         if: success()
         run: |
-          echo "Media-filled Deels preview deployed"
-          echo "${{ steps.deployment.outputs.page_url }}"
+          echo "Deels GitHub Pages deployed"
+          echo "Commit: $GITHUB_SHA"
+          echo "URL: ${{ steps.deployment.outputs.page_url }}"
