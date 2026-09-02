@@ -12,6 +12,9 @@
 
 @section('content')
 @php
+    $topChallenges = $topChallenges ?? collect();
+    $topStories = $topStories ?? collect();
+    $fundedCampaigns = $fundedCampaigns ?? collect();
     $heroChallenge = $topChallenges->first();
     $homeChallenges = $topChallenges->take(4);
     $homeStories = $topStories->take(3);
@@ -150,21 +153,38 @@
         <section class="source-section">
             <div class="container source-split-feature">
                 <div>
-                    <div class="source-section-head" style="display:block;margin-bottom:28px">
+                    <div class="source-section-head" style="display:block;margin-bottom:20px">
                         <span class="eyebrow">✦ Истории Deels</span>
                         <h2>Не просто видео. Настоящие истории</h2>
                         <p>Люди рассказывают о шагах, которые изменили их жизнь. Иногда достаточно одного честного ролика, чтобы вдохновить тысячи.</p>
+                    </div>
+                    <div class="source-story-filter-row" aria-label="Категории историй">
+                        <a href="{{ route('stories.catalog', ['type' => 'popular']) }}">Популярные</a>
+                        <a href="{{ route('stories.catalog', ['type' => 'new']) }}">Новые</a>
+                        <a href="{{ route('stories.catalog', ['type' => 'paid']) }}">За донаты</a>
                     </div>
                     <a href="{{ route('stories.catalog') }}" class="button button-dark">Смотреть истории →</a>
                 </div>
                 <div class="source-stories-stack">
                     @foreach($homeStories as $story)
-                        <a href="#story-popup" class="source-story-card show_story" data-route="{{ route('stories.preview', ['id' => $story->id, 'user_id' => Auth::id()]) }}" data-story="{{ $story->id }}" data-type="{{ $story->type }}" data-paid="{{ $story->paid }}" data-amount="{{ $story->amount }}">
-                            <div class="source-story-icon">{{ ['✨','🎭','🏆'][$loop->index] ?? '✦' }}</div>
-                            <div>
+                        @php
+                            $isViewed = false;
+                            if(Auth::check()) {
+                                $isViewed = \App\Models\View::where('user_id', Auth::id())->where('story_id', $story->id)->exists();
+                            }
+                            $lockedStory = $story->paid && !$isViewed;
+                            $previewClass = 'source-story-media '.($story->paid && $story->type !== 'video' && !$isViewed ? 'blurred_preview' : '');
+                        @endphp
+                        <a href="#story-popup" class="source-story-card show_story {{ $lockedStory ? 'story_paid story__content_closed' : '' }}" data-route="{{ route('stories.preview', ['id' => $story->id, 'user_id' => Auth::id()]) }}" data-story="{{ $story->id }}" data-type="{{ $story->type }}" data-paid="{{ $story->paid }}" data-amount="{{ $story->amount }}" aria-label="Смотреть историю {{ $story->title ?: 'участника Deels' }}">
+                            @include('stories.parts.preview', [
+                                'story' => $story,
+                                'class' => $previewClass,
+                                'alt' => $story->title ?: 'История участника Deels',
+                            ])
+                            <div class="source-story-copy">
                                 <span>{{ optional($story->created_at)->diffForHumans() }} • {{ $story->user ? '@'.$story->user->username : '@deels' }}</span>
                                 <h3>{{ $story->title ?: 'История участника Deels' }}</h3>
-                                <span class="source-story-more">Смотреть историю →</span>
+                                <span class="source-story-more">{{ $lockedStory ? 'Открыть историю →' : 'Смотреть историю →' }}</span>
                             </div>
                         </a>
                     @endforeach
