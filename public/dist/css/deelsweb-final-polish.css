@@ -1,0 +1,274 @@
+/* Deels final visual normalization.
+ * Loaded last in Laravel and GitHub Pages so preview and real Blade surfaces
+ * share one typography, spacing, card and responsive language.
+ */
+:root {
+  --deels-ui-font: "Gilroy", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --deels-ui-ink: #231a2d;
+  --deels-ui-muted: #746a7e;
+  --deels-ui-line: #ebe4f1;
+  --deels-ui-purple: #6b2bc1;
+  --deels-ui-pink: #ff4fc8;
+  --deels-ui-cyan: #34d7e9;
+  --deels-ui-surface: #fff;
+  --deels-ui-bg: #faf8fc;
+  --deels-ui-soft: #f4eff8;
+  --deels-ui-radius-xl: 32px;
+  --deels-ui-radius-lg: 24px;
+  --deels-ui-radius-md: 16px;
+  --deels-ui-shadow: 0 18px 54px rgba(68,26,107,.10);
+  --deels-ui-shadow-hover: 0 24px 64px rgba(68,26,107,.15);
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body,
+.deels-app,
+.deels-source-home,
+.deels-source-auth,
+.deels-v2-enabled {
+  font-family: var(--deels-ui-font) !important;
+  font-size: 16px;
+  line-height: 1.5;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+button,input,textarea,select { font-family: inherit !important; }
+
+/* Typography */
+.deels-app :where(h1,h2,h3,h4),
+.deels-source-home :where(h1,h2,h3,h4),
+.deels-v2-enabled :where(h1,h2,h3,h4) {
+  color: inherit;
+  font-family: var(--deels-ui-font) !important;
+  font-weight: 900;
+  text-wrap: balance;
+}
+.deels-app :where(p,li),
+.deels-source-home :where(p,li),
+.deels-v2-enabled :where(p,li) { line-height: 1.55; }
+.deels-app small,
+.deels-source-home small,
+.deels-v2-enabled small { font-size: 12px; line-height: 1.4; }
+.deels-app .eyebrow,
+.deels-source-home .eyebrow,
+.deels-v2-enabled .eyebrow {
+  font-size: 12px !important;
+  line-height: 1.3;
+  font-weight: 900 !important;
+  letter-spacing: .09em !important;
+}
+
+/* Shared layout rhythm */
+.deels-app .container,
+.deels-source-home .container,
+.deels-v2-enabled .container,
+.deels-v2-enabled .wrapper-container {
+  width: min(1180px, calc(100% - 48px)) !important;
+  max-width: 1180px !important;
+}
+.deels-app .section,
+.deels-source-home .source-section { padding-top: 92px !important; padding-bottom: 92px !important; }
+.deels-app .section-head,
+.deels-source-home .source-section-head { margin-bottom: 36px !important; }
+.deels-app .section-head h2,
+.deels-source-home .source-section-head h2 {
+  font-size: clamp(36px,4vw,56px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.045em !important;
+}
+.deels-app .section-head p,
+.deels-source-home .source-section-head p {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+/* Header / navigation */
+.site-header .header-inner,
+.header > .container { min-height: 72px !important; height: 72px !important; }
+.desktop-nav a,
+.header__list a { font-size: 15px !important; font-weight: 700 !important; }
+.brand-word { font-size: 20px !important; font-weight: 900 !important; }
+.site-header .button-small { min-height: 42px !important; }
+
+/* Controls */
+.deels-app :where(.button,.pbtn,.battle-primary,.battle-secondary,.resp,.chbtn),
+.deels-source-home .button,
+.deels-v2-enabled :where(.btn,.hero-btn,.ch-block__btn) {
+  min-height: 46px;
+  border-radius: var(--deels-ui-radius-md) !important;
+  font-size: 15px;
+  font-weight: 800 !important;
+}
+.deels-app :where(button,a,.button,.pbtn),
+.deels-source-home :where(button,a,.button),
+.deels-v2-enabled :where(button,a,.btn) { touch-action: manipulation; }
+
+/* Card system */
+.deels-app :where(.video-card,.chcard,.battle-card,.campaign-mini,.campaign-card,.content-card,.card),
+.deels-source-home :where(.source-video-card,.source-story-card,.source-campaign-card),
+.deels-v2-enabled :where(.story,.story-item,.challenge-item,.campaign-card,.profile-card,.dashboard-card,.content-card,.reward-item) {
+  border-color: var(--deels-ui-line) !important;
+}
+.deels-app :where(.chcard,.battle-card,.campaign-mini,.campaign-card,.content-card,.card),
+.deels-source-home :where(.source-story-card,.source-campaign-card),
+.deels-v2-enabled :where(.profile-card,.dashboard-card,.content-card,.reward-item) {
+  border-radius: var(--deels-ui-radius-lg) !important;
+  box-shadow: var(--deels-ui-shadow) !important;
+}
+@media (hover:hover) {
+  .deels-app :where(.video-card,.chcard,.battle-card,.campaign-mini,.campaign-card):hover,
+  .deels-source-home :where(.source-video-card,.source-story-card,.source-campaign-card):hover {
+    transform: translateY(-3px);
+    box-shadow: var(--deels-ui-shadow-hover) !important;
+  }
+}
+
+/* Home: one consistent scale in preview + real Blade. */
+#screen-home .hero-copy h1,
+.deels-source-home .source-hero-copy h1 {
+  font-size: clamp(54px,6vw,84px) !important;
+  line-height: .95 !important;
+  letter-spacing: -.058em !important;
+}
+#screen-home .hero-copy > p,
+.deels-source-home .source-hero-copy > p { font-size: 18px !important; line-height: 1.6 !important; }
+#screen-home .home-prod-card-poster,
+.deels-source-home .source-poster { aspect-ratio: 9 / 16 !important; min-height: 0 !important; border-radius: 24px !important; }
+#screen-home .home-prod-card-poster .poster-caption strong,
+.deels-source-home .source-poster-caption strong { font-size: 19px !important; line-height: 1.15 !important; }
+#screen-home .card-meta span,
+.deels-source-home .source-card-meta span { font-size: 12px !important; }
+
+/* Real story covers on the Laravel home page. */
+.deels-source-home .source-stories-stack { gap: 16px !important; }
+.deels-source-home .source-story-card {
+  position: relative;
+  min-height: 176px !important;
+  padding: 22px 22px 22px 190px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  overflow: hidden;
+  color: #fff !important;
+  isolation: isolate;
+  background: #25102f !important;
+}
+.deels-source-home .source-story-card::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(90deg,rgba(14,5,21,.04) 18%,rgba(14,5,21,.28) 43%,rgba(14,5,21,.88) 100%);
+  pointer-events: none;
+}
+.deels-source-home .source-story-media {
+  position: absolute !important;
+  z-index: 0;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+.deels-source-home .source-story-card > .source-story-copy { position: relative; z-index: 2; width: 100%; }
+.deels-source-home .source-story-card .source-story-icon { display: none !important; }
+.deels-source-home .source-story-card h3 { margin: 5px 0 !important; color: #fff !important; font-size: 21px !important; line-height: 1.15 !important; }
+.deels-source-home .source-story-card span { color: rgba(255,255,255,.82) !important; font-size: 12px !important; }
+.deels-source-home .source-story-filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.deels-source-home .source-story-filter-row a { padding: 8px 12px; border: 1px solid var(--deels-ui-line); border-radius: 999px; color: var(--deels-ui-muted); background: #fff; font-size: 12px; font-weight: 800; }
+.deels-source-home .source-story-filter-row a:hover { color: var(--deels-ui-purple); background: var(--deels-ui-soft); }
+
+/* Challenges */
+#screen-challenges .chp { padding-top: 30px !important; }
+#screen-challenges .chh { gap: 40px !important; border-radius: var(--deels-ui-radius-xl) !important; }
+#screen-challenges .chh h1 { font-size: clamp(48px,5.7vw,74px) !important; line-height: .96 !important; }
+#screen-challenges .chh p { font-size: 17px !important; line-height: 1.6 !important; }
+#screen-challenges .chnav button { font-size: 13px !important; }
+#screen-challenges .chhead h2 { font-size: clamp(34px,4vw,50px) !important; }
+#screen-challenges .chvideo,
+#screen-challenges .chv { border-radius: 24px !important; }
+#screen-challenges .chcap h2,
+#screen-challenges .chcap h3 { line-height: 1.12 !important; }
+#screen-challenges .chbody p { font-size: 14px !important; }
+
+/* Feed */
+#screen-feed .ux-feed-top h1 { font-size: clamp(34px,4vw,48px) !important; letter-spacing: -.04em !important; }
+#screen-feed .ux-feed-top p { font-size: 15px !important; line-height: 1.55 !important; }
+#screen-feed .ux-reel { border-radius: 28px !important; }
+#screen-feed .ux-reel-caption > h2 { font-size: clamp(24px,2.6vw,32px) !important; line-height: 1.08 !important; }
+#screen-feed .ux-reel-caption > p { font-size: 13px !important; line-height: 1.45 !important; }
+#screen-feed .ux-action small { font-size: 10px !important; }
+#screen-feed .ux-challenge-chip { font-size: 12px !important; }
+
+/* Battles */
+#screen-battles .battle-page { padding-top: 32px !important; }
+#screen-battles .battle-hero { border-radius: var(--deels-ui-radius-xl) !important; }
+#screen-battles .battle-hero-top h1 { font-size: clamp(46px,5.8vw,72px) !important; line-height: .96 !important; }
+#screen-battles .battle-hero-top p { font-size: 17px !important; line-height: 1.55 !important; }
+#screen-battles .battle-card-meta { font-size: 12px !important; }
+#screen-battles .battle-stat span { font-size: 12px !important; }
+#screen-battles .battle-section-head h2 { font-size: clamp(34px,4vw,50px) !important; }
+
+/* Campaigns, profile, wallet, messages, admin: raise tiny legacy labels. */
+#screen-campaign .campaign-mini-body h3 { font-size: 19px !important; line-height: 1.25 !important; }
+#screen-campaign .campaign-mini-meta span,
+#screen-campaign .campaign-mini-percent { font-size: 12px !important; }
+#screen-profile .profile-stats span,
+.deels-v2-enabled .profile-statistics :where(span,small),
+.deels-v2-enabled .organizer-card :where(span,small),
+.deels-v2-enabled .detail-stats span { font-size: 12px !important; }
+.deels-v2-enabled :where(.table,.admin-table table,.wallet-wrap table) { font-size: 14px !important; }
+.deels-v2-enabled :where(.table th,.admin-table th,.wallet-wrap th) { font-size: 12px !important; font-weight: 800 !important; letter-spacing: .03em; }
+.deels-v2-enabled :where(input,select,textarea) { font-size: 16px !important; line-height: 1.4; }
+
+/* Prevent orphaned tiny text from old styles. */
+.deels-v2-enabled :where(.battle-head span,.battle-head small,.battle-card>p,.organizer-card small,.organizer-card span,.mini-video small) { font-size: 12px !important; }
+
+@media (max-width: 980px) {
+  .deels-app .section,
+  .deels-source-home .source-section { padding-top: 72px !important; padding-bottom: 72px !important; }
+  #screen-home .hero-copy h1,
+  .deels-source-home .source-hero-copy h1 { font-size: clamp(50px,8vw,72px) !important; }
+}
+
+@media (max-width: 700px) {
+  body,.deels-app,.deels-source-home,.deels-source-auth,.deels-v2-enabled { font-size: 16px !important; }
+  .deels-app .container,
+  .deels-source-home .container,
+  .deels-v2-enabled .container,
+  .deels-v2-enabled .wrapper-container { width: min(100% - 28px,1180px) !important; }
+  .site-header .header-inner,
+  .header > .container { min-height: 66px !important; height: 66px !important; }
+  .deels-app .section,
+  .deels-source-home .source-section { padding-top: 56px !important; padding-bottom: 56px !important; }
+  .deels-app .section-head,
+  .deels-source-home .source-section-head { margin-bottom: 26px !important; gap: 18px !important; }
+  .deels-app .section-head h2,
+  .deels-source-home .source-section-head h2 { font-size: 34px !important; line-height: 1.05 !important; }
+  #screen-home .hero-copy h1,
+  .deels-source-home .source-hero-copy h1 { font-size: clamp(42px,12vw,56px) !important; line-height: .98 !important; }
+  #screen-home .hero-copy > p,
+  .deels-source-home .source-hero-copy > p { font-size: 16px !important; }
+  .deels-source-home .source-story-card { min-height: 210px !important; padding: 126px 16px 16px !important; align-items: flex-end !important; }
+  .deels-source-home .source-story-card::after { background: linear-gradient(180deg,transparent 26%,rgba(14,5,21,.9) 100%); }
+  .deels-source-home .source-story-card h3 { font-size: 20px !important; }
+  #screen-challenges .chh { border-radius: 0 !important; }
+  #screen-challenges .chh h1 { font-size: 44px !important; }
+  #screen-feed .ux-reel { border-radius: 0 !important; }
+  #screen-battles .battle-hero { border-radius: 0 !important; }
+  #screen-battles .battle-hero-top h1 { font-size: 40px !important; }
+  .deels-v2-enabled :where(.content-card,.profile-card,.dashboard-card) { border-radius: 20px !important; }
+}
+
+@media (max-width: 380px) {
+  .deels-app .container,
+  .deels-source-home .container,
+  .deels-v2-enabled .container,
+  .deels-v2-enabled .wrapper-container { width: min(100% - 20px,1180px) !important; }
+  #screen-home .hero-copy h1,
+  .deels-source-home .source-hero-copy h1 { font-size: 40px !important; }
+  #screen-challenges .chh h1 { font-size: 40px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deels-app *, .deels-source-home *, .deels-v2-enabled * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
