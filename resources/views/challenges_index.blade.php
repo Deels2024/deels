@@ -1,7 +1,7 @@
 @extends('layouts.neon.app')
 
 @php
-    $contentMode = request('content', 'challenges');
+    $contentMode = request('content', request()->routeIs('deels.public.battles.index') ? 'battles' : 'challenges');
     $isBattlesCatalog = $contentMode === 'battles';
     $catalogTitle = $isBattlesCatalog ? 'Баттлы' : 'Челленджи';
 @endphp
@@ -48,7 +48,12 @@
         <nav class="source-filter-row" aria-label="Фильтры каталога">
             @foreach($filters as $type => $label)
                 @if($type !== 'participant' || auth()->check())
-                    <a href="{{ route('challenges.catalog', ['content' => $contentMode, 'type' => $type]) }}" class="{{ $activeType === $type ? 'active' : '' }}">{{ $label }}</a>
+                    @php
+                        $filterRoute = $isBattlesCatalog
+                            ? route('deels.public.battles.index', ['type' => $type])
+                            : route('challenges.catalog', ['content' => 'challenges', 'type' => $type]);
+                    @endphp
+                    <a href="{{ $filterRoute }}" class="{{ $activeType === $type ? 'active' : '' }}">{{ $label }}</a>
                 @endif
             @endforeach
         </nav>
@@ -58,7 +63,7 @@
                 @foreach($challenges as $contest)
                     @php
                         $isBattle = $contest->getTable() === 'battles';
-                        $detailRoute = route($isBattle ? 'battle_page' : 'challenge_page', $contest->id);
+                        $detailRoute = route($isBattle ? 'deels.public.battles.show' : 'deels.public.challenges.show', $contest->id);
                         $participants = $contest->stories()->active()->count();
                         $reward = (int)($contest->reward_amount ?? 0);
                         $author = $contest->user ? '@'.$contest->user->username : '@deels';
@@ -101,7 +106,7 @@
                 @endforeach
             </div>
         @else
-            <div class="source-catalog-empty">
+            <div class="source-catalog-empty" role="status">
                 <h2>Пока ничего не найдено</h2>
                 <p>Попробуй другой фильтр или создай свой {{ $isBattlesCatalog ? 'баттл' : 'челлендж' }}.</p>
             </div>
