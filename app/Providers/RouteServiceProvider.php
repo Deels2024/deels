@@ -47,6 +47,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
         $this->mapDeelsCompatibilityRoutes();
         $this->mapDeelsBattleCompatibilityRoutes();
+        $this->mapDeelsPublicRoutes();
         $this->mapWebRoutes();
     }
 
@@ -78,5 +79,12 @@ class RouteServiceProvider extends ServiceProvider
         Route::prefix('api')
              ->middleware('api')
              ->group(base_path('routes/deels_battle_compat.php'));
+    }
+
+    /** Clean, indexable public URLs for the new facade. */
+    protected function mapDeelsPublicRoutes(): void
+    {
+        Route::middleware('web')
+             ->group(base_path('routes/deels_public.php'));
     }
 }
