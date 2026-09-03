@@ -20,6 +20,9 @@ on:
       - 'tests/Feature/Api/HomePageApiContractTest.php'
       - 'tests/Feature/HomeV2PreviewTest.php'
       - '.github/workflows/home-v2-contract.yml'
+  pull_request:
+    branches:
+      - 'codex/new-design-migration'
   workflow_dispatch:
 
 permissions:
