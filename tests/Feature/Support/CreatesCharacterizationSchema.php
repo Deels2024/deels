@@ -74,6 +74,7 @@ trait CreatesCharacterizationSchema
             $table->boolean('frozen')->default(false);
             $table->boolean('started')->default(false);
             $table->integer('cost')->nullable();
+            $table->unsignedInteger('reward_amount')->nullable();
             $table->json('moderation')->nullable();
             $table->boolean('ai_moderated')->default(false);
             $table->timestamp('finish')->nullable();
@@ -103,6 +104,7 @@ trait CreatesCharacterizationSchema
             $table->boolean('frozen')->default(false);
             $table->boolean('started')->default(false);
             $table->integer('cost')->nullable();
+            $table->unsignedInteger('reward_amount')->nullable();
             $table->json('moderation')->nullable();
             $table->boolean('ai_moderated')->default(false);
             $table->timestamp('finish')->nullable();

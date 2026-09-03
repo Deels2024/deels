@@ -1,0 +1,102 @@
+name: Home v2 design and backend contract
+
+on:
+  push:
+    branches:
+      - 'codex/home-v2-*'
+    paths:
+      - '.env.staging.example'
+      - 'app/Http/Controllers/Api/HomePageController.php'
+      - 'app/Http/Controllers/HomeController.php'
+      - 'app/Http/Resources/Home/**'
+      - 'app/Services/Home/**'
+      - 'config/homepage.php'
+      - 'resources/views/home-v2.blade.php'
+      - 'public/dist/css/home-v2.css'
+      - 'public/dist/js/home-v2.js'
+      - 'routes/api.php'
+      - 'routes/web.php'
+      - 'tests/Feature/Api/HomeCardResourcesTest.php'
+      - 'tests/Feature/Api/HomePageApiContractTest.php'
+      - 'tests/Feature/HomeV2PreviewTest.php'
+      - '.github/workflows/home-v2-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: Validate manifests and PHP syntax
+        run: |
+          set -euo pipefail
+          composer validate --no-check-publish
+          php -l app/Http/Controllers/Api/HomePageController.php
+          php -l app/Http/Controllers/HomeController.php
+          find app/Http/Resources/Home app/Services/Home -name '*.php' -print0 | xargs -0 -n1 php -l
+          php -l config/homepage.php
+          php -l routes/api.php
+          php -l routes/web.php
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=http://127.0.0.1'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+            echo 'HOME_DESIGN_V2=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Verify routes and compile Blade
+        run: |
+          set -euo pipefail
+          php artisan route:list --json > /tmp/home-v2-routes.json
+          jq -e '.[] | select(.name=="api.v1.home" and .uri=="api/v1/home")' /tmp/home-v2-routes.json >/dev/null
+          jq -e '.[] | select(.name=="home.v2.preview" and .uri=="home-v2-preview")' /tmp/home-v2-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.index" and .uri=="battles")' /tmp/home-v2-routes.json >/dev/null
+          php artisan view:cache
+
+      - name: Verify frontend contract
+        run: |
+          set -euo pipefail
+          grep -Fq 'data-home-v2' resources/views/home-v2.blade.php
+          grep -Fq 'data-bank-status' resources/views/home-v2.blade.php
+          grep -Fq 'hv2-ratio--vertical' resources/views/home-v2.blade.php
+          grep -Fq "'aspect_ratio' => '9:16'" app/Services/Home/HomeMediaResolver.php
+          node --check public/dist/js/home-v2.js
+
+      - name: Run Home v2 tests
+        run: |
+          vendor/bin/phpunit \
+            tests/Feature/Api/HomeCardResourcesTest.php \
+            tests/Feature/Api/HomePageApiContractTest.php \
+            tests/Feature/HomeV2PreviewTest.php

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ContestListService
 {
@@ -142,6 +143,27 @@ class ContestListService
 
         if ($filterType === 'active') {
             $query->where('finished', false);
+        }
+
+        if ($filterType === 'rewarded' && Schema::hasColumn($query->getModel()->getTable(), 'reward_amount')) {
+            $query->where('reward_amount', '>', 0);
+        }
+
+        if ($filterType === 'ending') {
+            $query->where('finished', false)
+                ->whereNotNull('finish')
+                ->where('finish', '>=', now())
+                ->orderBy('finish');
+        }
+
+        if ($filterType === 'new') {
+            $query->where('created_at', '>=', now()->subDays(14));
+        }
+
+        if ($filterType === 'popular') {
+            $query->withCount(['views', 'likes'])
+                ->orderByDesc('views_count')
+                ->orderByDesc('likes_count');
         }
     }
 }
