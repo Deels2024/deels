@@ -66,8 +66,8 @@ class DeelsPaymentCompatibilityController extends Controller
             'Amount' => $amountKopecks,
             'Taxation' => 'usn_income',
             'NotificationURL' => route('deels.compat.campaigns.donations.callback'),
-            'SuccessURL' => url('/campaign/'.$campaign->slug),
-            'FailURL' => url('/campaign/'.$campaign->slug),
+            'SuccessURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
+            'FailURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
             'Receipt' => [
                 'Taxation' => 'usn_income',
                 'Email' => $email,

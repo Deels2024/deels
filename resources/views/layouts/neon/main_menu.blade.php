@@ -1,58 +1,29 @@
 <header>
     <div class="header">
         <div class="container">
-            <a class="header__logo" href="{{route('home')}}"> <img src="/dist/images/icons/deels.svg" alt="DEELS"/></a>
+            <a class="header__logo" href="{{route('home')}}" aria-label="DEELS — на главную">
+                <img src="/dist/images/icons/deels.svg" alt="DEELS"/>
+                <span class="header__brand-pill" aria-hidden="true">ARENA</span>
+            </a>
             <div class="header__list desk">
                 <ul>
-                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='home') class="active" @endif>
-                        <a href="{{route('home')}}">Главная</a>
-                    </li>
-
-                    @foreach($header_menu_pages as $page)
-                        <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='single_page') class="active" @endif>
-                            <a href="{{ route('single_page', $page->slug) }}">{{ $page->title }} </a>
-                        </li>
-                    @endforeach
-
-{{--                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='browse_campaigns') class="active" @endif>--}}
-{{--                        <a href="{{route('browse_campaigns',[--}}
-{{--//                                'type' => 'funded'--}}
-{{--                        ] )}}">Копилки</a>--}}
-{{--                    </li>--}}
-
-
-                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='challenges.catalog') class="active" @endif>
-                        <a href="{{route('challenges.catalog')}}">Челленджи</a>
-                    </li>
-
-                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='stories.catalog') class="active" @endif>
-                        <a href="{{route('stories.catalog',[
-//                                'type' => 'funded'
-                        ] )}}">Сторис</a>
-                    </li>
-
-                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='contact_us') class="active" @endif>
-                        <a href="{{route('contact_us')}}">@lang('app.contact_us')</a>
-                    </li>
-{{--                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='card_pay') class="active" @endif>--}}
-{{--                        <a href="{{route('offer')}}">Правила и оферты</a>--}}
-{{--                    </li>--}}
+                    @include('layouts.neon.partials.platform_links')
                 </ul>
             </div>
             <div class="header__icons">
                 <form action="/search" class="header__search ">
-                    <a href="#" class="header__icon" id="searchOpen">
+                    <button type="button" class="header__icon" id="searchOpen" aria-label="Открыть поиск">
                         <img src="/dist/images/icons/search.svg" alt="Поиск">
-                    </a>
+                    </button>
                     <input class="header__input hide" type="text" name="q" placeholder="Поиск...">
                 </form>
 
-                <a href="#" class="header__icon-hide" id="searchClose">
+                <button type="button" class="header__icon-hide" id="searchClose" aria-label="Закрыть поиск">
                     <img src="/dist/images/icons/close.svg" alt="Закрыть">
-                </a>
+                </button>
 
                 @if (Auth::check())
-                    <div href="#" class="header-balance">
+                    <div class="header-balance">
                         <div class="header-balance__btn">
                             <img src="/dist/images/icon-wallet.svg" alt="баланс">
                         </div>
@@ -138,6 +109,10 @@
                 </div>
                 @endif
 
+                <a href="{{ route('challenges.create') }}" class="deels-source-create">
+                    <span aria-hidden="true">+</span> Создать
+                </a>
+
                 @if (Auth::check())
                     <a href="{{route('profile_edit')}}" class="header_profile">
                         <img src="/dist/images/icons/profile_fill.svg" alt="Профиль"/>
@@ -148,15 +123,15 @@
                         <img src="/dist/images/icons/profile.svg" alt="Профиль"/>
                     </a>
                 @endif
-                <a href="#" id="menuOpen">
+                <button type="button" id="menuOpen" aria-label="Открыть меню" aria-controls="deels-mobile-menu" aria-expanded="false">
                     <img src="/dist/images/icons/menu.svg" alt="Меню"/>
-                </a>
+                </button>
             </div>
         </div>
-        <div class="header__menu">
-            <a href="" id="menuClose">
-                <img src="/dist/images/icons/close.svg"/>
-            </a>
+        <div class="header__menu" id="deels-mobile-menu">
+            <button type="button" id="menuClose" aria-label="Закрыть меню">
+                <img src="/dist/images/icons/close.svg" alt="Закрыть"/>
+            </button>
             <ul class="header__menu-list" style="width: 100%">
                 <li>
                     <form action="/search" class="header__search header__search-show" style="display: block; width: 100%; padding-bottom: 10px; border-bottom: 1px solid white; position: relative">
@@ -166,30 +141,19 @@
                         </button>
                     </form>
                 </li>
-                <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='home') class="active" @endif>
-                    <a href="{{route('home')}}">Главная</a>
-                </li>
+                @include('layouts.neon.partials.platform_links')
 
+                <li class="header__menu-divider" aria-hidden="true"></li>
+                <li @if(request()->routeIs('home')) class="active" @endif>
+                    <a href="{{ route('home') }}">Главная</a>
+                </li>
                 @foreach($header_menu_pages as $page)
-                    <li>
-                        <a href="{{ route('single_page', $page->slug) }}">{{ $page->title }} </a>
+                    <li @if(request()->routeIs('single_page') && request()->route('slug') === $page->slug) class="active" @endif>
+                        <a href="{{ route('single_page', $page->slug) }}">{{ $page->title }}</a>
                     </li>
                 @endforeach
-                <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='challenges.catalog') class="active" @endif>
-                    <a href="{{route('challenges.catalog')}}">Челленджи</a>
-                </li>
-
-                <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='stories.catalog') class="active" @endif>
-                    <a href="{{route('stories.catalog',[
-//                                'type' => 'funded'
-                        ] )}}">Сторис</a>
-                </li>
-{{--                <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='browse_campaigns') class="active" @endif>--}}
-{{--                    <a href="{{route('browse_campaigns')}}">Копилки</a>--}}
-{{--                </li>--}}
-
-                <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='start_campaign') class="active" @endif>
-                    <a href="{{route('start_campaign')}}">@lang('app.start_campaign')</a>
+                <li @if(request()->routeIs('start_campaign')) class="active" @endif>
+                    <a href="{{ route('start_campaign') }}">Создать копилку</a>
                 </li>
                 <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='contact_us') class="active" @endif>
                     <a href="{{route('contact_us')}}">@lang('app.contact_us')</a>

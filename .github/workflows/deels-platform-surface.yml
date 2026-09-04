@@ -1,0 +1,147 @@
+name: Deels platform surface contract
+
+on:
+  push:
+    branches:
+      - 'codex/home-v2-*'
+    paths:
+      - 'app/Console/Commands/GenerateSitemap.php'
+      - 'app/Console/Commands/System/SitemapGeneration.php'
+      - 'app/Helpers/AppHelper.php'
+      - 'app/Http/Controllers/Api/ApiController.php'
+      - 'app/Http/Controllers/Api/ChallengeController.php'
+      - 'app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php'
+      - 'app/Http/Controllers/CampaignsController.php'
+      - 'app/Models/Campaign.php'
+      - 'app/Models/Comment.php'
+      - 'app/Services/ApiStoryFeedFormatter.php'
+      - 'app/Services/ApiStoriesFeedService.php'
+      - 'app/Services/CampaignFilterService.php'
+      - 'app/Services/CampaignShareThumbService.php'
+      - 'app/Services/Contests/ContestListService.php'
+      - 'resources/views/**'
+      - 'public/dist/css/deelsweb-platform-source.css'
+      - 'public/dist/js/deels-v2.js'
+      - 'tests/Feature/Api/ContestListCharacterizationTest.php'
+      - 'tests/Feature/Api/ApiContractTest.php'
+      - 'tests/Unit/Services/ApiStoryFeedFormatterTest.php'
+      - 'tests/Unit/Services/ApiStoriesFeedServiceTest.php'
+      - '.github/workflows/deels-platform-surface.yml'
+  pull_request:
+    branches:
+      - 'codex/new-design-migration'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  platform-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: Validate PHP sources
+        run: |
+          set -euo pipefail
+          composer validate --no-check-publish
+          for file in \
+            app/Console/Commands/GenerateSitemap.php \
+            app/Console/Commands/System/SitemapGeneration.php \
+            app/Helpers/AppHelper.php \
+            app/Http/Controllers/Api/ApiController.php \
+            app/Http/Controllers/Api/ChallengeController.php \
+            app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php \
+            app/Http/Controllers/CampaignsController.php \
+            app/Models/Campaign.php \
+            app/Models/Comment.php \
+            app/Services/ApiStoryFeedFormatter.php \
+            app/Services/ApiStoriesFeedService.php \
+            app/Services/CampaignFilterService.php \
+            app/Services/CampaignShareThumbService.php \
+            app/Services/Contests/ContestListService.php \
+            tests/Feature/Api/ContestListCharacterizationTest.php; do
+            php -l "$file"
+          done
+          node --check public/dist/js/deels-v2.js
+
+      - name: Install Laravel dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          : > .env
+          {
+            echo 'APP_NAME=Deels'
+            echo 'APP_ENV=testing'
+            echo 'APP_DEBUG=true'
+            echo 'APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+            echo 'APP_URL=https://deels.test'
+            echo 'DB_CONNECTION=sqlite'
+            echo 'DB_DATABASE=:memory:'
+            echo 'CACHE_DRIVER=array'
+            echo 'SESSION_DRIVER=array'
+            echo 'QUEUE_CONNECTION=sync'
+            echo 'MAIL_MAILER=array'
+            echo 'DISABLE_JIVOSITE=true'
+            echo 'HOME_DESIGN_V2=true'
+          } >> .env
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+
+      - name: Verify public and action routes
+        run: |
+          set -euo pipefail
+          php artisan route:list --json > /tmp/deels-routes.json
+          jq -e '.[] | select(.name=="challenges.catalog" and .uri=="challenges" and (.method|contains("GET")))' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.index" and .uri=="battles" and (.method|contains("GET")))' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="stories.catalog" and .uri=="stories" and (.method|contains("GET")))' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.index" and .uri=="campaigns" and (.method|contains("GET")))' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.challenges.show" and .uri=="challenges/{id}")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.battles.show" and .uri=="battles/{id}")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.stories.show" and .uri=="stories/{id}")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="deels.public.campaigns.show" and .uri=="campaigns/{slug}")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="challenges.create" and .uri=="dashboard/challenges/create")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="battles.create" and .uri=="dashboard/battles/create")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="stories.create" and .uri=="dashboard/stories/create")' /tmp/deels-routes.json >/dev/null
+          jq -e '.[] | select(.name=="start_campaign" and .uri=="dashboard/my_campaigns/start_campaign")' /tmp/deels-routes.json >/dev/null
+
+      - name: Compile Blade and verify UI contract
+        run: |
+          set -euo pipefail
+          php artisan view:cache
+          test -s public/dist/css/deelsweb-platform-source.css
+          grep -Fq 'deelsweb-platform-source.css' resources/views/layouts/neon/header.blade.php
+          grep -Fq "layouts.neon.partials.platform_links" resources/views/layouts/neon/main_menu.blade.php
+          grep -Fq "partials.deels.platform_switcher" resources/views/challenges_index.blade.php
+          grep -Fq "partials.deels.platform_switcher" resources/views/stories_index.blade.php
+          grep -Fq "partials.deels.platform_switcher" resources/views/browse_campaigns.blade.php
+          grep -Fq "route('deels.public.battles.index')" resources/views/home-v2.blade.php
+          grep -Fq 'source-feed-load-error' resources/views/stories_index.blade.php
+          grep -Fq 'stories-retry-button' resources/views/stories_index.blade.php
+          grep -Fq "'SuccessURL' => route('deels.public.campaigns.show'" app/Http/Controllers/Api/ApiController.php
+          grep -Fq "'SuccessURL' => route('deels.public.campaigns.show'" app/Http/Controllers/Api/DeelsPaymentCompatibilityController.php
+          grep -Fq "route('deels.public.campaigns.show'" app/Services/CampaignShareThumbService.php
+          grep -Fq "'route' => 'deels.public.campaigns.show'" app/Console/Commands/System/SitemapGeneration.php
+          if grep -Fq 'function ensureNavLink' public/dist/js/deels-v2.js; then
+            echo 'Primary navigation must be server-rendered'
+            exit 1
+          fi
+
+      - name: Run focused backend contracts
+        run: |
+          vendor/bin/phpunit \
+            tests/Feature/Api/ContestListCharacterizationTest.php \
+            tests/Feature/Api/ApiContractTest.php \
+            tests/Unit/Services/ApiStoryFeedFormatterTest.php \
+            tests/Unit/Services/ApiStoriesFeedServiceTest.php

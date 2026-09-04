@@ -14,7 +14,7 @@
     <div class="catalog">
         <div class="container">
             <div class="account-info">
-                @include('battles.battle_data', ['participant' => $participant, 'stories' => $stories, 'route' => route('challenges.catalog')])
+                @include('battles.battle_data', ['participant' => $participant, 'stories' => $stories, 'route' => route('deels.public.battles.index')])
             </div>
         </div>
     </div>

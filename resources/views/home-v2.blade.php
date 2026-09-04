@@ -78,11 +78,11 @@
         <div class="hv2-hero__copy">
             <div class="hv2-kicker">Социальная платформа нового формата</div>
             <h1 id="home-v2-title">Создавай. Соревнуйся.<br><span>Получай поддержку.</span></h1>
-            <p>Челленджи, батлы, сторис и копилки в одном живом сообществе. Снимай видео, собирай голоса и превращай идеи в результат.</p>
+            <p>Челленджи, баттлы, истории и копилки в одном живом сообществе. Снимай видео, собирай голоса и превращай идеи в результат.</p>
             <div class="hv2-actions">
-                <a class="hv2-btn hv2-btn--primary" href="{{ route('challenges.catalog') }}">Выбрать челлендж</a>
-                <a class="hv2-btn" href="{{ route('challenges.create') }}">Создать челлендж</a>
-                <a class="hv2-btn hv2-btn--link" href="#how-it-works">Как это работает <span aria-hidden="true">→</span></a>
+                <a class="hv2-btn hv2-btn--primary" href="{{ route('challenges.catalog') }}">Смотреть челленджи</a>
+                <a class="hv2-btn" href="{{ route('deels.public.battles.index') }}">Открыть баттлы</a>
+                <a class="hv2-btn hv2-btn--link" href="{{ route('challenges.create') }}">Создать свой вызов <span aria-hidden="true">→</span></a>
             </div>
             <div class="hv2-stores" aria-label="Скачать приложение Deels">
                 <a href="https://play.google.com/store/apps/details?id=com.kts.kopiberi_application" target="_blank" rel="noopener">

@@ -142,7 +142,7 @@ class ApiStoriesFeedService
                 ->orderBy('created_at', 'DESC');
         }
 
-        return Story::withCount('comments', 'likes')
+        return Story::withCount('comments', 'likes', 'views')
             ->whereHas('user')
             ->where('active', true)
             ->where('declined', false);

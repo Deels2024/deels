@@ -86,10 +86,10 @@ class ApiController extends Controller
         $user_id = $feed->userId;
         $excludeIds = $feed->excludeIds;
         $requestedPage = $feed->requestedPage;
+        $formatter = app(ApiStoryFeedFormatter::class);
+        $formatter->hydrateViewerState($media, $user_id);
 
         if (request()->wantsJson()) {
-            $formatter = app(ApiStoryFeedFormatter::class);
-
             $html = view('stories.partials.list_items', ['stories' => $media])->render();
             $data = $formatter->format($media, $user_id);
 
@@ -159,8 +159,8 @@ class ApiController extends Controller
             'OrderId' => $orderID,
             'Amount' => $donation_amount * 100,
             'Taxation' => 'usn_income',
-            'SuccessURL' => url('/campaign/'.$campaign->slug),
-            'FailURL' => url('/campaign/'.$campaign->slug),
+            'SuccessURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
+            'FailURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
             'Receipt' => [
                 'Taxation' => 'usn_income',
                 'Email' => auth()->user()?->email ?? $user->email ?? 'anon@email.ru',

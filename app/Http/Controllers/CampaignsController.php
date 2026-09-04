@@ -95,10 +95,13 @@ class CampaignsController extends Controller
         } else {
             $page = max(1, (int)$request->input('page', 1));
             $campaigns = $campaignsQuery->paginate(20, ['*'], 'page', $page);
+            $categories = Cache::remember('categories', 500, static function () {
+                return Category::withCount('campaigns')->get();
+            });
 
             return view(
                 'browse_campaigns',
-                compact('campaigns', 'filteredCategory'));
+                compact('campaigns', 'filteredCategory', 'categories'));
         }
     }
 
@@ -570,7 +573,7 @@ class CampaignsController extends Controller
     public function show($slug = null)
     {
         $campaign = Campaign::whereSlug($slug)
-            ->with('success_payments.user', 'success_payments.comment', 'user')
+            ->with('success_payments.user', 'success_payments.comment', 'user', 'feature_media', 'get_category')
             ->withSum('success_payments', 'amount')
             ->firstOrFail();
 
@@ -602,6 +605,16 @@ class CampaignsController extends Controller
                 'enable_discuss' => $enable_discuss,
             ]);
         } else {
+            $campaign->loadMissing([
+                'success_payments.thanks.payment',
+                'stories' => static function ($stories): void {
+                    $stories->active()
+                        ->with(['media', 'user'])
+                        ->withCount(['comments', 'likes', 'views'])
+                        ->orderByDesc('created_at');
+                },
+            ]);
+
             return view('campaign_single_new', compact('campaign', 'title', 'enable_discuss'));
         }
     }
@@ -1062,7 +1075,7 @@ class CampaignsController extends Controller
             );
             $request->session()->forget('cart');
 
-            $url = route('campaign_single', $payment->campaign->slug);
+            $url = route('deels.public.campaigns.show', ['slug' => $payment->campaign->slug]);
 
             try {
                 Mail::send(
@@ -1610,7 +1623,7 @@ class CampaignsController extends Controller
                 'type' => 'campaign',
                 'campaign_id' => $campaign->id,
                 'text' => 'Перейти и поблагодарить',
-                'url' => route('campaign_single', $campaign->slug) . '?thanks=' . $payment->id
+                'url' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]) . '?thanks=' . $payment->id
             ];
             $helper->chat_notify($campaign->user, $text, $button);
             if (request()->wantsJson()) {
@@ -1620,7 +1633,8 @@ class CampaignsController extends Controller
                     'message' => 'Вклад выполнен успешно!'
                 ]);
             } else {
-                return redirect(route('campaign_single', $campaign->slug))->with('success', 'Вклад выполнен успешно!');
+                return redirect(route('deels.public.campaigns.show', ['slug' => $campaign->slug]))
+                    ->with('success', 'Вклад выполнен успешно!');
             }
         } catch (\Throwable $e) {
             if (request()->wantsJson()) {

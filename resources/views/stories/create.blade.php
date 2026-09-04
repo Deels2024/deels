@@ -910,7 +910,7 @@
                 success: function (response) {
                    if(response.success) {
                        window.location.replace(@json($online_report || $is_useful
-                           ? ($challenge_id ? route('challenge_page', ['id' => $challenge_id]) : route('battle_page', ['id' => $battle_id]))
+                           ? ($challenge_id ? route('deels.public.challenges.show', ['id' => $challenge_id]) : route('deels.public.battles.show', ['id' => $battle_id]))
                            : route('user_stories')));
                    } else {
                        $('.alert-container').html('<div class="alert danger"> <span class="closebtn">&times;</span> '+(response.error || 'Не удалось создать сторис')+'</div>')

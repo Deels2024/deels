@@ -21,8 +21,17 @@
                         @endforeach
                     @endif
 
-                    <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='start_campaign') class="active" @endif>
-                        <a href="{{route('start_campaign')}}" style="font-weight: 800">@lang('app.start_campaign')</a>
+                    <li @if(request()->routeIs('challenges.catalog', 'deels.public.challenges.show')) class="active" @endif>
+                        <a href="{{ route('challenges.catalog') }}">Челленджи</a>
+                    </li>
+                    <li @if(request()->routeIs('deels.public.battles.*', 'battle_page')) class="active" @endif>
+                        <a href="{{ route('deels.public.battles.index') }}">Баттлы</a>
+                    </li>
+                    <li @if(request()->routeIs('stories.catalog', 'deels.public.stories.show')) class="active" @endif>
+                        <a href="{{ route('stories.catalog', ['type' => 'popular']) }}">Истории</a>
+                    </li>
+                    <li @if(request()->routeIs('deels.public.campaigns.*', 'browse_campaign', 'campaign_single')) class="active" @endif>
+                        <a href="{{ route('deels.public.campaigns.index') }}">Копилки</a>
                     </li>
                     <li @if(\Illuminate\Support\Facades\Route::currentRouteName()==='contact_us') class="active" @endif>
                         <a href="{{route('contact_us')}}">@lang('app.contact_us')</a>

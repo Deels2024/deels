@@ -1,4 +1,4 @@
-<div class="kpromo-item" onclick="window.location='{{route('campaign_single', $campaign->slug)}}'">
+<div class="kpromo-item" onclick="window.location='{{route('deels.public.campaigns.show', $campaign->slug)}}'">
     <div class="kpromo-item__img" style="background-size: cover; background-position: center; cursor:pointer; background-image: url('{{ $campaign->feature_img_url()->thumbnail ?? $campaign->feature_img_url()->feature_image }}')"></div>
 
     <div class="kpromo-item__content">

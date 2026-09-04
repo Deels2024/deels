@@ -9,7 +9,7 @@
                 @endif
             </div>
             <div class="bank__content">
-                <a href="{{route('campaign_single', $campaign->slug)}}" style="display: block; color: inherit; text-decoration: none;">
+                <a href="{{route('deels.public.campaigns.show', $campaign->slug)}}" style="display: block; color: inherit; text-decoration: none;">
                     <div class="bank__title">
                         <div class="bank__title-text">
                             {{$campaign->title}}

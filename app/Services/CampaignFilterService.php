@@ -32,7 +32,7 @@ class CampaignFilterService
         }
 
         $campaignsBuilder = $campaignsBuilder->active()
-            ->with('user', 'feature_media')
+            ->with('user', 'feature_media', 'get_category')
             ->withCount('success_payments')
             ->withSum('success_payments', 'amount')
             ->when($userId, fn($query) => $query->where('user_id', $userId))

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Http\Controllers\Api\ChallengeController;
 use App\Models\Battle;
 use App\Models\Challenge;
 use App\Models\Story;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\Support\CreatesCharacterizationSchema;
 use Tests\TestCase;
@@ -41,7 +43,6 @@ class ContestListCharacterizationTest extends TestCase
             'declined' => false,
             'finished' => true,
         ]);
-
         $response = $this
             ->withHeaders(['Accept' => 'application/json'])
             ->getJson('/api/challenges?type=active');
@@ -53,6 +54,46 @@ class ContestListCharacterizationTest extends TestCase
             ->assertJsonPath('total_pages', 1)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.title', 'Active challenge');
+    }
+
+    public function test_public_challenge_catalog_defaults_to_challenges_without_changing_api_aggregation(): void
+    {
+        $owner = $this->createCharacterizationUserWithWallets(['name' => 'Owner', 'email' => 'catalog-owner@example.test']);
+        $challenge = Challenge::create([
+            'user_id' => $owner->id,
+            'title' => 'Catalog challenge',
+            'active' => true,
+            'declined' => false,
+            'finished' => false,
+        ]);
+        Battle::create([
+            'user_id' => $owner->id,
+            'title' => 'Catalog battle',
+            'active' => true,
+            'declined' => false,
+            'finished' => false,
+            'visibility' => 'all',
+        ]);
+        Story::create([
+            'user_id' => $owner->id,
+            'challenge_id' => $challenge->id,
+            'active' => true,
+            'declined' => false,
+            'broken' => false,
+        ]);
+
+        $request = Request::create('/challenges', 'GET');
+        $view = (new ChallengeController())->get_challenges($request);
+
+        self::assertSame('challenges', $request->input('content'));
+        self::assertSame(['Catalog challenge'], $view->getData()['challenges']->pluck('title')->all());
+        self::assertSame(1, (int) $view->getData()['challenges']->first()->active_stories_count);
+
+        $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->getJson('/api/challenges')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_challenges_list_includes_visible_battles(): void

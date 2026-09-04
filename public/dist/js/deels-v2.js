@@ -6,57 +6,18 @@
     else fn();
   }
 
-  function ensureNavLink(label, href, beforeLabel) {
-    var lists = document.querySelectorAll('.header__list ul, .header__menu-list');
-    lists.forEach(function (list) {
-      var links = Array.prototype.slice.call(list.querySelectorAll('a'));
-      if (links.some(function (link) { return link.textContent.trim() === label; })) return;
-      var li = document.createElement('li');
-      li.className = 'deels-source-nav-link';
-      var a = document.createElement('a');
-      a.href = href;
-      a.textContent = label;
-      li.appendChild(a);
-      var before = links.find(function (link) { return link.textContent.trim() === beforeLabel; });
-      if (before && before.parentElement && before.parentElement.parentElement === list) list.insertBefore(li, before.parentElement);
-      else list.appendChild(li);
-    });
-  }
-
-  function normalizeNav() {
-    ensureNavLink('Лента', '/stories?type=new', 'Челленджи');
-    ensureNavLink('Баттлы', '/challenges?content=battles', 'Сторис');
-    ensureNavLink('Копилки', '/campaign', 'Контакты');
-
-    document.querySelectorAll('.header__list ul, .header__menu-list').forEach(function (list) {
-      Array.prototype.slice.call(list.querySelectorAll('a')).forEach(function (link) {
-        var text = link.textContent.trim();
-        if (text === 'Челленджи') link.href = '/challenges?content=challenges';
-        if (text === 'Сторис') { link.textContent = 'Истории'; link.href = '/stories?type=popular'; }
-        if (text === 'Баттлы') link.href = '/challenges?content=battles';
-        if (text === 'Копилки') link.href = '/campaign';
-        if (['Главная', 'Контакты', 'О нас', 'Начать копить'].indexOf(text) !== -1 && link.parentElement) link.parentElement.classList.add('deels-source-hide');
-      });
-    });
-  }
-
-  function ensureCreateButton() {
-    var actions = document.querySelector('.header__icons');
-    if (!actions || actions.querySelector('.deels-source-create')) return;
-    var create = document.createElement('a');
-    create.className = 'deels-source-create';
-    create.href = '/dashboard/challenges/create';
-    create.innerHTML = '<span aria-hidden="true">+</span> Создать';
-    var profile = actions.querySelector('.header_profile');
-    if (profile) actions.insertBefore(create, profile);
-    else actions.appendChild(create);
-  }
-
   function upgradeHeader() {
-    normalizeNav();
-    ensureCreateButton();
     var header = document.querySelector('.header');
     if (header) header.classList.add('deels-source-header');
+
+    var open = document.getElementById('menuOpen');
+    var close = document.getElementById('menuClose');
+    if (open) {
+      open.addEventListener('click', function () { open.setAttribute('aria-expanded', 'true'); });
+    }
+    if (open && close) {
+      close.addEventListener('click', function () { open.setAttribute('aria-expanded', 'false'); });
+    }
   }
 
   function labelPage() {
@@ -108,7 +69,7 @@
   }
 
   function campaignPublicPath() {
-    var match = window.location.pathname.match(/^\/campaign\/([^/]+)\/?$/);
+    var match = window.location.pathname.match(/^\/campaigns?\/([^/]+)\/?$/);
     return match ? match[1] : null;
   }
 
@@ -121,7 +82,7 @@
     nav.className = 'deels-campaign-tools';
     nav.setAttribute('aria-label', 'Разделы копилки');
     nav.innerHTML = '' +
-      '<a class="active" href="/campaign/' + slug + '">О сборе</a>' +
+      '<a class="active" href="/campaigns/' + slug + '">О сборе</a>' +
       '<a href="/campaign/backers/' + slug + '">Донатеры</a>' +
       '<a href="/campaign/updates/' + slug + '">Обновления</a>' +
       '<a href="/campaign/faqs/' + slug + '">FAQ</a>';

@@ -244,7 +244,7 @@ class Campaign extends Model
         $goal = $this->goal;
 
         $percent = 0;
-        if ($raised > 0) {
+        if ($raised > 0 && $goal > 0) {
             $percent = round(($raised * 100) / $goal, 2, \PHP_ROUND_HALF_DOWN);
         }
 
@@ -368,7 +368,7 @@ class Campaign extends Model
 
     public function getUrl()
     {
-        return url(route('campaign_single', $this->slug));
+        return route('deels.public.campaigns.show', ['slug' => $this->slug]);
     }
 
     public function getStatus()

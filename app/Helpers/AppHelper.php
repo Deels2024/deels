@@ -325,20 +325,20 @@ class AppHelper
             if ($type) {
                 if ($type == 'campaign') {
                     $text = 'Новая копилка "' . $model->title . '" от ' . $user->name . '<br>';
-                    $button = '<a href="' . route('campaign_single', $model->slug) . '" class="btn btn-small">Перейти</a>';
+                    $button = '<a href="' . route('deels.public.campaigns.show', ['slug' => $model->slug]) . '" class="btn btn-small">Перейти</a>';
                     $notification = $text . $button;
                     $this->chat_notify($follower, $notification);
                 }
                 if ($type == 'story') {
                     $text = 'Новая сторис от ' . $user->name . '<br>';
-                    $button = '<a href="' . url('') . '/stories?show=' . $model->id . '" class="btn btn-small">Перейти</a>';
+                    $button = '<a href="' . route('deels.public.stories.show', ['id' => $model->id]) . '" class="btn btn-small">Перейти</a>';
                     $notification = $text . $button;
                     $this->chat_notify($follower, $notification);
                 }
 
                 if ($type == 'challenge') {
                     $text = 'Новый челлендж от ' . $user->name . '<br>';
-                    $button = '<a href="' . url('') . '/challenges/show/' . $model->id . '" class="btn btn-small">Перейти</a>';
+                    $button = '<a href="' . route('deels.public.challenges.show', ['id' => $model->id]) . '" class="btn btn-small">Перейти</a>';
                     $notification = $text . $button;
                     $this->chat_notify($follower, $notification);
                 }

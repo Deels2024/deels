@@ -80,19 +80,19 @@ class SitemapGeneration extends Command
                 [
                     'table' => 'campaigns',
                     'slug' => 'campaigns',
-                    'route' => 'campaign_single',
+                    'route' => 'deels.public.campaigns.show',
                     'field' => 'slug',
                 ],
                 [
                     'table' => 'challenges',
                     'slug' => 'challenges',
-                    'route' => 'challenge_page',
+                    'route' => 'deels.public.challenges.show',
                     'field' => 'id',
                 ],
                 [
                     'table' => 'stories',
                     'slug' => 'stories',
-                    'route' => 'stories.get',
+                    'route' => 'deels.public.stories.show',
                     'field' => 'id',
                 ],
             ];
@@ -131,9 +131,6 @@ class SitemapGeneration extends Command
                     // add every product to multiple sitemaps with one sitemap index
                     foreach ($items as $p) {
                         $item_route = route($items_route, $p->{$items_field});
-                        if($items_slug == 'stories') {
-                            $item_route = url('/stories?show=').$p->id;
-                        }
                         if ($sitemapCounter > 0) {
                             $sitemapCounterSlug = '' . $sitemapCounter;
                         }

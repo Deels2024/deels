@@ -67,7 +67,7 @@ class GenerateSitemap extends Command
 
                 foreach ($items as $item) {
                     $sitemap .= '<url>';
-                    $sitemap .= '<loc>'.url(route('campaign_single', $item->slug)).'</loc>';
+                    $sitemap .= '<loc>'.route('deels.public.campaigns.show', ['slug' => $item->slug]).'</loc>';
                     $sitemap .= '<lastmod>'.$item->updated_at->format('Y-m-d').'</lastmod>';
                     $sitemap .= '</url>';
                 }

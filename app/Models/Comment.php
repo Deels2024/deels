@@ -49,7 +49,7 @@ class Comment extends Model
                     'type' => 'campaign',
                     'campaign_id' => $comment->campaign_id,
                     'text' => 'Перейти',
-                    'url' => route('campaign_single', $comment->campaign->slug)
+                    'url' => route('deels.public.campaigns.show', ['slug' => $comment->campaign->slug])
                 ];
                 $helper->chat_notify($comment->campaign->user,$text,$button);
             }

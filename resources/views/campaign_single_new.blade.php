@@ -7,7 +7,7 @@
 //    $meta_description = 'С помощью платформы DEELS '.$campaign->user->fullname.' копит на свою мечту. Желание: брекет '.$campaign->title.', цель - собрать '.number_format($campaign->goal, 0).' руб. Хочешь накопить на свою мечту? Регистрируйся в DEELS и осуществляй свои желания!';
     $meta_description = 'Коплю на '.$title.'. Поддержите мою мечту на Deels!';
 
-    $campaignShareUrl = route('campaign_single', $campaign->slug);
+    $campaignShareUrl = route('deels.public.campaigns.show', ['slug' => $campaign->slug]);
 
     if (!empty($campaign->user?->referral_code)) {
         $campaignShareUrl .= '?ref=' . urlencode($campaign->user->referral_code);
@@ -39,7 +39,7 @@
 
     <!-- Open Graph data -->
     <meta property="og:title" content="{{ $meta_title }}"/>
-    <meta property="og:url" content="{{route('campaign_single', $campaign->slug)}}"/>
+    <meta property="og:url" content="{{ route('deels.public.campaigns.show', ['slug' => $campaign->slug]) }}"/>
     <meta property="og:image" content="{{$campaign->feature_img_url()->feature_image}}"/>
     <meta property="og:type" content="article"/>
     <meta property="og:description" content="{{$meta_description}}"/>
@@ -84,7 +84,7 @@
                 </a>
                 <ul class="main-content__social-link-list">
                     <li>
-                        <a href="https://t.me/share/url?url={{route('campaign_single', $campaign->slug)}}"
+                        <a href="https://t.me/share/url?url={{ route('deels.public.campaigns.show', ['slug' => $campaign->slug]) }}"
                            class="main-content__social-link main-content__social-link_telegram" target="_blank" style="background-size: cover"></a>
                     </li>
 {{--                    <li>--}}
@@ -95,7 +95,7 @@
                 </ul>
             </div>
             <p class="main-content__category">
-                <a href="#">Категория</a> - <a href="#">{{$campaign->get_category->category_name}}</a><span
+                <a href="{{ route('deels.public.campaigns.index') }}">Копилки</a> — <a href="{{ route('campaigns.category', ['slug' => $campaign->get_category->slug]) }}">{{$campaign->get_category->category_name}}</a><span
                         class="main-content__category-number">№ {{$campaign->id}}</span>
             </p>
             <h1 class="main-content__title">
@@ -126,20 +126,28 @@
 
 
             @php
-                $campaignStories = $campaign->stories()->active()->with(['media', 'user'])->orderBy('created_at', 'desc')->get();
+                $campaignStories = $campaign->stories;
+                $campaignViewedStoryIds = Auth::check() && $campaignStories->isNotEmpty()
+                    ? \App\Models\View::where('user_id', Auth::id())
+                        ->whereIn('story_id', $campaignStories->pluck('id'))
+                        ->pluck('story_id')
+                    : collect();
+                $campaignStories->each(function ($story) use ($campaignViewedStoryIds): void {
+                    $story->setAttribute('is_viewed', $campaignViewedStoryIds->contains((int) $story->id));
+                });
             @endphp
             <ul class="main-content__switch">
                 @if($campaignStories->isNotEmpty())
                     <li class="main-content__switch-link main-content__switch-link_stories main-content__switch-link_active">
-                        <a class="main-content__switch-link" href="#">Сторис копилки</a>
+                        <a class="main-content__switch-link" href="#campaign-stories">Истории копилки</a>
                     </li>
                 @endif
                 <li class="main-content__switch-link main-content__switch-link_donate {{ $campaignStories->isEmpty() ? 'main-content__switch-link_active' : '' }}">
-                    <a class="main-content__switch-link" href="#">Донатеры</a>
+                    <a class="main-content__switch-link" href="#campaign-donors">Поддержали</a>
                 </li>
                 @if(isset($show_comments))
                     <li class="main-content__switch-link main-content__switch-link_comments">
-                        <a class="main-content__switch-link" href="#">Комментарии</a>
+                        <a class="main-content__switch-link" href="#campaign-comments">Комментарии</a>
                     </li>
                 @endif
             </ul>
@@ -173,9 +181,6 @@
                     </form>
                 @endif
                 @if ((int)$campaign->percent_raised() < 100)
-                    <button class="story__button story__button_special" type="button">
-                        Специальное предложение
-                    </button>
                 @if(Auth::user())
                     @if(Auth::id() === $campaign->user_id)
                         <a class="story__button story__record" href="{{route('stories.create', ['campaign' => $campaign->id])}}" style="text-align: center">
@@ -239,20 +244,14 @@
                 </div>
                 */?>
                 @php
-                    $stories = $campaign->user->stories()->notMainStory()->where('active', true)->get();
+                    $stories = $campaignStories;
                 @endphp
                 @if(count($stories))
                     <div class="story__content">
                         <div style="width: 202px; height: 345px" class="stories_carousel">
                             @foreach($stories as $story)
                                 @php
-                                    $is_viewed = false;
-                                    if(Auth::user()) {
-                                        $view = \App\Models\View::where('user_id', Auth::user()->id)->where('story_id', $story->id)->first();
-                                        if($view) {
-                                            $is_viewed = true;
-                                        }
-                                    }
+                                    $is_viewed = (bool) $story->getAttribute('is_viewed');
                                 @endphp
                                     <a href="#story-popup" class="copystories-item show_campaign_story show_story {{$story->paid && !$is_viewed ? 'story__content_closed' : ''}}" style="width: 202px; height: 345px" data-route="{{route('stories.preview', ['id' => $story->id, 'user_id' => Auth::user()->id ?? null])}}" data-story="{{$story->id}}" data-type="{{$story->type}}" data-paid="{{$story->paid}}" data-amount="{{$story->amount}}">
                                     @include('stories.parts.preview', [
@@ -302,8 +301,8 @@
 {{--                </div>--}}
 {{--            </div>--}}
             <div class="main-content__donate-comments">
-                <div class="main-content__donates {{ $campaignStories->isEmpty() ? 'main-content__block_active' : '' }}">
-                    @foreach($campaign->payments as $payment)
+                <div class="main-content__donates {{ $campaignStories->isEmpty() ? 'main-content__block_active' : '' }}" id="campaign-donors">
+                    @forelse($campaign->success_payments as $payment)
                         <div class="main-content__donate">
                             <div class="main-content__donate-head">
                                 <a href="{{$payment->user ? route('user.profile', $payment->user->id) : '#'}}">
@@ -373,8 +372,7 @@
                                                         <i class="main-content__donate-avatar magnific_image circle-img"
                                                            style="background-image: url({{$campaign->user?->avatar()}});" data-image="{{$campaign->user?->avatar()}}"></i>
                                                         <li>
-                                                            <a class="main-content__donate-name"
-                                                               href="#">{!! $campaign->user->fullname !!}</a><span
+                                                            <span class="main-content__donate-name">{!! $campaign->user->fullname !!}</span><span
                                                                     class="main-content__donate-date">{{$payment->thanks->created_at->format('d.m.Y')}}</span>
                                                         </li>
                                                         <li>
@@ -502,15 +500,15 @@
 {{--                                </button>--}}
 {{--                            </form>--}}
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="main-content__donate main-content__donate_empty">
+                            Пока никто не поддержал эту копилку. Можно стать первым.
+                        </div>
+                    @endforelse
                 </div>
 
-                @php
-                    $comments = \App\Models\Comment::approved()->parent()->whereCampaignId($campaign->id)->with('childs_approved')->orderBy('id', 'desc')->get();
-                    $comments_count = \App\Models\Comment::approved()->whereCampaignId($campaign->id)->count();
-                @endphp
                 @if($campaignStories->isNotEmpty())
-                <div class="main-content__stories-block main-content__block_active mb-5">
+                <div class="main-content__stories-block main-content__block_active mb-5" id="campaign-stories">
                     <div class="challenge-grid main-content__stories" style="--challenge-grid: repeat(4, 1fr); overflow-y: initial">
                         @foreach($campaignStories as $story)
                             @include('stories.story_item', ['story' => $story, 'challenge' => true])
@@ -519,7 +517,11 @@
                 </div>
                 @endif
                 @if(isset($show_comments))
-                <div class="main-content__comments-block mb-5">
+                @php
+                    $comments = \App\Models\Comment::approved()->parent()->whereCampaignId($campaign->id)->with('childs_approved')->orderBy('id', 'desc')->get();
+                    $comments_count = \App\Models\Comment::approved()->whereCampaignId($campaign->id)->count();
+                @endphp
+                <div class="main-content__comments-block mb-5" id="campaign-comments">
                     <div class="main-content__comments" style="overflow-y: initial">
                         @if($comments_count < 1)
                             <div class="comments__info">Нет комментариев, будь первым
@@ -815,10 +817,12 @@
                 contentBlock.classList.add("main-content__block_active");
             }
 
-            donateBtn.addEventListener("click", (event) => {
-                event.preventDefault();
-                swicthToggle(donateBtn, donateBlock);
-            });
+            if (donateBtn && donateBlock) {
+                donateBtn.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    swicthToggle(donateBtn, donateBlock);
+                });
+            }
 
             if (storiesBtn && storiesBlock) {
                 storiesBtn.addEventListener("click", (event) => {
