@@ -108,16 +108,15 @@
         status.classList.toggle('is-offline', Boolean(offline));
     }
 
-    var tabs = root.querySelector('[data-story-tabs]');
-    if (tabs) {
-        var tabButtons = Array.from(tabs.querySelectorAll('[data-story-tab]'));
-        function selectStoryTab(button) {
-            var key = button.getAttribute('data-story-tab');
+    root.querySelectorAll('[data-home-tabs]').forEach(function (tabs) {
+        var tabButtons = Array.from(tabs.querySelectorAll('[data-home-tab]'));
+        function selectCollectionTab(button) {
+            var key = button.getAttribute('data-home-tab');
             tabButtons.forEach(function (item) {
                 item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
             });
-            tabs.querySelectorAll('[data-story-panel]').forEach(function (panel) {
-                panel.hidden = panel.getAttribute('data-story-panel') !== key;
+            tabs.querySelectorAll('[data-home-panel]').forEach(function (panel) {
+                panel.hidden = panel.getAttribute('data-home-panel') !== key;
                 if (panel.hidden) {
                     panel.querySelectorAll('video').forEach(function (video) { video.pause(); });
                 } else {
@@ -128,9 +127,19 @@
         }
         if (tabButtons.length) {
             tabs.classList.add('is-enhanced');
-            selectStoryTab(tabButtons[0]);
+            function selectLinkedCollection() {
+                var target = document.getElementById(window.location.hash.slice(1));
+                var panel = target && target.closest('[data-home-panel]');
+                var button = panel && tabs.contains(panel) && tabButtons.find(function (item) {
+                    return item.getAttribute('data-home-tab') === panel.getAttribute('data-home-panel');
+                });
+                if (button) selectCollectionTab(button);
+                return Boolean(button);
+            }
+            if (!selectLinkedCollection()) selectCollectionTab(tabButtons[0]);
+            window.addEventListener('hashchange', selectLinkedCollection);
             tabButtons.forEach(function (button, index) {
-                button.addEventListener('click', function () { selectStoryTab(button); });
+                button.addEventListener('click', function () { selectCollectionTab(button); });
                 button.addEventListener('keydown', function (event) {
                     var nextIndex;
                     if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
@@ -140,11 +149,11 @@
                     else return;
                     event.preventDefault();
                     tabButtons[nextIndex].focus();
-                    selectStoryTab(tabButtons[nextIndex]);
+                    selectCollectionTab(tabButtons[nextIndex]);
                 });
             });
         }
-    }
+    });
 
     function setBankValue(value) {
         var counter = root.querySelector('[data-bank-counter]');

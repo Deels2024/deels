@@ -45,7 +45,6 @@
     $homeV2Directions = collect($popularDirections ?? [])->take(6);
     $homeV2LatestCampaigns = collect($latestFundedCampaigns ?? [])->take(8);
     $homeV2NewCampaigns = collect($newCampaigns ?? [])->take(8);
-    $homeV2DirectionIcons = ['✦', '◉', '➜', '◇', '⌁', '♡'];
 
     $homeV2HeroChallenge = $homeV2TopChallenges->first();
     $homeV2HeroCard = $homeV2HeroChallenge
@@ -77,11 +76,11 @@
 
     <section class="hv2-shell hv2-hero" aria-labelledby="home-v2-title">
         <div class="hv2-hero__copy">
-            <div class="hv2-kicker">Место, где идеи становятся действиями</div>
-            <h1 id="home-v2-title">Твой следующий<br>вызов — <span>здесь.</span></h1>
-            <p>Снимай, соревнуйся, поддерживай. Челленджи и баттлы для тех, кто готов показать себя.</p>
+            <div class="hv2-kicker">Челленджи · Баттлы · Сообщество</div>
+            <h1 id="home-v2-title">Бросай вызов.<br><span>Показывай себя.</span></h1>
+            <p>Участвуй в челленджах, соревнуйся в баттлах и получай награды DEELS. Здесь ценят то, что ты делаешь.</p>
             <div class="hv2-actions">
-                <a class="hv2-btn hv2-btn--primary" href="#home-v2-challenges">Выбрать челлендж <span aria-hidden="true">↗</span></a>
+                <a class="hv2-btn hv2-btn--primary" href="#home-v2-challenges">Выбрать челлендж <span aria-hidden="true">→</span></a>
                 <a class="hv2-btn hv2-btn--link" href="#how-it-works">Как это работает</a>
             </div>
         </div>
@@ -95,10 +94,10 @@
                     @endif
                 </span>
                 <span class="hv2-feature__copy">
-                    <span class="hv2-section-kicker">В фокусе</span>
+                    <span class="hv2-feature__label">Челлендж в фокусе</span>
                     <strong>{{ \Illuminate\Support\Str::limit($homeV2HeroTitle, 58) }}</strong>
                     <span class="hv2-feature__reward">{{ $homeV2HeroMeta }}</span>
-                    <span class="hv2-feature__link">Смотреть задание <b aria-hidden="true">↗</b></span>
+                    <span class="hv2-feature__link">Смотреть задание <b aria-hidden="true">→</b></span>
                 </span>
             </a>
         @else
@@ -109,8 +108,8 @@
     <section class="hv2-shell hv2-section hv2-challenges hv2-panel" aria-labelledby="home-v2-challenges">
             <div class="hv2-section-head">
                 <div>
-                    <span class="hv2-section-kicker">Найди свой вызов</span>
-                    <h2 id="home-v2-challenges">Челленджи</h2>
+                    <h2 id="home-v2-challenges">Найди свой челлендж</h2>
+                    <p class="hv2-section-description">Выбери задание и присоединяйся.</p>
                 </div>
                 <div class="hv2-section-head__actions">
                     @if($homeV2TopChallenges->isNotEmpty())
@@ -158,7 +157,7 @@
                                 <span>{{ number_format($challengeCard['participants']['current'], 0, ',', ' ') }} участников</span>
                                 @if($challengeDeadline)<time datetime="{{ $challengeDeadline->toDateString() }}">до {{ $challengeDeadline->format('d.m') }}</time>@endif
                             </div>
-                            <a class="hv2-card-action" href="{{ $challengeCard['url'] }}">{{ !empty($challengeCard['status']['finished']) ? 'Смотреть итоги' : 'Открыть челлендж' }} <span aria-hidden="true">↗</span></a>
+                            <a class="hv2-card-action" href="{{ $challengeCard['url'] }}">{{ !empty($challengeCard['status']['finished']) ? 'Смотреть итоги' : 'Открыть челлендж' }} <span aria-hidden="true">→</span></a>
                         </div>
                     </article>
                 @endforeach
@@ -173,17 +172,10 @@
             @endif
     </section>
 
-    <section id="how-it-works" class="hv2-shell hv2-steps hv2-panel" aria-labelledby="home-v2-how">
-        <h2 id="home-v2-how">Как участвовать</h2>
-        <div class="hv2-step"><span>01</span><div><strong>Найди свой вызов</strong><p>Посмотри задание и условия участия.</p></div></div>
-        <div class="hv2-step"><span>02</span><div><strong>Покажи результат</strong><p>Добавь видео или отметку по правилам челленджа.</p></div></div>
-        <div class="hv2-step"><span>03</span><div><strong>Будь частью движения</strong><p>Следи за участниками и поддерживай авторов.</p></div></div>
-    </section>
-
     @if($homeV2Battles->isNotEmpty())
         <section class="hv2-shell hv2-section hv2-battles hv2-panel" aria-labelledby="home-v2-battles">
             <div class="hv2-section-head">
-                <div><span class="hv2-section-kicker">Выбери сторону</span><h2 id="home-v2-battles">Баттлы</h2></div>
+                <div><h2 id="home-v2-battles">Баттлы</h2><p class="hv2-section-description">Соревнуйся и поддерживай участников.</p></div>
                 <div class="hv2-section-head__actions">
                     <div class="hv2-rail-controls" aria-label="Прокрутка баттлов"><button type="button" data-rail-prev aria-label="Назад">←</button><button type="button" data-rail-next aria-label="Вперёд">→</button></div>
                     <a href="{{ route('deels.public.battles.index') }}">Все баттлы <span aria-hidden="true">→</span></a>
@@ -221,7 +213,7 @@
                             <span>{{ number_format($battleCard['stats']['likes'], 0, ',', ' ') }} голосов</span>
                             @if($battleDeadline)<time datetime="{{ $battleDeadline->toDateString() }}">до {{ $battleDeadline->format('d.m') }}</time>@endif
                         </div>
-                        <a class="hv2-card-action" href="{{ $battleCard['url'] }}">Смотреть баттл <span aria-hidden="true">↗</span></a>
+                        <a class="hv2-card-action" href="{{ $battleCard['url'] }}">Смотреть баттл <span aria-hidden="true">→</span></a>
                     </article>
                 @endforeach
             </div>
@@ -239,20 +231,18 @@
             || $homeV2NewStories->isNotEmpty();
     @endphp
 
-    <div class="hv2-stories-group" data-story-tabs>
-        <div class="hv2-shell hv2-stories-heading">
-            <div><span class="hv2-section-kicker">У каждого есть своя история</span><h2>Лента сообщества</h2></div>
-            <div class="hv2-story-tabs" aria-label="Подборки историй">
+    <div class="hv2-shell hv2-section hv2-collection" data-home-tabs>
+        <div class="hv2-collection-heading"><h2>Истории сообщества</h2><p class="hv2-section-description">Смотри, вдохновляйся, делись своим.</p></div>
+            <div class="hv2-tabs" aria-label="Подборки историй">
                 @foreach($homeV2StorySections as $storySection)
                     @if($storySection['items']->isNotEmpty())
-                        <button type="button" data-story-tab="{{ $storySection['id'] }}" aria-pressed="false">{{ $storySection['title'] }}</button>
+                        <button type="button" data-home-tab="{{ $storySection['id'] }}" aria-pressed="false">{{ $storySection['title'] }}</button>
                     @endif
                 @endforeach
             </div>
-        </div>
     @foreach($homeV2StorySections as $storySection)
         @if($storySection['items']->isNotEmpty())
-            <section class="hv2-shell hv2-section hv2-stories hv2-panel {{ $storySection['id'] !== 'top' ? 'hv2-stories--four' : '' }} {{ $storySection['donate'] ? 'hv2-stories--donate' : '' }}" data-story-panel="{{ $storySection['id'] }}" aria-labelledby="home-v2-stories-{{ $storySection['id'] }}">
+            <section class="hv2-collection-panel hv2-stories hv2-panel {{ $storySection['id'] !== 'top' ? 'hv2-stories--four' : '' }} {{ $storySection['donate'] ? 'hv2-stories--donate' : '' }}" data-home-panel="{{ $storySection['id'] }}" aria-labelledby="home-v2-stories-{{ $storySection['id'] }}">
                 <div class="hv2-section-head">
                     <h2 id="home-v2-stories-{{ $storySection['id'] }}">{{ $storySection['title'] }}</h2>
                     <div class="hv2-section-head__actions">
@@ -305,7 +295,7 @@
     @endforeach
 
     @if(!$homeV2HasStories)
-        <section class="hv2-shell hv2-section hv2-stories hv2-panel" aria-labelledby="home-v2-stories-empty">
+        <section class="hv2-collection-panel hv2-stories hv2-panel" aria-labelledby="home-v2-stories-empty">
             <div class="hv2-section-head"><h2 id="home-v2-stories-empty">Сторис сообщества</h2></div>
             <div class="hv2-content-empty">
                 <span aria-hidden="true">▷</span>
@@ -317,40 +307,25 @@
 
     </div>
 
-    <section class="hv2-shell hv2-bank" aria-labelledby="home-v2-bank-title">
-        <div class="hv2-bank__copy"><span class="hv2-section-kicker">Поддержка внутри сообщества</span><h2 id="home-v2-bank-title">Банк DEELS</h2><p>DEELS — внутренняя единица платформы. Условия наград и участия указаны в каждом челлендже.</p></div>
-        <div class="hv2-bank__value">
-            <strong data-bank-counter aria-label="{{ number_format((int) ($bank ?? 0), 0, ',', ' ') }} DEELS">{{ number_format((int) ($bank ?? 0), 0, ',', ' ') }}</strong><span>DEELS в банке</span>
-            <small data-bank-status>Последнее значение</small><button type="button" data-bank-retry hidden>Обновить</button>
-        </div>
-        <div class="hv2-bank__stats"><div><strong>{{ number_format((int) ($challengesCount ?? 0), 0, ',', ' ') }}</strong><span>активных челленджей</span></div><div><strong>{{ number_format((int) ($usersCount ?? 0), 0, ',', ' ') }}</strong><span>пользователей Deels</span></div></div>
-    </section>
-
-    @if($homeV2Directions->isNotEmpty())
-        <section class="hv2-shell hv2-section hv2-directions hv2-panel" aria-labelledby="home-v2-directions">
-            <div class="hv2-section-head"><h2 id="home-v2-directions">Популярные направления</h2></div>
-            <div class="hv2-direction-grid">
-                @foreach($homeV2Directions as $direction)
-                    <a class="hv2-direction" href="{{ route('campaigns.category', $direction->slug) }}">
-                        <span aria-hidden="true">{{ $homeV2DirectionIcons[$loop->index] ?? '✦' }}</span>
-                        <strong>{{ $direction->category_name }}</strong>
-                        <small>{{ number_format((int) ($direction->campaigns_count ?? 0), 0, ',', ' ') }} проектов</small>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
     @php
         $homeV2CampaignSections = [
-            ['id' => 'latest', 'title' => 'Недавно пополненные копилки', 'items' => $homeV2LatestCampaigns, 'url' => route('deels.public.campaigns.index')],
-            ['id' => 'new', 'title' => 'Новые копилки', 'items' => $homeV2NewCampaigns, 'url' => route('deels.public.campaigns.index', ['type' => 'new'])],
+            ['id' => 'latest', 'title' => 'Недавно поддержали', 'items' => $homeV2LatestCampaigns, 'url' => route('deels.public.campaigns.index')],
+            ['id' => 'new', 'title' => 'Новые', 'items' => $homeV2NewCampaigns, 'url' => route('deels.public.campaigns.index', ['type' => 'new'])],
         ];
     @endphp
 
+    <div class="hv2-shell hv2-section hv2-collection" data-home-tabs>
+        <div class="hv2-collection-heading"><h2>Копилки</h2><p class="hv2-section-description">Помоги хорошей идее стать реальностью.</p></div>
+        <div class="hv2-tabs" aria-label="Подборки копилок">
+            @foreach($homeV2CampaignSections as $campaignSection)
+                @if($campaignSection['items']->isNotEmpty())
+                    <button type="button" data-home-tab="{{ $campaignSection['id'] }}" aria-pressed="false">{{ $campaignSection['title'] }}</button>
+                @endif
+            @endforeach
+        </div>
     @foreach($homeV2CampaignSections as $campaignSection)
         @if($campaignSection['items']->isNotEmpty())
-            <section class="hv2-shell hv2-section hv2-funds hv2-panel" aria-labelledby="home-v2-funds-{{ $campaignSection['id'] }}">
+            <section class="hv2-collection-panel hv2-funds hv2-panel" data-home-panel="{{ $campaignSection['id'] }}" aria-labelledby="home-v2-funds-{{ $campaignSection['id'] }}">
                 <div class="hv2-section-head">
                     <h2 id="home-v2-funds-{{ $campaignSection['id'] }}">{{ $campaignSection['title'] }}</h2>
                     <div class="hv2-section-head__actions">
@@ -386,9 +361,41 @@
         @endif
     @endforeach
 
+    @if($homeV2LatestCampaigns->isEmpty() && $homeV2NewCampaigns->isEmpty())
+        <div class="hv2-content-empty"><div><strong>У каждой идеи есть начало</strong><p>Расскажи о своей цели и открой копилку.</p></div><a class="hv2-card-action" href="{{ route('start_campaign') }}">Создать копилку</a></div>
+    @endif
+    @if($homeV2Directions->isNotEmpty())
+        <nav class="hv2-directions" aria-label="Направления копилок">
+                @foreach($homeV2Directions as $direction)
+                    <a class="hv2-direction" href="{{ route('campaigns.category', $direction->slug) }}">
+                        <strong>{{ $direction->category_name }}</strong>
+                        <small>{{ number_format((int) ($direction->campaigns_count ?? 0), 0, ',', ' ') }} проектов</small>
+                    </a>
+                @endforeach
+        </nav>
+    @endif
+
+    </div>
+
+    <section class="hv2-shell hv2-bank" aria-labelledby="home-v2-bank-title">
+        <div class="hv2-bank__copy"><span class="hv2-section-kicker">Поддержка внутри сообщества</span><h2 id="home-v2-bank-title">Банк DEELS</h2><p>DEELS — внутренняя единица платформы. Условия наград и участия указаны в каждом челлендже.</p></div>
+        <div class="hv2-bank__value">
+            <strong data-bank-counter aria-label="{{ number_format((int) ($bank ?? 0), 0, ',', ' ') }} DEELS">{{ number_format((int) ($bank ?? 0), 0, ',', ' ') }}</strong><span>DEELS в банке</span>
+            <small data-bank-status>Последнее значение</small><button type="button" data-bank-retry hidden>Обновить</button>
+        </div>
+        <div class="hv2-bank__stats"><div><strong>{{ number_format((int) ($challengesCount ?? 0), 0, ',', ' ') }}</strong><span>активных челленджей</span></div><div><strong>{{ number_format((int) ($usersCount ?? 0), 0, ',', ' ') }}</strong><span>пользователей Deels</span></div></div>
+    </section>
+
+    <section id="how-it-works" class="hv2-shell hv2-steps hv2-panel" aria-labelledby="home-v2-how">
+        <h2 id="home-v2-how">Как участвовать</h2>
+        <div class="hv2-step"><span>01</span><div><strong>Найди свой вызов</strong><p>Посмотри задание и условия участия.</p></div></div>
+        <div class="hv2-step"><span>02</span><div><strong>Покажи результат</strong><p>Добавь видео или отметку по правилам челленджа.</p></div></div>
+        <div class="hv2-step"><span>03</span><div><strong>Будь частью движения</strong><p>Следи за участниками и поддерживай авторов.</p></div></div>
+    </section>
+
     <section class="hv2-shell hv2-cta" aria-labelledby="home-v2-cta">
-        <div><span class="hv2-section-kicker">Хорошая идея — только начало</span><h2 id="home-v2-cta">Теперь твоя очередь.</h2><p>Делись историями, находи единомышленников и создавай что-то своё.</p></div>
-        <div class="hv2-actions"><a class="hv2-btn hv2-btn--primary" href="{{ route('stories.create') }}">Добавить историю <span aria-hidden="true">+</span></a><a class="hv2-btn" href="{{ route('start_campaign') }}">Создать копилку</a></div>
+        <div><span class="hv2-section-kicker">Хорошая идея — только начало</span><h2 id="home-v2-cta">Есть идея? Дай ей старт.</h2><p>Создай свой челлендж или расскажи историю. Сообщество рядом.</p></div>
+        <div class="hv2-actions"><a class="hv2-btn hv2-btn--primary" href="{{ route('challenges.create') }}">Создать челлендж <span aria-hidden="true">+</span></a><a class="hv2-btn hv2-btn--link" href="{{ route('stories.create') }}">Добавить историю</a></div>
     </section>
 
     @include('stories.modal')

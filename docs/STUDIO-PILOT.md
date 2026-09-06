@@ -45,3 +45,18 @@ The private design preview contains synthetic data and never performs login,
 participation, uploads or payments. It is for reviewing the homepage and three
 challenge states. It does not establish that the VPS is updated or that end-to-end
 payment, moderation and account flows have passed a release check.
+
+## Layout refinement
+
+The homepage and public challenge share a 1280px content width, responsive page
+gutters, type scale and control sizes. Battle cards now follow the main page grid.
+Card titles and descriptions have bounded line counts, while action rows align
+through flex layout. The actual DEELS SVG replaces the CSS lettermark.
+
+Stories and campaigns use the same independent collection switcher. Without
+JavaScript, every collection remains available; with JavaScript, only the selected
+collection is shown. Keyboard navigation and links to a specific collection select
+the correct panel. Campaign categories remain real navigation links. The bank and
+participation explanation follow the main content feed. On the challenge page,
+the task precedes the conditions visually; eligibility, payments and reporting
+actions still come from the existing services.

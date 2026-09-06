@@ -89,7 +89,7 @@
             <div class="contest-overview__content">
                 @if(!empty($deelsStudio))
                     <div class="studio-contest-heading">
-                        <div class="studio-contest-labels"><span class="studio-type-label">Челлендж</span><span class="studio-status {{ $contest->finished ? 'studio-status--finished' : '' }}">{{ $contest->status_title }}</span></div>
+                        <div class="studio-contest-labels"><span class="studio-type-label">{{ $isBattle ? 'Баттл' : 'Челлендж' }}</span><span class="studio-status {{ $contest->finished ? 'studio-status--finished' : '' }}">{{ $contest->status_title }}</span></div>
                         <h1 class="contest-overview__title">{{ $contest->title }}</h1>
                         <a class="studio-author" href="{{ route('user.profile', $contest->user->id) }}">
                             @if($contest->user->avatar_url)<img src="{{ $contest->user->avatar_url }}" width="38" height="38" alt="">@endif
