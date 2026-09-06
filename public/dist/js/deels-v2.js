@@ -125,6 +125,7 @@
   }
 
   function upgradeHeadings() {
+    if (document.body.classList.contains('deels-studio-enabled')) return;
     document.querySelectorAll('h1, h2').forEach(function (heading) {
       if (!heading.closest('header, footer, .chat, .deels-source-home, .source-catalog, .contest-overview, .deels-functional-hub, .deels-campaign-manage')) heading.classList.add('deels-v2-heading');
     });

@@ -10,7 +10,7 @@
 .deels-studio-enabled .studio-challenge .challenge-media::after {background:linear-gradient(180deg,transparent 80%,#15101d70)!important}
 .deels-studio-enabled .studio-challenge .challenge-media img,.deels-studio-enabled .studio-challenge .challenge-media video {object-fit:cover!important;width:100%!important;height:100%!important}
 .deels-studio-enabled .studio-challenge .contest-overview__content {grid-column:2;grid-row:1;min-width:0;display:flex;flex-direction:column;gap:24px}
-.deels-studio-enabled .studio-challenge .contest-overview__title {margin:14px 0 20px!important;font-size:clamp(30px,3.2vw,44px)!important;line-height:1.15!important;letter-spacing:-.03em!important;overflow-wrap:anywhere;font-weight:700!important}
+.deels-studio-enabled .studio-challenge .contest-overview__title {margin:14px 0 20px!important;font-size:clamp(30px,3.2vw,40px)!important;line-height:1.2!important;letter-spacing:-.025em!important;overflow-wrap:anywhere;font-weight:600!important}
 .studio-contest-labels {display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:600}
 .studio-type-label {padding:6px 10px;border-radius:7px;color:var(--studio-purple-dark);background:var(--studio-soft)}
 .studio-status {display:inline-flex;align-items:center;gap:7px;color:#176a4b}
@@ -63,7 +63,7 @@
 .deels-studio-enabled .studio-challenge .challenge-invite-search {color:var(--studio-ink)!important;border-color:var(--studio-line)!important}
 .deels-studio-enabled .studio-challenge .challenge-invite-search::placeholder {color:var(--studio-muted)!important}
 .deels-studio-enabled .studio-challenge .contest-journal {margin-top:56px;padding:0;background:transparent}
-.deels-studio-enabled .studio-challenge .contest-journal__title,.deels-studio-enabled .studio-challenge .challenge-subtitle {margin:0 0 22px!important;font-size:28px!important;font-weight:700!important;line-height:1.2!important;letter-spacing:-.025em;color:var(--studio-ink)!important}
+.deels-studio-enabled .studio-challenge .contest-journal__title,.deels-studio-enabled .studio-challenge .challenge-subtitle {margin:0 0 22px!important;font-size:28px!important;font-weight:600!important;line-height:1.2!important;letter-spacing:-.025em;color:var(--studio-ink)!important}
 .deels-studio-enabled .studio-challenge .challenge-grid:not(.owl-carousel) {display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px!important;justify-content:start!important}
 .deels-studio-enabled .studio-challenge .challenge-card {position:relative!important;aspect-ratio:9 / 16!important;min-height:0!important;width:100%!important;border-radius:17px!important;overflow:hidden!important;border:0!important;box-shadow:none!important;background:#211b2c!important}
 .deels-studio-enabled .studio-challenge .challenge-card > img,.deels-studio-enabled .studio-challenge .challenge-card > video {position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important}

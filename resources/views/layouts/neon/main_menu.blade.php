@@ -1,4 +1,4 @@
-<header>
+<header class="deels-site-header">
     <div class="header">
         <div class="container">
             <a class="header__logo" href="{{route('home')}}" aria-label="DEELS — на главную">

@@ -75,3 +75,20 @@ cross-panel grid placement and frees the full mobile toolbar for its filters.
 Static rendering and CI checks do not establish visual correctness in a browser.
 The current buildless Sites preview has no supported browser QA server; browser
 validation remains outstanding and is not represented as passing.
+
+## Header, footer and typography repair from supplied screenshots
+
+The legacy .header had both position:fixed and 36px vertical padding. It is now
+a normal-flow child of the explicitly named sticky site header: 72px on desktop
+and 64px on mobile, with no inherited padding. White icon assets get a dark
+monochrome treatment on the light controls.
+
+The footer explicitly overrides the old white text, white logo, absolute contact
+positioning and oversized margins. Navigation wraps, contacts remain in flow and
+the original social, document and store destinations are preserved. The legacy
+footer replacement script skips Studio pages, so Laravel retains the same footer
+that the design preview renders.
+
+Studio uses the device system sans-serif stack, normal body tracking and lighter
+heading weights. Legacy JavaScript no longer adds the 900-weight heading class
+on these pages. The existing pages outside Studio keep their previous behavior.
