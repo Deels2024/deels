@@ -1,4 +1,4 @@
-<a href="{{route('campaign_single', $campaign->slug)}}" class="bank__item catalog__content-item">
+<a href="{{route('deels.public.campaigns.show', $campaign->slug)}}" class="bank__item catalog__content-item">
     <div class="campaign_image_in_list_container"
          style="background-image: url('{{ $campaign->feature_img_url()->thumbnail }}');"
     >

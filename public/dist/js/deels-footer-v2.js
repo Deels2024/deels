@@ -2,6 +2,8 @@
   'use strict';
   function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn,{once:true});else fn();}
   ready(function(){
+    // Studio keeps the server-rendered footer and its dynamic links.
+    if(document.body.classList.contains('deels-studio-enabled'))return;
     var footer=document.querySelector('footer.footer');
     if(!footer||footer.dataset.deelsSourceFooter==='1')return;
     footer.dataset.deelsSourceFooter='1';

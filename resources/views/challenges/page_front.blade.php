@@ -1,5 +1,14 @@
 @extends('layouts.neon.app')
 
+@section('body-class', config('homepage.use_v2') ? 'deels-studio-enabled' : '')
+
+@section('page-css')
+    @if(config('homepage.use_v2'))
+        <link rel="stylesheet" href="{{ ext_asset('/dist/css/deels-studio.css') }}">
+        <link rel="stylesheet" href="{{ ext_asset('/dist/css/challenge-studio.css') }}">
+    @endif
+@endsection
+
 @section('title')
     @if(! empty($title))
         {{$title}}
@@ -11,18 +20,18 @@
     <?php
         $participant = $challenge->participant(Auth::user()->id ?? null);
     ?>
-    <div class="catalog">
+    <main class="catalog {{ config('homepage.use_v2') ? 'studio-challenge' : '' }}">
         <div class="container">
+            @if(config('homepage.use_v2'))
+                <nav class="studio-breadcrumb" aria-label="Навигация по разделу"><a href="{{ route('home') }}">Главная</a><span aria-hidden="true">/</span><a href="{{ route('challenges.catalog') }}">Челленджи</a><span aria-hidden="true">/</span><span aria-current="page">Задание</span></nav>
+            @endif
             <div class="account-info">
-                @include('challenges.challenge_data', ['participant' => $participant, 'stories' => $stories, 'route' => route('challenges.catalog')])
+                @include('challenges.challenge_data', ['participant' => $participant, 'stories' => $stories, 'route' => route('challenges.catalog'), 'deelsStudio' => (bool) config('homepage.use_v2')])
             </div>
         </div>
-    </div>
+    </main>
     @include('challenges.modal')
     @include('stories.modal')
-@endsection
-
-@section('page-js')
 @endsection
 
 @push('after_scripts')

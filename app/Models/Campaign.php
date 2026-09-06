@@ -193,6 +193,14 @@ class Campaign extends Model
         return $this->hasMany(Story::class, 'campaign_id', 'id');
     }
 
+    public function latestActiveStory(): HasOne
+    {
+        return $this->hasOne(Story::class, 'campaign_id', 'id')
+            ->withoutGlobalScopes()
+            ->active()
+            ->latestOfMany();
+    }
+
     /** @return false|float|int */
     public function days_left()
     {
@@ -236,7 +244,7 @@ class Campaign extends Model
         $goal = $this->goal;
 
         $percent = 0;
-        if ($raised > 0) {
+        if ($raised > 0 && $goal > 0) {
             $percent = round(($raised * 100) / $goal, 2, \PHP_ROUND_HALF_DOWN);
         }
 
@@ -360,7 +368,7 @@ class Campaign extends Model
 
     public function getUrl()
     {
-        return url(route('campaign_single', $this->slug));
+        return route('deels.public.campaigns.show', ['slug' => $this->slug]);
     }
 
     public function getStatus()

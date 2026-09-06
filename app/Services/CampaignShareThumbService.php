@@ -64,7 +64,7 @@ class CampaignShareThumbService
 
     public function shareUrl(Campaign $campaign): string
     {
-        $url = route('campaign_single', $campaign->slug);
+        $url = route('deels.public.campaigns.show', ['slug' => $campaign->slug]);
 
         if (!empty($campaign->user?->referral_code)) {
             $url .= '?ref='.urlencode($campaign->user->referral_code);

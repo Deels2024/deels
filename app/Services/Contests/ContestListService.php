@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ContestListService
 {
@@ -28,7 +29,13 @@ class ContestListService
         $query = $this->baseQuery(Challenge::query(), 'challenges');
         $this->applyFilters($query, $request, 'challenge_id');
 
-        return $query->with('user')->orderBy('created_at', 'DESC')->paginate(20);
+        return $this->withCardData(
+            $query,
+            !$request->wantsJson(),
+            $request->wantsJson() || $request->input('type') === 'popular'
+        )
+            ->orderBy('created_at', 'DESC')
+            ->paginate(20);
     }
 
     public function contests(Request $request): LengthAwarePaginator
@@ -49,8 +56,10 @@ class ContestListService
         $battleQuery = $this->baseQuery(Battle::query(), 'battles');
         $this->applyFilters($battleQuery, $request, 'battle_id', true);
 
-        $items = $challengeQuery->with('user')->get()
-            ->concat($battleQuery->with('user')->get())
+        $forPublicCards = !$request->wantsJson();
+        $withEngagementCounts = $request->wantsJson() || $request->input('type') === 'popular';
+        $items = $this->withCardData($challengeQuery, $forPublicCards, $withEngagementCounts)->get()
+            ->concat($this->withCardData($battleQuery, $forPublicCards, $withEngagementCounts)->get())
             ->sortByDesc('created_at')
             ->values();
         $perPage = 20;
@@ -70,7 +79,13 @@ class ContestListService
         $query = $this->baseQuery(Battle::query(), 'battles');
         $this->applyFilters($query, $request, 'battle_id', true);
 
-        return $query->with('user')->orderBy('created_at', 'DESC')->paginate(20);
+        return $this->withCardData(
+            $query,
+            !$request->wantsJson(),
+            $request->wantsJson() || $request->input('type') === 'popular'
+        )
+            ->orderBy('created_at', 'DESC')
+            ->paginate(20);
     }
 
     public function formatPaginator(LengthAwarePaginator $items): array
@@ -97,6 +112,27 @@ class ContestListService
             ->whereNull($table . '.blocked_at');
 
         return $this->visibility->applyToContests($query, $table, Auth::user() ?? auth()->user());
+    }
+
+    private function withCardData(
+        Builder $query,
+        bool $forPublicCards,
+        bool $withEngagementCounts
+    ): Builder
+    {
+        $query->with('user');
+
+        if ($withEngagementCounts) {
+            $query->withCount(['views', 'likes', 'comments']);
+        }
+
+        if ($forPublicCards) {
+            $query->with('media')->withCount([
+                'stories as active_stories_count' => static fn (Builder $stories): Builder => $stories->active(),
+            ]);
+        }
+
+        return $query;
     }
 
     private function applyFilters(Builder $query, Request $request, string $storyForeignKey, bool $withoutGlobalScopes = false): void
@@ -142,6 +178,26 @@ class ContestListService
 
         if ($filterType === 'active') {
             $query->where('finished', false);
+        }
+
+        if ($filterType === 'rewarded' && Schema::hasColumn($query->getModel()->getTable(), 'reward_amount')) {
+            $query->where('reward_amount', '>', 0);
+        }
+
+        if ($filterType === 'ending') {
+            $query->where('finished', false)
+                ->whereNotNull('finish')
+                ->where('finish', '>=', now())
+                ->orderBy('finish');
+        }
+
+        if ($filterType === 'new') {
+            $query->where('created_at', '>=', now()->subDays(14));
+        }
+
+        if ($filterType === 'popular') {
+            $query->orderByDesc('views_count')
+                ->orderByDesc('likes_count');
         }
     }
 }

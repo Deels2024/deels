@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-detail-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-feed-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-campaign-detail-source.css')}}"/>
+    <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-platform-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-dashboard-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-create-source.css')}}"/>
     <link rel="stylesheet" href="{{ext_asset('/dist/css/deelsweb-functional-source.css')}}"/>
@@ -55,6 +56,23 @@
     @endif
     @include('layouts/neon/partials/counters')
 </head>
-<body>
+@php
+    $deelsBodyClasses = ['deels-v2-enabled'];
+
+    if (request()->routeIs('home', 'home.v2.preview') || request()->is('home')) {
+        $deelsBodyClasses[] = 'deels-v2-page-home';
+    } elseif (request()->is('stories*')) {
+        $deelsBodyClasses[] = 'deels-v2-page-stories';
+    } elseif (request()->is('battles*') || (request()->is('challenges*') && request()->query('content') === 'battles')) {
+        $deelsBodyClasses[] = 'deels-v2-page-battles';
+    } elseif (request()->is('challenges*')) {
+        $deelsBodyClasses[] = 'deels-v2-page-challenges';
+    } elseif (request()->is('campaign*') || request()->is('campaigns*')) {
+        $deelsBodyClasses[] = 'deels-v2-page-campaigns';
+    } elseif (request()->is('dashboard*')) {
+        $deelsBodyClasses[] = 'deels-v2-page-dashboard';
+    }
+@endphp
+<body class="{{ implode(' ', $deelsBodyClasses) }} @yield('body-class')">
 @include('layouts/neon/partials/header_modal')
 @include('layouts.neon.main_menu')

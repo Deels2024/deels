@@ -41,10 +41,12 @@ class ApiStoryFeedFormatter
 
     public function format($media, $userId): array
     {
+        $this->hydrateViewerState($media, $userId);
         $data = [];
 
         foreach ($media as $mediaItem) {
-            [$isLiked, $isViewed] = $this->viewerState($mediaItem->id, $userId);
+            $isLiked = (bool) $mediaItem->getAttribute('is_liked');
+            $isViewed = (bool) $mediaItem->getAttribute('is_viewed');
 
             $mediaItem->campaign = $mediaItem->campaign();
             $mediaItem->user = $this->accountInfoService->build($mediaItem->user_id, true);
@@ -65,15 +67,46 @@ class ApiStoryFeedFormatter
         return $data;
     }
 
-    private function viewerState($storyId, $userId): array
+    public function hydrateViewerState($media, $userId): void
     {
-        if (!$userId) {
-            return [false, false];
+        $items = $media instanceof \Illuminate\Contracts\Pagination\Paginator
+            ? collect($media->items())
+            : collect($media);
+
+        if ($items->isEmpty()) {
+            return;
         }
 
-        return [
-            Likes::where('story_id', $storyId)->where('user_id', $userId)->exists(),
-            View::where('story_id', $storyId)->where('user_id', $userId)->exists(),
-        ];
+        $alreadyHydrated = $items->every(static function (Story $story): bool {
+            $attributes = $story->getAttributes();
+
+            return array_key_exists('is_liked', $attributes)
+                && array_key_exists('is_viewed', $attributes);
+        });
+        if ($alreadyHydrated) {
+            return;
+        }
+
+        $likedIds = [];
+        $viewedIds = [];
+        if ($userId) {
+            $storyIds = $items->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+            $likedIds = Likes::where('user_id', $userId)
+                ->whereIn('story_id', $storyIds)
+                ->pluck('story_id')
+                ->mapWithKeys(static fn ($id): array => [(int) $id => true])
+                ->all();
+            $viewedIds = View::where('user_id', $userId)
+                ->whereIn('story_id', $storyIds)
+                ->pluck('story_id')
+                ->mapWithKeys(static fn ($id): array => [(int) $id => true])
+                ->all();
+        }
+
+        $items->each(static function (Story $story) use ($likedIds, $viewedIds): void {
+            $storyId = (int) $story->id;
+            $story->setAttribute('is_liked', isset($likedIds[$storyId]));
+            $story->setAttribute('is_viewed', isset($viewedIds[$storyId]));
+        });
     }
 }

@@ -46,7 +46,9 @@
             @endif
         @endif
         <?php
-            $challenge_winners_count = count($challenge->winners);
+            $challenge_winners_count = $challenge->relationLoaded('winners')
+                ? $challenge->winners->count()
+                : $challenge->winners()->count();
         ?>
         @if($challenge_winners_count)
             @if($challenge_winners_count == 1)
@@ -69,7 +71,9 @@
 {{--        </div>--}}
                 <div class="copystories-item__info mt-3">
                     @php
-                        $participants = $challenge->stories()->active()->count();
+                        $participants = array_key_exists('stories_count', $challenge->getAttributes())
+                            ? (int) $challenge->getAttributes()['stories_count']
+                            : $challenge->stories()->active()->count();
                     @endphp
             @if(!$challenge->finished)
 {{--            <div class="btn_pill copystories-info copystories-info--participants">--}}

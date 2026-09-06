@@ -34,6 +34,12 @@ class ChallengeController extends Controller
 
     public function get_challenges(Request $request)
     {
+        // The public /challenges page is a dedicated challenge catalog. Keep the
+        // legacy JSON contract (which may aggregate contests) unchanged.
+        if (!$request->wantsJson() && !$request->filled('content')) {
+            $request->merge(['content' => 'challenges']);
+        }
+
         $listService = app(ContestListService::class);
         $media = $listService->contests($request);
 

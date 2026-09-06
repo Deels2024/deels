@@ -15,6 +15,7 @@ use App\Services\ApiAccountInfoService;
 use App\Services\ApiStoriesFeedService;
 use App\Services\ApiStoryFeedFormatter;
 use App\Services\ApiTokenAuthService;
+use App\Services\Home\DeelsBankService;
 use App\Services\ReferralBonusService;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\Request;
@@ -85,10 +86,10 @@ class ApiController extends Controller
         $user_id = $feed->userId;
         $excludeIds = $feed->excludeIds;
         $requestedPage = $feed->requestedPage;
+        $formatter = app(ApiStoryFeedFormatter::class);
+        $formatter->hydrateViewerState($media, $user_id);
 
         if (request()->wantsJson()) {
-            $formatter = app(ApiStoryFeedFormatter::class);
-
             $html = view('stories.partials.list_items', ['stories' => $media])->render();
             $data = $formatter->format($media, $user_id);
 
@@ -158,8 +159,8 @@ class ApiController extends Controller
             'OrderId' => $orderID,
             'Amount' => $donation_amount * 100,
             'Taxation' => 'usn_income',
-            'SuccessURL' => url('/campaign/'.$campaign->slug),
-            'FailURL' => url('/campaign/'.$campaign->slug),
+            'SuccessURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
+            'FailURL' => route('deels.public.campaigns.show', ['slug' => $campaign->slug]),
             'Receipt' => [
                 'Taxation' => 'usn_income',
                 'Email' => auth()->user()?->email ?? $user->email ?? 'anon@email.ru',
@@ -299,25 +300,11 @@ class ApiController extends Controller
         return $helper->twitch_status();
     }
 
-    public function coins_bank()
+    public function coins_bank(DeelsBankService $bank)
     {
-        $deels_bank_user = \App\Models\User::where('email', 'moderdeels@mail.ru')->first();
-        $transactions_total = \Bavix\Wallet\Models\Transaction::where('meta', 'like', '%"get":"coins","old_connected"%')->sum('amount');
-        if ($deels_bank_user) {
-            $deels_wallet_balance = intval($deels_bank_user->wallet_balance ?? 0);
-            $bank = intval($deels_wallet_balance - intval($transactions_total));
-            //                                    $bank = $deels_wallet_balance;
-            if ($bank < 0) {
-                $bank = 0;
-            }
-        } else {
-            $bank = intval(10000000 - $transactions_total);
-        }
-        $bank = str_pad(strval($bank), 8, '0', STR_PAD_LEFT);
-
         return response()->json([
             'success' => true,
-            'count' => $bank,
+            'count' => $bank->formattedBalance(),
         ]);
     }
 

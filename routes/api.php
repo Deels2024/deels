@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\ActionsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CampaignsController;
+use App\Http\Controllers\Api\HomePageController;
 use App\Http\Controllers\PaymentCommentController;
 use App\Http\Controllers\UserController;
 use App\Models\Mailing;
@@ -30,6 +31,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/auth_token', 'Api\ApiController@create_token');
 Route::get('/vk_auth/link', 'Api\AuthController@vk_auth_link');
+Route::get('/v1/home', HomePageController::class)->name('api.v1.home');
 Route::post('/vk_auth', 'Api\AuthController@vk_authenticate');
 Route::post('/apple_auth', 'Api\AuthController@apple_authenticate');
 Route::post('/yandex_auth', 'Api\AuthController@yandex_authenticate');

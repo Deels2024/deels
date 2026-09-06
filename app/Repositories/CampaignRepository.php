@@ -83,7 +83,7 @@ class CampaignRepository
                          ->whereNotIn('id', $except)
                          ->orderBy('created_at', 'desc')
                          ->take($count)
-                         ->get(['campaigns.*', 'media.slug_ext'])
+                         ->get(['campaigns.*'])
         );
     }
 
@@ -92,7 +92,7 @@ class CampaignRepository
         return $this
             ->campaign
             ->active()
-            ->with('user', 'success_payments', 'feature_media')
+            ->with('user', 'success_payments', 'feature_media', 'get_category', 'latestActiveStory.media', 'latestActiveStory.user')
             ->withSum('success_payments', 'amount');
     }
 }
