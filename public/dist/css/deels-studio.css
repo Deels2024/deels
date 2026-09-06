@@ -1,0 +1,57 @@
+/* Foundations for the Home V2 and challenge pilot. Scoped to these pages. */
+body.deels-studio-enabled {
+  --studio-ink:#211b2c; --studio-muted:#706979; --studio-purple:#7135c8;
+  --studio-purple-dark:#542499; --studio-line:#e8e4ed; --studio-soft:#f2edf8;
+  --studio-bg:#faf9fc; --studio-radius:20px;
+  background:var(--studio-bg)!important; color:var(--studio-ink)!important;
+  font-family:Gilroy,Arial,sans-serif; font-size:16px; line-height:1.5;
+}
+.deels-studio-enabled *, .deels-studio-enabled *::before, .deels-studio-enabled *::after {box-sizing:border-box}
+.deels-studio-enabled .background, .deels-studio-enabled .background__filter {background:none!important}
+.deels-studio-enabled .background::before, .deels-studio-enabled .background::after {display:none!important}
+.deels-studio-enabled :is(a,button,input,select,textarea):focus-visible {outline:3px solid #9d6ada!important;outline-offset:4px}
+.deels-studio-enabled button,.deels-studio-enabled input {font:inherit}
+.deels-studio-enabled [hidden] {display:none!important}
+.deels-studio-enabled > header {top:0!important}
+.deels-studio-enabled .header {background:#fff!important;backdrop-filter:none!important}
+.deels-studio-enabled .header > .container {width:min(1320px,calc(100% - 80px))!important;max-width:none!important;gap:36px!important;height:80px!important}
+.deels-studio-enabled .header__logo::before {background:var(--studio-purple);box-shadow:none;transform:none;border-radius:12px 12px 12px 4px}
+.deels-studio-enabled .header__logo::after {letter-spacing:-.04em;font-size:23px}
+.deels-studio-enabled .header__brand-pill {display:none}
+.deels-studio-enabled .header__list ul {gap:28px!important}
+.deels-studio-enabled .header__list a {font-size:15px!important;font-weight:600!important}
+.deels-studio-enabled .deels-source-create {background:var(--studio-purple)!important;box-shadow:none!important;border-radius:12px!important;min-height:44px!important;font-size:15px!important}
+.deels-studio-enabled .deels-source-create:hover {background:var(--studio-purple-dark)!important;transform:none}
+.deels-studio-enabled :is(.header__icon,.header-chat__btn,.header_profile,.header-balance__btn,#menuOpen) {background:#f5f3f8!important;width:44px!important;height:44px!important;min-width:44px!important}
+.deels-studio-enabled .header__menu-list a {display:block;padding:9px 0;font-size:17px}
+.deels-studio-enabled .header__menu {overscroll-behavior:contain}
+.deels-studio-enabled .footer {background:#fff!important;border-top:1px solid var(--studio-line)!important;padding-top:38px!important}
+.deels-studio-enabled .footer .container {width:min(1320px,calc(100% - 80px))!important;max-width:none!important}
+.deels-studio-enabled .footer__menu {gap:24px!important}
+.deels-studio-enabled .footer__list a {font-size:14px!important}
+.deels-studio-enabled .footer__items,.deels-studio-enabled .footer__href {font-size:13px!important;color:var(--studio-muted)!important}
+.deels-studio-enabled .deels-v2-heading {color:inherit;text-shadow:none}
+.deels-studio-enabled :is(.home-v2,.studio-challenge) [id] {scroll-margin-top:100px}
+.hv2-section-kicker {display:block;color:var(--studio-muted);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.5}
+.studio-breadcrumb {display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 26px;color:var(--studio-muted);font-size:14px}
+.studio-breadcrumb a {color:inherit;text-decoration:none}
+.studio-breadcrumb a:hover {color:var(--studio-purple)}
+@media(max-width:1100px) {
+ .deels-studio-enabled .header > .container {width:calc(100% - 48px)!important;gap:22px!important}
+ .deels-studio-enabled .header__list ul {gap:18px!important}
+}
+@media(max-width:860px) {
+ .deels-studio-enabled .header > .container {gap:12px!important;height:68px!important;min-height:68px!important}
+ .deels-studio-enabled .footer .container {width:calc(100% - 40px)!important}
+}
+@media(max-width:520px) {
+ .deels-studio-enabled .header > .container {width:calc(100% - 32px)!important}
+ .deels-studio-enabled .header__icons {gap:6px!important}
+ .deels-studio-enabled .header__logo {min-width:105px!important}
+ .deels-studio-enabled .header__logo::after {font-size:20px}
+ .deels-studio-enabled .header__logo::before {width:32px;height:32px;font-size:18px}
+ .deels-studio-enabled .header__search {display:none!important}
+}
+@media(prefers-reduced-motion:reduce) {
+ .deels-studio-enabled *, .deels-studio-enabled *::before, .deels-studio-enabled *::after {scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}

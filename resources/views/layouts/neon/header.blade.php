@@ -73,6 +73,6 @@
         $deelsBodyClasses[] = 'deels-v2-page-dashboard';
     }
 @endphp
-<body class="{{ implode(' ', $deelsBodyClasses) }}">
+<body class="{{ implode(' ', $deelsBodyClasses) }} @yield('body-class')">
 @include('layouts/neon/partials/header_modal')
 @include('layouts.neon.main_menu')

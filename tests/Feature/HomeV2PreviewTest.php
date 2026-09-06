@@ -26,10 +26,12 @@ class HomeV2PreviewTest extends TestCase
         $service = $this->createMock(HomePageDataService::class);
         $service->expects($this->never())->method('get');
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionCode(403);
-
-        (new HomeController())->previewV2($request, $service);
+        try {
+            (new HomeController())->previewV2($request, $service);
+            $this->fail('Non-admin preview must be forbidden.');
+        } catch (HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
     }
 
     public function testFullAdminCanPreviewV2WhilePublicFlagIsDisabled(): void

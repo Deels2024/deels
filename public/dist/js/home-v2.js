@@ -17,7 +17,7 @@
     }
 
     function railStep(rail) {
-        var first = rail.firstElementChild;
+        var first = rail.querySelector(':scope > :not([hidden])');
         if (!first) {
             return Math.max(rail.clientWidth * 0.8, 260);
         }
@@ -108,59 +108,95 @@
         status.classList.toggle('is-offline', Boolean(offline));
     }
 
-    function setBankValue(value) {
-        var digits = String(Math.max(0, parseInt(value, 10) || 0)).padStart(8, '0').slice(-8).split('');
-        var nodes = root.querySelectorAll('[data-bank-counter] .hv2-counter__digit');
-
-        nodes.forEach(function (node, index) {
-            if (node.textContent === digits[index]) {
-                return;
-            }
-
-            node.textContent = digits[index];
-            node.classList.remove('is-changing');
-            void node.offsetWidth;
-            node.classList.add('is-changing');
-        });
-
-        var counter = root.querySelector('[data-bank-counter]');
-        if (counter) {
-            counter.setAttribute('aria-label', new Intl.NumberFormat('ru-RU').format(parseInt(value, 10) || 0) + ' DEELS');
+    var tabs = root.querySelector('[data-story-tabs]');
+    if (tabs) {
+        var tabButtons = Array.from(tabs.querySelectorAll('[data-story-tab]'));
+        function selectStoryTab(button) {
+            var key = button.getAttribute('data-story-tab');
+            tabButtons.forEach(function (item) {
+                item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+            });
+            tabs.querySelectorAll('[data-story-panel]').forEach(function (panel) {
+                panel.hidden = panel.getAttribute('data-story-panel') !== key;
+                if (panel.hidden) {
+                    panel.querySelectorAll('video').forEach(function (video) { video.pause(); });
+                } else {
+                    var rail = panel.querySelector('[data-rail]');
+                    if (rail) rail.dispatchEvent(new Event('scroll'));
+                }
+            });
+        }
+        if (tabButtons.length) {
+            tabs.classList.add('is-enhanced');
+            selectStoryTab(tabButtons[0]);
+            tabButtons.forEach(function (button, index) {
+                button.addEventListener('click', function () { selectStoryTab(button); });
+                button.addEventListener('keydown', function (event) {
+                    var nextIndex;
+                    if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
+                    else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+                    else if (event.key === 'Home') nextIndex = 0;
+                    else if (event.key === 'End') nextIndex = tabButtons.length - 1;
+                    else return;
+                    event.preventDefault();
+                    tabButtons[nextIndex].focus();
+                    selectStoryTab(tabButtons[nextIndex]);
+                });
+            });
         }
     }
 
+    function setBankValue(value) {
+        var counter = root.querySelector('[data-bank-counter]');
+        if (counter) {
+            var formatted = new Intl.NumberFormat('ru-RU').format(value);
+            counter.textContent = formatted;
+            counter.setAttribute('aria-label', formatted + ' DEELS');
+        }
+    }
+
+    var bankInFlight = false;
+    var bankRetry = root.querySelector('[data-bank-retry]');
     function refreshBank() {
         var url = root.getAttribute('data-bank-url');
-        if (!url || document.hidden) {
-            return;
-        }
+        if (!url || document.hidden || bankInFlight || root.getAttribute('data-preview') === 'true') return;
 
+        bankInFlight = true;
+        if (bankRetry) bankRetry.hidden = true;
         setBankStatus('Обновляем данные…', false);
-
+        var controller = new AbortController();
+        var timeout = window.setTimeout(function () { controller.abort(); }, 10000);
         fetch(url, {
             headers: {'Accept': 'application/json'},
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            signal: controller.signal
         })
             .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Bank request failed');
-                }
+                if (!response.ok) throw new Error('Bank request failed');
                 return response.json();
             })
             .then(function (data) {
-                if (data && typeof data.count !== 'undefined') {
-                    setBankValue(data.count);
-                    setBankStatus('Данные обновлены только что', false);
+                var count = data && data.count;
+                if ((typeof count !== 'number' && typeof count !== 'string') || String(count).trim() === '' ||
+                    !Number.isSafeInteger(Number(count)) || Number(count) < 0) {
+                    throw new Error('Invalid bank balance');
                 }
+                setBankValue(Number(count));
+                setBankStatus('Данные обновлены', false);
             })
             .catch(function () {
-                // The server-rendered value stays visible when live refresh is unavailable.
+                // Preserve the last server-rendered value; never invent a fallback balance.
                 setBankStatus('Показано последнее значение', true);
+                if (bankRetry) bankRetry.hidden = false;
+            })
+            .finally(function () {
+                bankInFlight = false;
+                window.clearTimeout(timeout);
             });
     }
-
+    if (bankRetry) bankRetry.addEventListener('click', refreshBank);
     refreshBank();
-    window.setInterval(refreshBank, 10000);
+    window.setInterval(refreshBank, 60000);
 
     if (!reduceMotion && !saveData) {
         root.querySelectorAll('.hv2-ratio video').forEach(function (video) {
