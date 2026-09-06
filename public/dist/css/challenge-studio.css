@@ -61,7 +61,7 @@
 .deels-studio-enabled .studio-challenge .challenge-invite-search::placeholder {color:var(--studio-muted)!important}
 .deels-studio-enabled .studio-challenge .contest-journal {margin-top:46px;padding:0;background:transparent}
 .deels-studio-enabled .studio-challenge .contest-journal__title,.deels-studio-enabled .studio-challenge .challenge-subtitle {margin:0 0 22px!important;font-size:28px!important;font-weight:700!important;line-height:1.2!important;letter-spacing:-.025em;color:var(--studio-ink)!important}
-.deels-studio-enabled .studio-challenge .challenge-grid {display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px!important;justify-content:start!important}
+.deels-studio-enabled .studio-challenge .challenge-grid:not(.owl-carousel) {display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:20px!important;justify-content:start!important}
 .deels-studio-enabled .studio-challenge .challenge-card {position:relative!important;aspect-ratio:9 / 16!important;min-height:0!important;width:100%!important;border-radius:17px!important;overflow:hidden!important;border:0!important;box-shadow:none!important;background:#211b2c!important}
 .deels-studio-enabled .studio-challenge .challenge-card > img,.deels-studio-enabled .studio-challenge .challenge-card > video {position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important}
 .deels-studio-enabled .studio-challenge .challenge-card__head {position:absolute!important;left:12px!important;right:12px!important;top:12px!important;z-index:2!important;display:flex!important;align-items:center!important;gap:8px!important;padding:7px 10px!important;border-radius:11px!important;background:#171020a6!important;color:#fff!important;min-height:0!important}
@@ -94,7 +94,7 @@
  .deels-studio-enabled .studio-challenge .contest-description-wrap {grid-column:1;grid-row:4}
  .deels-studio-enabled .studio-challenge .contest-overview__actions {grid-column:1;grid-row:5}
  .deels-studio-enabled .studio-challenge .contest-overview__title {font-size:34px!important;margin-bottom:18px!important}
- .deels-studio-enabled .studio-challenge .challenge-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+ .deels-studio-enabled .studio-challenge .challenge-grid:not(.owl-carousel) {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
  .deels-studio-enabled .studio-challenge .contest-journal__title {font-size:26px!important}
 }
 @media(max-width:400px) {
