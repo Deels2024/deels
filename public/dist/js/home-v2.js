@@ -28,31 +28,33 @@
     }
 
     function bindRail(panel) {
-        var rail = panel.querySelector('[data-rail]');
+        var rails = Array.from(panel.querySelectorAll('[data-rail]'));
         var previous = panel.querySelector('[data-rail-prev]');
         var next = panel.querySelector('[data-rail-next]');
+        if (!previous || !next) return;
 
-        if (!rail || !previous || !next) {
-            return;
+        function activeRail() {
+            return rails.find(function (rail) { return !rail.closest('[hidden]'); });
         }
 
         function updateControls() {
-            var max = Math.max(0, rail.scrollWidth - rail.clientWidth);
+            var rail = activeRail();
+            var max = rail ? Math.max(0, rail.scrollWidth - rail.clientWidth) : 0;
             var hasOverflow = max > 3;
             previous.disabled = !hasOverflow || rail.scrollLeft <= 3;
             next.disabled = !hasOverflow || rail.scrollLeft >= max - 3;
             previous.parentElement.hidden = !hasOverflow;
         }
 
-        previous.addEventListener('click', function () {
-            rail.scrollBy({left: -railStep(rail), behavior: reduceMotion ? 'auto' : 'smooth'});
+        function scrollRail(direction) {
+            var rail = activeRail();
+            if (rail) rail.scrollBy({left: direction * railStep(rail), behavior: reduceMotion ? 'auto' : 'smooth'});
+        }
+        previous.addEventListener('click', function () { scrollRail(-1); });
+        next.addEventListener('click', function () { scrollRail(1); });
+        rails.forEach(function (rail) {
+            rail.addEventListener('scroll', updateControls, {passive: true});
         });
-
-        next.addEventListener('click', function () {
-            rail.scrollBy({left: railStep(rail), behavior: reduceMotion ? 'auto' : 'smooth'});
-        });
-
-        rail.addEventListener('scroll', updateControls, {passive: true});
         window.addEventListener('resize', updateControls, {passive: true});
         updateControls();
     }
@@ -112,6 +114,8 @@
         var tabButtons = Array.from(tabs.querySelectorAll('[data-home-tab]'));
         function selectCollectionTab(button) {
             var key = button.getAttribute('data-home-tab');
+            var catalog = tabs.querySelector('[data-collection-catalog]');
+            if (catalog) catalog.href = button.getAttribute('data-catalog-url');
             tabButtons.forEach(function (item) {
                 item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
             });

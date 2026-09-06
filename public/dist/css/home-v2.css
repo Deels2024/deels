@@ -12,7 +12,7 @@
 .hv2-hero {display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center;gap:40px;padding:36px 40px;background:#eeebfa;border:1px solid #e7e1f5;border-radius:24px}
 .hv2-kicker {margin-bottom:16px;color:var(--studio-purple-dark);font-size:13px;line-height:1.4;font-weight:600}
 .home-v2 .hv2-hero h1 {font-size:clamp(38px,4.1vw,56px);font-weight:700;line-height:1.08;letter-spacing:-.04em}
-.hv2-hero h1 span {color:var(--studio-purple)}
+.home-v2 .hv2-hero h1 span {color:var(--studio-purple)}
 .hv2-hero__copy > p {max-width:470px;margin-top:18px;color:#625d71;font-size:16px;line-height:1.6}
 .hv2-actions {display:flex;align-items:center;flex-wrap:wrap;gap:12px}
 .hv2-hero .hv2-actions {margin-top:24px}
@@ -77,19 +77,18 @@
 .hv2-battle-card__meta strong {flex-basis:100%;color:var(--studio-purple);font-size:15px}
 .hv2-battle-card__waiting {display:flex;min-height:100%;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:16px;color:#d5ccdf;text-align:center}
 .hv2-battle-card__waiting img {border-radius:50%;object-fit:cover}
-/* With JS, each collection has one title, one set of filters and a stable rail. */
-.hv2-collection {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 24px}
-.hv2-collection-heading {grid-column:1 / -1}
-.hv2-tabs {grid-column:1 / -1;min-width:0}
-.hv2-collection-panel {grid-column:1 / -1;min-width:0}
-.hv2-collection > .hv2-content-empty {grid-column:1 / -1}
-.hv2-collection.is-enhanced .hv2-collection-heading {grid-column:1;grid-row:1}
-.hv2-collection.is-enhanced .hv2-tabs {grid-row:2}
-.hv2-collection.is-enhanced .hv2-collection-panel {display:contents}
-.hv2-collection.is-enhanced .hv2-collection-panel .hv2-section-head {grid-column:2;grid-row:1;align-self:center;margin:0}
-.hv2-collection.is-enhanced .hv2-collection-panel .hv2-section-head > h2 {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.hv2-collection.is-enhanced .hv2-collection-panel .hv2-rail {grid-column:1 / -1;grid-row:3}
+/* Keep collection layout in normal flow; switching only hides a complete panel. */
+.hv2-collection-toolbar {display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px;min-width:0}
+.hv2-collection-toolbar .hv2-tabs {flex:1;min-width:0}
+.hv2-collection-toolbar .hv2-rail-controls {flex-shrink:0}
+.hv2-collection-panel {position:relative;min-width:0}
+.hv2-collection-panel + .hv2-collection-panel {margin-top:24px}
+.hv2-collection.is-enhanced .hv2-collection-panel {margin-top:0}
+.home-v2 .hv2-panel-title {font-size:18px;margin:0 0 16px}
+.hv2-collection.is-enhanced .hv2-panel-title {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hv2-collection-toolbar:not(:has(button[data-home-tab])) {display:none}
 .hv2-tabs:not(:has(button)) {display:none}
+.home-v2 .hv2-link-compact {display:none}
 .hv2-rail--stories {grid-auto-columns:calc((100% - 80px) / 5)}
 .hv2-story-card {min-width:0}
 .hv2-story-card__media {border-radius:var(--studio-radius)}
@@ -111,7 +110,7 @@
 .hv2-fund-card__row {display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .hv2-fund-card__row b {color:var(--studio-purple);font-size:15px}
 .hv2-fund-card__row small {color:var(--studio-muted);font-size:12px}
-.hv2-directions {display:flex;grid-column:1 / -1;flex-wrap:wrap;gap:8px}
+.hv2-directions {display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
 .hv2-direction {display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:8px 14px;border:1px solid var(--studio-line);border-radius:24px;background:#fff}
 .hv2-direction strong {font-size:13px;font-weight:600}
 .hv2-direction small {font-size:12px;color:var(--studio-muted)}
@@ -199,19 +198,17 @@
  .hv2-section-head {gap:12px;margin-bottom:20px;align-items:flex-start}
  .home-v2 h2 {font-size:25px}
  .home-v2 .hv2-section-description {font-size:14px;margin-top:6px}
- .hv2-section-head__actions > a {font-size:12px;gap:6px;min-height:34px}
+ .hv2-section-head__actions > a {font-size:14px;gap:6px;min-height:40px}
+ .home-v2 .hv2-link-full {display:none}
+ .home-v2 .hv2-link-compact {display:inline}
+ .hv2-collection-toolbar {margin-bottom:16px}
  .hv2-rail {grid-auto-columns:76%;gap:16px}
  .hv2-rail--stories {grid-auto-columns:44%}
  .hv2-rail--battles {grid-auto-columns:90%}
  .hv2-challenge-card__body,.hv2-fund-card__body {padding:16px}
  .hv2-challenge-card h3 {font-size:20px}
  .hv2-filters {margin-bottom:16px}
- .hv2-filters button,.hv2-tabs button {padding-inline:14px;font-size:13px}
- .hv2-collection {gap:16px 12px}
- .hv2-collection.is-enhanced .hv2-collection-heading {grid-column:1 / -1}
- .hv2-collection.is-enhanced .hv2-tabs {grid-column:1;grid-row:2}
- .hv2-collection.is-enhanced .hv2-collection-panel .hv2-section-head {grid-column:2;grid-row:2}
- .hv2-collection.is-enhanced .hv2-collection-panel .hv2-rail {grid-row:3}
+ .hv2-filters button,.hv2-tabs button {padding-inline:14px;font-size:14px}
  .hv2-direction {padding:8px 12px;gap:8px}
  .hv2-bank {padding:24px 20px;gap:24px 16px;margin-top:36px}
  .hv2-bank__value > strong {font-size:28px}

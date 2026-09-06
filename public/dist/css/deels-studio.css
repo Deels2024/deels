@@ -13,6 +13,13 @@ body.deels-studio-enabled {
 .deels-studio-enabled :is(a,button,input,select,textarea):focus-visible {outline:3px solid #9d6ada!important;outline-offset:4px}
 .deels-studio-enabled button,.deels-studio-enabled input {font:inherit}
 .deels-studio-enabled [hidden] {display:none!important}
+/* app.min.css treats heading spans as absolute, blurred decorative duplicates.
+   In Studio they are real content and must remain in normal document flow. */
+.deels-studio-enabled :is(.home-v2,.studio-challenge) :is(h1,h2,h3) span {
+ position:static;inset:auto;display:inline;filter:none;transform:none;
+ color:inherit;background:none;text-shadow:none;
+}
+
 .deels-studio-enabled > header {top:0!important}
 .deels-studio-enabled .header {height:auto!important;min-height:0!important;background:#fff!important;backdrop-filter:none!important}
 .deels-studio-enabled .header > .container {width:var(--studio-width)!important;max-width:none!important;gap:32px!important;height:76px!important}

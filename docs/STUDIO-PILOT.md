@@ -60,3 +60,18 @@ the correct panel. Campaign categories remain real navigation links. The bank an
 participation explanation follow the main content feed. On the challenge page,
 the task precedes the conditions visually; eligibility, payments and reporting
 actions still come from the existing services.
+
+## Regression repair
+
+The legacy base stylesheet applies absolute positioning and blur to every span
+inside h1/h2/h3. Studio headings now explicitly reset those properties in their
+scoped foundation; heading text must never be treated as a decorative duplicate.
+
+Collections now keep the heading, toolbar and selected rail in normal document
+flow. The shared arrows target the visible rail, and the catalogue link follows
+the selected collection. No collection layout uses display:contents. This avoids
+cross-panel grid placement and frees the full mobile toolbar for its filters.
+
+Static rendering and CI checks do not establish visual correctness in a browser.
+The current buildless Sites preview has no supported browser QA server; browser
+validation remains outstanding and is not represented as passing.

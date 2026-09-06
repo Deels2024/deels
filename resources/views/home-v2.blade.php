@@ -118,7 +118,7 @@
                             <button type="button" data-rail-next aria-label="Следующие челленджи">→</button>
                         </div>
                     @endif
-                    <a href="{{ route('challenges.catalog') }}">Смотреть все <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('challenges.catalog') }}" aria-label="Все челленджи"><span class="hv2-link-full">Все челленджи</span><span class="hv2-link-compact" aria-hidden="true">Все</span><span aria-hidden="true">→</span></a>
                 </div>
             </div>
             @if($homeV2TopChallenges->isNotEmpty())
@@ -178,7 +178,7 @@
                 <div><h2 id="home-v2-battles">Баттлы</h2><p class="hv2-section-description">Соревнуйся и поддерживай участников.</p></div>
                 <div class="hv2-section-head__actions">
                     <div class="hv2-rail-controls" aria-label="Прокрутка баттлов"><button type="button" data-rail-prev aria-label="Назад">←</button><button type="button" data-rail-next aria-label="Вперёд">→</button></div>
-                    <a href="{{ route('deels.public.battles.index') }}">Все баттлы <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('deels.public.battles.index') }}" aria-label="Все баттлы"><span class="hv2-link-full">Все баттлы</span><span class="hv2-link-compact" aria-hidden="true">Все</span><span aria-hidden="true">→</span></a>
                 </div>
             </div>
             <div class="hv2-rail hv2-rail--battles" data-rail>
@@ -231,28 +231,25 @@
             || $homeV2NewStories->isNotEmpty();
     @endphp
 
-    <div class="hv2-shell hv2-section hv2-collection" data-home-tabs>
-        <div class="hv2-collection-heading"><h2>Истории сообщества</h2><p class="hv2-section-description">Смотри, вдохновляйся, делись своим.</p></div>
+    <section class="hv2-shell hv2-section hv2-collection hv2-panel" data-home-tabs>
+        <div class="hv2-section-head">
+            <div class="hv2-collection-heading"><h2>Истории сообщества</h2><p class="hv2-section-description">Смотри, вдохновляйся, делись своим.</p></div>
+            <div class="hv2-section-head__actions"><a data-collection-catalog href="{{ route('stories.catalog') }}" aria-label="Все истории"><span class="hv2-link-full">Все истории</span><span class="hv2-link-compact" aria-hidden="true">Все</span><span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="hv2-collection-toolbar">
             <div class="hv2-tabs" aria-label="Подборки историй">
                 @foreach($homeV2StorySections as $storySection)
                     @if($storySection['items']->isNotEmpty())
-                        <button type="button" data-home-tab="{{ $storySection['id'] }}" aria-pressed="false">{{ $storySection['title'] }}</button>
+                        <button type="button" data-home-tab="{{ $storySection['id'] }}" data-catalog-url="{{ $storySection['url'] }}" aria-pressed="false">{{ $storySection['title'] }}</button>
                     @endif
                 @endforeach
             </div>
+            <div class="hv2-rail-controls" aria-label="Прокрутка историй"><button type="button" data-rail-prev aria-label="Предыдущие истории">←</button><button type="button" data-rail-next aria-label="Следующие истории">→</button></div>
+        </div>
     @foreach($homeV2StorySections as $storySection)
         @if($storySection['items']->isNotEmpty())
-            <section class="hv2-collection-panel hv2-stories hv2-panel {{ $storySection['id'] !== 'top' ? 'hv2-stories--four' : '' }} {{ $storySection['donate'] ? 'hv2-stories--donate' : '' }}" data-home-panel="{{ $storySection['id'] }}" aria-labelledby="home-v2-stories-{{ $storySection['id'] }}">
-                <div class="hv2-section-head">
-                    <h2 id="home-v2-stories-{{ $storySection['id'] }}">{{ $storySection['title'] }}</h2>
-                    <div class="hv2-section-head__actions">
-                        <div class="hv2-rail-controls" aria-label="Прокрутка раздела {{ $storySection['title'] }}">
-                            <button type="button" data-rail-prev aria-label="Назад">←</button>
-                            <button type="button" data-rail-next aria-label="Вперёд">→</button>
-                        </div>
-                        <a href="{{ $storySection['url'] }}">Смотреть все <span aria-hidden="true">→</span></a>
-                    </div>
-                </div>
+            <section class="hv2-collection-panel hv2-stories" data-home-panel="{{ $storySection['id'] }}" aria-labelledby="home-v2-stories-{{ $storySection['id'] }}">
+                <h3 class="hv2-panel-title" id="home-v2-stories-{{ $storySection['id'] }}">{{ $storySection['title'] }}</h3>
                 <div class="hv2-rail hv2-rail--stories" data-rail>
                     @foreach($storySection['items'] as $story)
                         @php
@@ -305,7 +302,7 @@
         </section>
     @endif
 
-    </div>
+    </section>
 
     @php
         $homeV2CampaignSections = [
@@ -314,25 +311,25 @@
         ];
     @endphp
 
-    <div class="hv2-shell hv2-section hv2-collection" data-home-tabs>
-        <div class="hv2-collection-heading"><h2>Копилки</h2><p class="hv2-section-description">Помоги хорошей идее стать реальностью.</p></div>
+    <section class="hv2-shell hv2-section hv2-collection hv2-panel" data-home-tabs>
+        <div class="hv2-section-head">
+            <div class="hv2-collection-heading"><h2>Копилки</h2><p class="hv2-section-description">Помоги хорошей идее стать реальностью.</p></div>
+            <div class="hv2-section-head__actions"><a data-collection-catalog href="{{ route('deels.public.campaigns.index') }}" aria-label="Все копилки"><span class="hv2-link-full">Все копилки</span><span class="hv2-link-compact" aria-hidden="true">Все</span><span aria-hidden="true">→</span></a></div>
+        </div>
+        <div class="hv2-collection-toolbar">
         <div class="hv2-tabs" aria-label="Подборки копилок">
             @foreach($homeV2CampaignSections as $campaignSection)
                 @if($campaignSection['items']->isNotEmpty())
-                    <button type="button" data-home-tab="{{ $campaignSection['id'] }}" aria-pressed="false">{{ $campaignSection['title'] }}</button>
+                    <button type="button" data-home-tab="{{ $campaignSection['id'] }}" data-catalog-url="{{ $campaignSection['url'] }}" aria-pressed="false">{{ $campaignSection['title'] }}</button>
                 @endif
             @endforeach
         </div>
+            <div class="hv2-rail-controls" aria-label="Прокрутка копилок"><button type="button" data-rail-prev aria-label="Предыдущие копилки">←</button><button type="button" data-rail-next aria-label="Следующие копилки">→</button></div>
+        </div>
     @foreach($homeV2CampaignSections as $campaignSection)
         @if($campaignSection['items']->isNotEmpty())
-            <section class="hv2-collection-panel hv2-funds hv2-panel" data-home-panel="{{ $campaignSection['id'] }}" aria-labelledby="home-v2-funds-{{ $campaignSection['id'] }}">
-                <div class="hv2-section-head">
-                    <h2 id="home-v2-funds-{{ $campaignSection['id'] }}">{{ $campaignSection['title'] }}</h2>
-                    <div class="hv2-section-head__actions">
-                        <div class="hv2-rail-controls" aria-label="Прокрутка копилок"><button type="button" data-rail-prev aria-label="Назад">←</button><button type="button" data-rail-next aria-label="Вперёд">→</button></div>
-                        <a href="{{ $campaignSection['url'] }}">Посмотреть все <span aria-hidden="true">→</span></a>
-                    </div>
-                </div>
+            <section class="hv2-collection-panel hv2-funds" data-home-panel="{{ $campaignSection['id'] }}" aria-labelledby="home-v2-funds-{{ $campaignSection['id'] }}">
+                <h3 class="hv2-panel-title" id="home-v2-funds-{{ $campaignSection['id'] }}">{{ $campaignSection['title'] }}</h3>
                 <div class="hv2-rail hv2-rail--funds" data-rail>
                     @foreach($campaignSection['items'] as $campaign)
                         @php
@@ -375,7 +372,7 @@
         </nav>
     @endif
 
-    </div>
+    </section>
 
     <section class="hv2-shell hv2-bank" aria-labelledby="home-v2-bank-title">
         <div class="hv2-bank__copy"><span class="hv2-section-kicker">Поддержка внутри сообщества</span><h2 id="home-v2-bank-title">Банк DEELS</h2><p>DEELS — внутренняя единица платформы. Условия наград и участия указаны в каждом челлендже.</p></div>
